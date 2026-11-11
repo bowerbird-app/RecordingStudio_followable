@@ -1,24 +1,32 @@
 # frozen_string_literal: true
 
-RecordingStudio.configure do |config|
-  # Registered delegated_type recordables (strings or classes)
-  config.recordable_types = [ "Workspace", "Folder", "Page" ]
+RecordingStudioFollowable.configure do |config|
+  config.allowed_parent_types = [ "Workspace" ]
+end
 
-  # Require each configured ActiveRecord type to call recording_studio_recordable.
+RecordingStudio.configure do |config|
+  config.recordable_types = [ "Workspace", "Folder", "Page", "RecordingStudioFollowable::Follow" ]
+
   config.require_recordable_declarations = true
 
-  # Shown in the shared default layout title fallback.
-  config.app_name = "Addon Template" if config.respond_to?(:app_name=)
+  config.app_name = "Followable" if config.respond_to?(:app_name=)
 
-  # Actor resolver for events when no actor is explicitly supplied
   config.actor = -> { Current.actor }
 
-  # Emit ActiveSupport::Notifications events
   config.event_notifications_enabled = true
 
-  # Idempotency behavior for log_event!
-  config.idempotency_mode = :return_existing # or :raise
+  config.idempotency_mode = :return_existing
 
-  # Recordable duplication strategy for revisions
   config.recordable_dup_strategy = :dup
+
+  config.authorize_write = lambda do |actor:, recordable:, parent_recording:, **|
+    next false if actor.blank?
+    next true if parent_recording.nil?
+    next true unless defined?(RecordingStudioAccessible)
+
+    role = recordable.is_a?(RecordingStudioFollowable::Follow) ? :view : :edit
+    next true if RecordingStudioAccessible.authorized?(actor: actor, recording: parent_recording, role: role)
+
+    RecordingStudioAccessible::AccessGrantList.rows_for(parent_recording).none?
+  end
 end

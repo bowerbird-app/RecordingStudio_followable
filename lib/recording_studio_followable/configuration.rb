@@ -2,21 +2,17 @@
 
 module RecordingStudioFollowable
   class Configuration
-    attr_accessor :api_key, :enable_feature_x, :timeout
+    attr_accessor :allowed_parent_types
     attr_reader :hooks
 
     def initialize
-      @api_key = ENV.fetch("RECORDING_STUDIO_FOLLOWABLE_API_KEY", nil)
-      @enable_feature_x = false
-      @timeout = 5
+      @allowed_parent_types = ["Workspace"]
       @hooks = RecordingStudio::Hooks.new
     end
 
     def to_h
       {
-        api_key: api_key,
-        enable_feature_x: enable_feature_x,
-        timeout: timeout,
+        allowed_parent_types: allowed_parent_types,
         hooks_registered: hooks.instance_variable_get(:@registry).transform_values(&:size)
       }
     end

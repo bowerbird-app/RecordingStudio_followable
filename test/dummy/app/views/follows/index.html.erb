@@ -1,0 +1,35 @@
+<% dummy_page_nav(title: "Following", back_url: root_path) %>
+
+<div class="flex w-full flex-col gap-6">
+  <%= render FlatPack::PageTitle::Component.new(
+    title: "Following",
+    subtitle: "Pages this workspace is watching.",
+    variant: :h1
+  ) %>
+
+  <% if @follows.blank? %>
+    <p class="text-sm leading-6">Nothing on the list yet. Open a page and hit Follow.</p>
+  <% else %>
+    <div class="flex flex-col gap-4">
+      <% @follows.each do |follow_recording| %>
+        <%= render FlatPack::Card::Component.new do |card| %>
+          <% card.body do %>
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <p class="text-sm leading-6"><%= follow_target_title(follow_recording) %></p>
+              <%= form_with url: main_app.follow_path(follow_recording), method: :delete, local: true do %>
+                <%= hidden_field_tag :root_id, @follow_root.id %>
+                <%= hidden_field_tag :target_id, follow_recording.recordable.target_recording_id %>
+                <%= render FlatPack::Button::Component.new(
+                  text: "Stop following",
+                  type: :submit,
+                  style: :ghost,
+                  size: :sm
+                ) %>
+              <% end %>
+            </div>
+          <% end %>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+</div>

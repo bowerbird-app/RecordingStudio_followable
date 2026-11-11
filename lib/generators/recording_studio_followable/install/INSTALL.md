@@ -1,14 +1,10 @@
 ===============================================================================
 
-RecordingStudioFollowable has been installed successfully!
+RecordingStudioFollowable has been installed.
 
-The engine has been mounted at /recording_studio_followable in your application.
+The engine is mounted at /recording_studio_followable.
 
-If you use Tailwind CSS:
-1. Run 'bin/rails tailwindcss:build' to rebuild your CSS with RecordingStudioFollowable styles
-
-To use the engine:
-1. Start your Rails server
-2. Visit http://localhost:3000/recording_studio_followable
+Add RecordingStudioFollowable::Follow to recordable_types, enable Followable
+and FollowParent on the right models, then install migrations.
 
 ===============================================================================

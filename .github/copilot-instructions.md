@@ -5,7 +5,7 @@
 - This repository is the Recording Studio followable addon, a Rails mountable engine.
 - Preserve engine namespace isolation under `RecordingStudioFollowable` unless the task is explicitly about renaming the gem.
 - Treat `docs/gem_template/` as architectural reference material from the original template. For current addon workflow, prefer the top-level README and the dummy app.
-- Keep changes small and scoped. Do not invent a follow API unless the request requires it.
+- Keep changes small and scoped. Public follow helpers live on `RecordingStudioFollowable`.
 
 ## UI Conventions
 

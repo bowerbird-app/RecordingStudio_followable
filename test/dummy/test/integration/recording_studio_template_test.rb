@@ -5,15 +5,16 @@ require "test_helper"
 class RecordingStudioTemplateTest < ActiveSupport::TestCase
   test "dummy app loads root switchable config and controller support" do
     assert_equal [ "all_workspaces" ], RecordingStudioRootSwitchable.configuration.scopes.keys
-    assert_equal :application_layout, RecordingStudioRootSwitchable.configuration.layout
+    assert_equal "recording_studio/default_layout", RecordingStudioRootSwitchable.configuration.layout
     assert_includes ApplicationController.ancestors, RecordingStudio::RootSwitchable::ControllerSupport
-    assert_includes ApplicationController.ancestors, RecordingStudio::UsesDefaultLayout
+    refute defined?(RecordingStudio::UsesDefaultLayout)
   end
 
   test "dummy app validates recordable declarations" do
     assert RecordingStudio.validate_recordable_declarations!
     assert_equal [ "Workspace" ], RecordingStudio.root_recordable_types
     assert_equal [ "Workspace", "Folder" ], RecordingStudio.allowed_parent_types_for("Page")
+    assert_equal [ "Workspace" ], RecordingStudio.allowed_parent_types_for("RecordingStudioFollowable::Follow")
   end
 
   test "dummy app schema keeps accessible grants and excludes removed core tables" do
@@ -70,9 +71,10 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     refute File.exist?(RecordingStudioFollowable::Engine.root.join("lib/recording_studio_followable/capabilities/example.rb"))
 
     assert RecordingStudio.capability_enabled?(:accessible, for: Workspace)
+    assert RecordingStudio.capability_enabled?(:follow_parent, for: Workspace)
+    assert RecordingStudio.capability_enabled?(:followable, for: Page)
     refute RecordingStudio.capability_enabled?(:accessible, for: Folder)
     refute RecordingStudio.capability_enabled?(:accessible, for: Page)
     refute RecordingStudio.capability_enabled?(:example, for: Workspace)
-    assert_includes ApplicationController.ancestors, RecordingStudio::UsesDefaultLayout
   end
 end

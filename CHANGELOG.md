@@ -7,9 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Fixed
-- Config loading no longer uses empty `rescue` bodies, so RuboCop `Lint/SuppressedException` stays clean while missing host config still boots.
-- The install initializer calls `RecordingStudioFollowable.configure` without an empty block.
+## [0.2.0] - 2026-11-11
+
+### Added
+- `RecordingStudioFollowable::Follow` recordable. It stores `target_recording_id` under a host root.
+- `follow`, `unfollow`, `follows`, and `followers` services, plus matching API capability actions (`:followable` on the target, `:follow_parent` on the root). MCP uses the same actions.
+- `RecordingStudioFollowable.notify_followers` (Ruby only). Notifications set `recording` to the Follow, `root_recording` to the Follow's root, and `notifiable` to that root's recordable. Recipients are direct Accessible grants on that root.
+- Dummy follow button, following list, ping action, and Notifications inbox.
+
+### Changed
+- Requires Recording Studio 6.3 or newer and pins Notifications `~> 0.14.9`.
+
+### Upgrade notes
+- Bump to `0.2.0`. Run the followable and notifications migrations.
+- Add `RecordingStudioFollowable::Follow` to `recordable_types`.
+- Include `Followable` on types people follow and `FollowParent` on roots that store follows.
+- Register a `:root` notification type before calling `notify_followers`.
+- Point `authorize_write` (and Follow trash) at Accessible `:view` on the follow root if anyone with access should manage Follows.
+- Do not call `notify_followers` over the API. It is host Ruby only.
+- Inherited Accessible grants are not notified in v1.
+- Keep `title` and `body` free of secrets. Inbox access is the Follow root, not the followed item.
 
 ## [0.1.0] - 2026-11-11
 
@@ -20,5 +37,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Notes
 - Follow features are coming soon. This version does not ship a follow API, models, or public helpers.
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_followable/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_followable/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/bowerbird-app/RecordingStudio_followable/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/bowerbird-app/RecordingStudio_followable/releases/tag/v0.1.0

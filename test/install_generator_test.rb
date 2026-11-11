@@ -152,8 +152,8 @@ class InstallGeneratorTest < Minitest::Test
 
     assert_includes install_guide, "bin/rails generate recording_studio_followable:migrations"
     assert_includes install_guide, "bin/rails db:migrate"
-    assert_includes install_guide, "auth, layout, and current actor integration"
-    assert_includes install_guide, "recording_studio_recordable"
+    assert_includes install_guide, "notify_followers"
+    assert_includes install_guide, "Followable"
     refute_includes install_guide, "RecordingStudio v3"
   end
 

@@ -2,8 +2,8 @@
 
 <div class="flex w-full flex-col gap-6">
   <%= render FlatPack::PageTitle::Component.new(
-    title: "Followable",
-    subtitle: "This dummy app proves the followable engine boots in a host. Follow features are coming soon.",
+    title: "Keep an eye on a page",
+    subtitle: "Follow from this workspace. News lands in this workspace inbox.",
     variant: :h1
   ) %>
 
@@ -11,85 +11,81 @@
     <%= render FlatPack::Card::Component.new do |card| %>
       <% card.header do %>
         <%= render FlatPack::PageTitle::Component.new(
-          title: "What's working",
-          subtitle: "Host wiring already present in this dummy app.",
+          title: @page&.title || "Getting Started",
+          subtitle: "A page in Studio Workspace. Follow it from whichever workspace you have open.",
           variant: :h3,
           class: "mb-0 pb-0"
         ) %>
       <% end %>
 
       <% card.body do %>
-        <ul class="space-y-3 text-sm leading-6">
-          <li>The followable engine loads in this host app.</li>
-          <li>The dummy app exercises authentication, the Recording Studio default layout, and FlatPack.</li>
-        </ul>
+        <% if @page_recording && @follow_root && RecordingStudioAccessible.authorized?(actor: current_user, recording: @page_recording, role: :view) && RecordingStudioAccessible.authorized?(actor: current_user, recording: @follow_root, role: :view) %>
+          <%= render RecordingStudioFollowable::FollowButtonComponent.new(
+            target: @page_recording,
+            root: @follow_root,
+            following: @following,
+            follow_url: main_app.follows_path,
+            unfollow_url: @following ? main_app.follow_path(@following) : main_app.follows_path
+          ) %>
+        <% else %>
+          <p class="text-sm leading-6">Open a workspace you can use, then you can follow this page.</p>
+        <% end %>
+      <% end %>
+
+      <% if @page.present? %>
+        <% card.footer do %>
+          <div class="flex flex-wrap gap-3">
+            <%= render FlatPack::Button::Component.new(
+              text: "Open page",
+              style: :ghost,
+              size: :md,
+              href: main_app.page_path(@page)
+            ) %>
+            <% if @following %>
+              <%= form_with url: notify_followers_page_path(@page), method: :post, local: true do %>
+                <%= hidden_field_tag :event_key, "dummy-home-#{@page.id}" %>
+                <%= render FlatPack::Button::Component.new(
+                  text: "Ping followers",
+                  type: :submit,
+                  style: :secondary,
+                  size: :md
+                ) %>
+              <% end %>
+            <% end %>
+          </div>
+        <% end %>
       <% end %>
     <% end %>
 
     <%= render FlatPack::Card::Component.new do |card| %>
       <% card.header do %>
         <%= render FlatPack::PageTitle::Component.new(
-          title: "Coming soon",
-          subtitle: "Follow behavior is not in this release.",
+          title: "This workspace is following",
+          subtitle: "Stored with the open workspace, even when the page lives elsewhere.",
           variant: :h3,
           class: "mb-0 pb-0"
         ) %>
       <% end %>
 
       <% card.body do %>
-        <p class="text-sm leading-6">
-          This gem will add following for recordings. There is no follow API, model, or helper to call yet.
-        </p>
-      <% end %>
-    <% end %>
-
-    <%= render FlatPack::Card::Component.new do |card| %>
-      <% card.header do %>
-        <%= render FlatPack::PageTitle::Component.new(
-          title: "FlatPack usage",
-          subtitle: "This page uses FlatPack components for its primary UI structure.",
-          variant: :h3,
-          class: "mb-0 pb-0"
-        ) %>
-      <% end %>
-
-      <% card.body do %>
-        <p class="text-sm leading-6 text-(--surface-content-color)">
-          Use FlatPack cards, buttons, badges, inputs, and layout primitives as the default path for addon UI. Keep raw HTML for simple semantic content only.
-        </p>
+        <% if @follows.blank? %>
+          <p class="text-sm leading-6">Nothing on the list yet. Follow a page to fill it.</p>
+        <% else %>
+          <ul class="space-y-3 text-sm leading-6">
+            <% @follows.each do |follow_recording| %>
+              <li><%= follow_target_title(follow_recording) %></li>
+            <% end %>
+          </ul>
+        <% end %>
       <% end %>
 
       <% card.footer do %>
-        <a href="https://github.com/bowerbird-app/flatpack"
-           target="_blank"
-           rel="noopener noreferrer"
-           class="inline-flex">
-          <%= render FlatPack::Button::Component.new(
-            text: "View FlatPack documentation",
-            style: :primary,
-            size: :md
-          ) %>
-        </a>
-      <% end %>
-    <% end %>
-
-    <%= render FlatPack::Card::Component.new do |card| %>
-      <% card.header do %>
-        <%= render FlatPack::PageTitle::Component.new(
-          title: "Install flow",
-          subtitle: "What the host app generator path covers.",
-          variant: :h3,
-          class: "mb-0 pb-0"
+        <%= render FlatPack::Button::Component.new(
+          text: "See the full list",
+          style: :ghost,
+          size: :md,
+          href: main_app.follows_path
         ) %>
-      <% end %>
-
-      <% card.body do %>
-        <ul class="space-y-3 text-sm leading-6">
-          <li>Add the gem to your host app and run <code>bundle install</code>.</li>
-          <li>Run <code>rails generate recording_studio_followable:install</code> to mount the engine and add configuration.</li>
-          <li>Run <code>rails generate recording_studio_followable:migrations</code> after follow tables exist.</li>
-          <li>Rebuild Tailwind if needed with <code>bin/rails tailwindcss:build</code>.</li>
-        </ul>
       <% end %>
     <% end %>
   </div>

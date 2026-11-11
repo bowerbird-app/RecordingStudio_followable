@@ -1,0 +1,23 @@
+<% if following? %>
+  <%= form_with url: unfollow_url, method: :delete, local: true do %>
+    <%= hidden_field_tag :root_id, root.id %>
+    <%= hidden_field_tag :target_id, target.id %>
+    <%= render FlatPack::Button::Component.new(
+      text: "Following",
+      type: :submit,
+      style: :secondary,
+      size: :md
+    ) %>
+  <% end %>
+<% else %>
+  <%= form_with url: follow_url, method: :post, local: true do %>
+    <%= hidden_field_tag :root_id, root.id %>
+    <%= hidden_field_tag :target_id, target.id %>
+    <%= render FlatPack::Button::Component.new(
+      text: "Follow",
+      type: :submit,
+      style: :primary,
+      size: :md
+    ) %>
+  <% end %>
+<% end %>

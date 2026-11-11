@@ -4,9 +4,13 @@
 
 - Ruby 3.3 or newer
 - Rails 8.1 or newer
-- Recording Studio 4.x (`~> 4.2` in the gemspec; dummy GitHub tag `v4.7.1`)
-- Accessible dummy tag `v0.18.0`, Trashable dummy tag `v0.11.0` (`require: false`), Root Switchable dummy tag `v0.10.0`, and Metrics dummy tag `v0.3.1`
-- FlatPack dummy tag `v0.1.331`
+- Recording Studio 6.3 or newer (dummy GitHub tag `v6.6.0`)
+- Accessible dummy tag `v0.27.0`
+- Trashable dummy tag `v0.12.3`
+- Notifications dummy tag `v0.14.9`
+- Root Switchable dummy tag `v0.14.0`
+- Metrics dummy tag `v0.7.3`
+- FlatPack dummy tag `v0.1.341`
 
 ## Verification
 

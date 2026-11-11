@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module RecordingStudioFollowable
-  class Engine < ::Rails::Engine
+  class Engine < ::Rails::Engine # rubocop:disable Metrics/ClassLength
     isolate_namespace RecordingStudioFollowable
 
     class << self
@@ -121,6 +121,18 @@ module RecordingStudioFollowable
           RecordingStudioFollowable::Engine.apply_controller_extensions(controller)
         end
       end
+    end
+
+    initializer "recording_studio_followable.register_api" do
+      config.after_initialize do
+        RecordingStudioFollowable::Api.register!
+      end
+    end
+
+    config.to_prepare do
+      engine_root = RecordingStudioFollowable::Engine.root
+      load engine_root.join("lib/recording_studio_followable/capabilities/followable.rb")
+      load engine_root.join("lib/recording_studio_followable/capabilities/follow_parent.rb")
     end
   end
 end

@@ -6,6 +6,11 @@ require "devise/test/integration_helpers"
 class RootSwitchDropdownTest < ActionDispatch::IntegrationTest
   include Devise::Test::IntegrationHelpers
 
+  setup do
+    load Rails.root.join("db/seeds.rb")
+    @admin = User.find_by!(email: "admin@admin.com")
+  end
+
   test "sign in page uses the devise layout and is not squished by the default layout" do
     get new_user_session_path
 
@@ -28,8 +33,7 @@ class RootSwitchDropdownTest < ActionDispatch::IntegrationTest
 
     workspace = Workspace.create!(name: "Dropdown Workspace")
     other_workspace = Workspace.create!(name: "Zzz Switch Target")
-    RecordingStudio.root_recording_for(workspace)
-    RecordingStudio.root_recording_for(other_workspace)
+    own_roots(user, workspace, other_workspace)
 
     get root_path
 
@@ -49,7 +53,7 @@ class RootSwitchDropdownTest < ActionDispatch::IntegrationTest
     sign_in user
 
     workspace = Workspace.create!(name: "Switch Page Workspace")
-    RecordingStudio.root_recording_for(workspace)
+    own_roots(user, workspace)
 
     get "/recording_studio_root_switchable/v1/root_switch?scope=all_workspaces"
 
@@ -68,8 +72,8 @@ class RootSwitchDropdownTest < ActionDispatch::IntegrationTest
 
     source_workspace = Workspace.create!(name: "Source Workspace")
     target_workspace = Workspace.create!(name: "Target Workspace")
+    own_roots(user, source_workspace, target_workspace)
     target_root_recording = RecordingStudio.root_recording_for(target_workspace)
-    RecordingStudio.root_recording_for(source_workspace)
 
     patch "/recording_studio_root_switchable/v1/root_switch", params: {
       scope: "all_workspaces",
@@ -92,8 +96,8 @@ class RootSwitchDropdownTest < ActionDispatch::IntegrationTest
 
     source_workspace = Workspace.create!(name: "Fallback Source Workspace")
     target_workspace = Workspace.create!(name: "Fallback Target Workspace")
+    own_roots(user, source_workspace, target_workspace)
     target_root_recording = RecordingStudio.root_recording_for(target_workspace)
-    RecordingStudio.root_recording_for(source_workspace)
 
     patch "/recording_studio_root_switchable/v1/root_switch", params: {
       scope: "all_workspaces",
@@ -104,6 +108,29 @@ class RootSwitchDropdownTest < ActionDispatch::IntegrationTest
     }
 
     assert_redirected_to "/"
+  end
+
+  def own_roots(user, *workspaces)
+    previous = Current.actor
+    Current.actor = @admin
+    (Workspace.all.to_a | workspaces).uniq.each do |workspace|
+      recording = RecordingStudio.root_recording_for(workspace)
+      next if RecordingStudioAccessible.authorized?(actor: user, recording: recording, role: :view)
+
+      result = if RecordingStudioAccessible::AccessGrantList.rows_for(recording).none?
+        RecordingStudioAccessible.bootstrap_owner_access!(recording: recording, actor: user)
+      else
+        RecordingStudioAccessible.grant_access(
+          recording: recording,
+          actor: user,
+          role: :view,
+          manager_actor: @admin
+        )
+      end
+      raise result.error if result.failure?
+    end
+  ensure
+    Current.actor = previous
   end
 
   def patch_switch_form?(form, label)
