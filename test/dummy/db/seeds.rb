@@ -71,7 +71,7 @@ begin
   )
   raise studio_view.error if studio_view.failure?
 
-  unless Rails.env.test?
+  if Rails.env.development? && ENV["CI"].blank?
     extra_roots = [root_recording, accessible_root_recording]
     30.times do |index|
       extra_page = Page.find_or_create_by!(title: "Followed page #{format('%02d', index + 1)}")
@@ -91,4 +91,6 @@ puts "Seeded: Workspace '#{workspace.name}' with root recording ##{root_recordin
 puts "Seeded: Workspace '#{accessible_workspace.name}' with root recording ##{accessible_root_recording.id}"
 puts "Seeded: Workspace '#{private_workspace.name}' with root recording ##{private_root_recording.id}"
 puts "Seeded: Folder '#{folder.name}' and page '#{page.title}'"
-puts "Seeded: 30 extra pages followed from Studio and Client workspaces" unless Rails.env.test?
+if Rails.env.development? && ENV["CI"].blank?
+  puts "Seeded: 30 extra pages followed from Studio and Client workspaces"
+end

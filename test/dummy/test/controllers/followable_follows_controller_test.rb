@@ -110,7 +110,8 @@ class FollowableFollowsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "index is empty when the current root follows nothing" do
-    switch_to_client_workspace
+    private_root = RecordingStudio.root_recording_for(Workspace.find_by!(name: "Private Workspace"))
+    switch_to_workspace(private_root)
 
     get recording_studio_followable.follows_path
 
@@ -137,7 +138,9 @@ class FollowableFollowsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "index paginates newest first and the next frame returns the rest" do
-    switch_to_client_workspace
+    list_root = RecordingStudio.root_recording_for(Workspace.create!(name: "Follow list #{SecureRandom.hex(4)}"))
+    RecordingStudioAccessible.bootstrap_owner_access!(recording: list_root, actor: @admin)
+    switch_to_workspace(list_root)
     studio = RecordingStudio.root_recording_for(Workspace.find_by!(name: "Studio Workspace"))
     titles = %w[Alpha Bravo Charlie]
     titles.each do |title|
@@ -148,7 +151,7 @@ class FollowableFollowsControllerTest < ActionDispatch::IntegrationTest
         root_recording: studio,
         parent_recording: studio
       ).recording
-      RecordingStudioFollowable.follow(target: recording, root: @client, actor: @admin)
+      RecordingStudioFollowable.follow(target: recording, root: list_root, actor: @admin)
     end
     RecordingStudioFollowable.configuration.page_size = 2
 
@@ -178,12 +181,16 @@ class FollowableFollowsControllerTest < ActionDispatch::IntegrationTest
   private
 
   def switch_to_client_workspace
+    switch_to_workspace(@client)
+  end
+
+  def switch_to_workspace(root)
     return unless defined?(RecordingStudioRootSwitchable)
 
     patch "/recording_studio_root_switchable/v1/root_switch", params: {
       scope: "all_workspaces",
       root_switch: {
-        root_recording_id: @client.id,
+        root_recording_id: root.id,
         return_to: "/"
       }
     }
