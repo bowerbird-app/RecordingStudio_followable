@@ -243,6 +243,9 @@ class RecordingStudioFollowableTest < Minitest::Test
 
     assert_equal 1, view_source.scan('title: "Following"').length
     refute_includes view_source, 'dummy_page_nav(title: "Following"'
+    refute_includes view_source, "Pages this workspace is watching."
+    assert_includes view_source, "follow_target_url("
+    assert_includes view_source, "follow_button("
   end
 
   def test_dummy_does_not_ship_template_starter_docs

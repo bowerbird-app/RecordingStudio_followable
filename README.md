@@ -42,7 +42,7 @@ include RecordingStudio::Capabilities::FollowParent.to
 ```
 
 5. Let Accessible `:view` on the follow root create and trash Follows. Dummy `authorize_write` treats Follow creates as `:view`. Trashable on Follow also uses `:view`.
-6. Mount the engine (`generate recording_studio_followable:install` does this). Then render `follow_button(recording)` on a host page. The helper uses the current root and actor, and the button updates in place over Turbo. Without JavaScript it redirects back.
+6. Mount the engine (`generate recording_studio_followable:install` does this). Then render `follow_button(recording)` on a host page. The helper uses the current root and actor, and the button updates in place over Turbo. Without JavaScript it redirects back. `follow_target_url(recording)` is the path for a followed item. It uses `polymorphic_path` on the recordable. Set `config.followed_url` when the host path is different.
 7. Register a Notifications type with `scope: :root` before you call `notify_followers`. Dummy registers `:followed_update`.
 8. Register the followed type and the root type with Recording Studio API so `follow`, `unfollow`, `followers`, and `follows` appear. Do not register `notify_followers`. Recording Studio MCP exposes the same capability actions once the host pins a MCP gem that accepts your API version. MCP 0.28.0 still requires API `< 0.18`, so this dummy pins API 0.19 without MCP.
 
@@ -91,10 +91,12 @@ Dummy screenshots from this version:
 
 ![Follow](docs/screenshots/follow-button.png)
 ![Following, with Unfollow open](docs/screenshots/following-button.png)
+![Following list](docs/screenshots/follows-list.png)
 ![Inbox notice](docs/screenshots/notification-inbox.png)
 
 - Home: one title and `follow_button` for Getting Started
 - Following dropdown: Unfollow with `minus-circle`
+- `/follows`: titles link to the page, each row uses `follow_button`
 - `/notifications`: inbox from Recording Studio Notifications
 
 Alice (`alice@example.com`), Bob, and Charlie share Client Workspace. Getting Started lives in Studio Workspace.

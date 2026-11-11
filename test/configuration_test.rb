@@ -32,7 +32,15 @@ class ConfigurationTest < Minitest::Test
     configuration = RecordingStudioFollowable::Configuration.new
 
     assert_equal ["Workspace"], configuration.allowed_parent_types
+    assert_nil configuration.followed_url
     assert_instance_of RecordingStudio::Hooks, configuration.hooks
+  end
+
+  def test_merge_updates_followed_url
+    resolver = ->(recording) { "/items/#{recording.id}" }
+    @configuration.merge!(followed_url: resolver)
+
+    assert_equal resolver, @configuration.followed_url
   end
 
   def test_merge_accepts_string_keys

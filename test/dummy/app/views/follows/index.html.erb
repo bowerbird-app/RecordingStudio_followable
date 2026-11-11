@@ -3,7 +3,6 @@
 <div class="flex w-full flex-col gap-6">
   <%= render FlatPack::PageTitle::Component.new(
     title: "Following",
-    subtitle: "Pages this workspace is watching.",
     variant: :h1
   ) %>
 
@@ -12,11 +11,19 @@
   <% else %>
     <div class="flex flex-col gap-4">
       <% @follows.each do |follow_recording| %>
+        <% target = follow_recording.recordable.target_recording %>
         <%= render FlatPack::Card::Component.new do |card| %>
           <% card.body do %>
             <div class="flex flex-wrap items-center justify-between gap-3">
-              <p class="text-sm leading-6"><%= follow_target_title(follow_recording) %></p>
-              <%= follow_button(follow_recording.recordable.target_recording) %>
+              <% url = follow_target_url(target) %>
+              <% if url.present? %>
+                <%= render FlatPack::Link::Component.new(href: url, class: "text-sm leading-6") do %>
+                  <%= follow_target_title(follow_recording) %>
+                <% end %>
+              <% else %>
+                <p class="text-sm leading-6"><%= follow_target_title(follow_recording) %></p>
+              <% end %>
+              <%= follow_button(target) %>
             </div>
           <% end %>
         <% end %>

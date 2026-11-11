@@ -157,6 +157,8 @@ class InstallGeneratorTest < Minitest::Test
     assert_includes install_guide, "notify_followers"
     assert_includes install_guide, "Followable"
     assert_includes install_guide, "follow_button(recording)"
+    assert_includes install_guide, "follow_target_url(recording)"
+    assert_includes install_guide, "config.followed_url"
     refute_includes install_guide, "RecordingStudio v3"
   end
 

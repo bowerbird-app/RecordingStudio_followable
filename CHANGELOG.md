@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `follow`, `unfollow`, `follows`, and `followers` services, plus matching API capability actions (`:followable` on the target, `:follow_parent` on the root). MCP uses the same actions.
 - `RecordingStudioFollowable.notify_followers` (Ruby only). Notifications set `recording` to the Follow, `root_recording` to the Follow's root, and `notifiable` to that root's recordable. Recipients are direct Accessible grants on that root.
 - Dummy Following list, ping action, and Notifications inbox, using the gem `follow_button` helper.
+- `follow_target_url(recording)` plus optional `config.followed_url`. Default is `polymorphic_path` on the followed recordable. Dummy Following rows link titles and reuse `follow_button`.
 - Engine `follows` routes and `follow_button(recording)`. Follow is a Flatpack button with `plus-circle`. Following is a Flatpack dropdown with `check-circle` and Unfollow (`minus-circle`). Turbo Stream replaces the button. HTML redirects back.
 
 ### Changed
@@ -27,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Register a `:root` notification type before calling `notify_followers`.
 - Point `authorize_write` (and Follow trash) at Accessible `:view` on the follow root if anyone with access should manage Follows.
 - Mount the engine and call `follow_button(recording)` for the turnkey button.
+- Optional `config.followed_url` when `follow_target_url` cannot use `polymorphic_path`.
 - Do not call `notify_followers` over the API. It is host Ruby only.
 - Inherited Accessible grants are not notified in v1.
 - Keep `title` and `body` free of secrets. Inbox access is the Follow root, not the followed item.

@@ -19,6 +19,7 @@ class FollowButtonHelperTest < ActionView::TestCase
 
   teardown do
     Current.actor = nil
+    RecordingStudioFollowable.configuration.followed_url = nil
   end
 
   test "follow_button renders Follow when the root is not following" do
@@ -46,6 +47,16 @@ class FollowButtonHelperTest < ActionView::TestCase
     end
 
     assert_nil follow_button(@page_recording, root: @client, actor: stranger)
+  end
+
+  test "follow_target_url uses polymorphic_path on the recordable" do
+    assert_equal page_path(@page), follow_target_url(@page_recording)
+  end
+
+  test "follow_target_url uses config.followed_url when set" do
+    RecordingStudioFollowable.configuration.followed_url = ->(_recording) { "/custom-page" }
+
+    assert_equal "/custom-page", follow_target_url(@page_recording)
   end
 
   def current_user

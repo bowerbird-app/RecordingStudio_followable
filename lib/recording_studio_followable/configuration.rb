@@ -2,11 +2,12 @@
 
 module RecordingStudioFollowable
   class Configuration
-    attr_accessor :allowed_parent_types
+    attr_accessor :allowed_parent_types, :followed_url
     attr_reader :hooks
 
     def initialize
       @allowed_parent_types = ["Workspace"]
+      @followed_url = nil
       @hooks = RecordingStudio::Hooks.new
     end
 
