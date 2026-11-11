@@ -2,10 +2,10 @@
 
 ## Architecture
 
-- This repository is a Rails mountable engine template for building Recording Studio addons.
-- Preserve engine namespace isolation under `GemTemplate` unless the task is explicitly about renaming the gem.
-- Treat `docs/gem_template/` as architectural reference material. For current addon workflow, prefer the top-level README and the dummy app.
-- Keep changes small and scoped. Do not rewrite template surfaces unless the request requires it.
+- This repository is the Recording Studio followable addon, a Rails mountable engine.
+- Preserve engine namespace isolation under `RecordingStudioFollowable` unless the task is explicitly about renaming the gem.
+- Treat `docs/gem_template/` as architectural reference material from the original template. For current addon workflow, prefer the top-level README and the dummy app.
+- Keep changes small and scoped. Do not invent a follow API unless the request requires it.
 
 ## UI Conventions
 
@@ -23,10 +23,10 @@
 
 - The standard root validation command is `bundle exec rake test` from the repository root.
 - If a change affects dummy app boot, assets, or migrations, also validate the dummy app setup the same way CI does.
-- Add focused regression tests for engine hooks, generators, Recording Studio integration points, and template UX changes.
+- Add focused regression tests for engine hooks, generators, Recording Studio integration points, and dummy host UX changes.
 
 ## Repo Conventions
 
 - Keep internal dependency assumptions intact unless the request explicitly asks to change private gem infrastructure.
-- Update docs when template behavior or setup steps change.
+- Update docs when addon behavior or setup steps change.
 - Prefer existing generator, service, and hook patterns over introducing a parallel abstraction.

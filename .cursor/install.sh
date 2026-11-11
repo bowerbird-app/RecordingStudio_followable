@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# Cloud Agent install hook for the RecordingStudio gem template.
 #
 # Runs at Build time on Cursor's default image (no snapshot) to provision a
 # complete development environment: Ruby, PostgreSQL 16, gem dependencies, the

@@ -2,23 +2,23 @@
 
 require "test_helper"
 
-class GemTemplateTest < Minitest::Test
+class RecordingStudioFollowableTest < Minitest::Test
   def test_version_matches_release
-    assert_equal "0.2.12", ::GemTemplate::VERSION
+    assert_equal "0.1.0", ::RecordingStudioFollowable::VERSION
   end
 
   def test_engine_exists
-    assert_kind_of Class, ::GemTemplate::Engine
+    assert_kind_of Class, ::RecordingStudioFollowable::Engine
   end
 
   def test_gemspec_pins_recording_studio_4_2
-    gemspec = File.read(File.expand_path("../gem_template.gemspec", __dir__))
+    gemspec = File.read(File.expand_path("../recording_studio_followable.gemspec", __dir__))
 
     assert_includes gemspec, 'spec.add_dependency "recording_studio", "~> 4.2"'
   end
 
   def test_gemspec_excludes_cursor_config
-    spec = Gem::Specification.load(File.expand_path("../gem_template.gemspec", __dir__))
+    spec = Gem::Specification.load(File.expand_path("../recording_studio_followable.gemspec", __dir__))
     cursor_files = spec.files.select { |path| path == ".cursor" || path.split("/").include?(".cursor") }
 
     assert_empty cursor_files, "gemspec must not package .cursor/ (got #{cursor_files.inspect})"
@@ -28,7 +28,7 @@ class GemTemplateTest < Minitest::Test
     path = File.expand_path("../.cursor/environment.json", __dir__)
     json = JSON.parse(File.read(path))
 
-    assert_equal "recording-studio-gem-template", json["name"]
+    assert_equal "recording-studio-followable", json["name"]
     assert_equal ".cursor/install.sh", json["install"]
     assert_equal ".cursor/start.sh", json["start"]
     refute json.key?("snapshot"), "snapshot pins a Personal build and skips install"
@@ -121,21 +121,14 @@ class GemTemplateTest < Minitest::Test
   end
 
   def test_template_does_not_ship_copied_core_hooks_or_base_service
-    refute File.exist?(File.expand_path("../lib/gem_template/hooks.rb", __dir__))
-    refute File.exist?(File.expand_path("../lib/gem_template/services/base_service.rb", __dir__))
-    refute File.exist?(File.expand_path("../lib/gem_template/services/example_service.rb", __dir__))
+    refute File.exist?(File.expand_path("../lib/recording_studio_followable/hooks.rb", __dir__))
+    refute File.exist?(File.expand_path("../lib/recording_studio_followable/services/base_service.rb", __dir__))
+    refute File.exist?(File.expand_path("../lib/recording_studio_followable/services/example_service.rb", __dir__))
   end
 
-  def test_example_capability_wraps_include_for_and_is_not_enabled_globally
-    source = File.read(File.expand_path("../lib/gem_template/capabilities/example.rb", __dir__))
-
-    assert_includes source, "def self.to(**)"
-    assert_includes source, "RecordingStudio::Capabilities.include_for(:example, **)"
-    refute_includes source, "enable_capability"
-    refute_includes source, "set_capability_options"
-    refute RecordingStudio.capability_enabled?(:example, for: "Folder")
-    refute RecordingStudio.capability_enabled?(:example, for: "Page")
-    assert_empty RecordingStudio.configuration.enabled_recordable_types_for(:example)
+  def test_addon_does_not_ship_the_template_example_capability
+    refute File.exist?(File.expand_path("../lib/recording_studio_followable/capabilities/example.rb", __dir__))
+    refute defined?(RecordingStudio::Capabilities::Example)
   end
 
   def test_dummy_app_uses_recording_studio_default_layout
@@ -200,44 +193,20 @@ class GemTemplateTest < Minitest::Test
     readme_path = File.expand_path("dummy/README.md", __dir__)
     readme_source = File.read(readme_path)
 
-    assert_includes readme_source, "This Rails app exists to validate the Recording Studio addon template"
+    assert_includes readme_source, "This Rails app exists to prove `recording_studio_followable` boots"
     assert_includes readme_source, "/recording_studio"
     assert_includes readme_source, "redirects to `/`"
     refute_includes readme_source, "flat_pack_sidebar"
   end
 
-  def test_product_readme_is_the_template_guide
+  def test_product_readme_describes_followable_without_invented_api
     readme = File.read(File.expand_path("../README.md", __dir__))
 
-    assert_includes readme, "RecordingStudio"
-    assert_includes readme, "dummy GitHub tag `v4.7.1`"
-    refute_includes readme, "dummy GitHub tag `v4.7.0`"
-    refute_includes readme, "dummy GitHub tag `v4.6.0`"
-    refute_includes readme, "dummy GitHub tag `v4.5.0`"
-    assert_includes readme, "dummy GitHub tag `v0.1.331`"
-    refute_includes readme, "dummy GitHub tag `v0.1.196`"
-    assert_includes readme, "dummy GitHub tag `v0.18.0`"
-    assert_includes readme, "dummy GitHub tag `v0.11.0`"
-    assert_includes readme, "dummy GitHub tag `v0.10.0`"
-    refute_includes readme, "dummy GitHub tag `v0.9.0`"
-    assert_includes readme, "dummy GitHub tag `v0.3.1`"
-    refute_includes readme, "dummy GitHub tag `v0.2.0`"
-    refute_includes readme, "dummy GitHub tag `v0.17.0`"
-    refute_includes readme, "dummy GitHub tag `v0.15.0`"
-    refute_includes readme, "dummy GitHub tag `v0.10.1`"
-    refute_includes readme, "dummy GitHub tag `v0.8.0`"
-    refute_includes readme, "dummy GitHub tag `v0.6.0`"
-    refute_includes readme, "dummy GitHub tag `v0.5.1`"
-    refute_includes readme, "dummy GitHub tag `v4.4.0`"
-    refute_includes readme, "dummy GitHub tag `v4.3.0`"
-    refute_includes readme, "dummy GitHub tag `v4.2.2`"
-    refute_includes readme, "dummy GitHub tag `v4.2.1`"
-    refute_includes readme, "dummy GitHub tag `v4.2.0`"
-    refute_includes readme, "v0.1.177"
-    refute_includes readme, "v0.9.1"
-    refute_includes readme, "v0.1.133"
-    refute_includes readme, "v3 declarations"
-    refute_includes readme, "RecordingStudio v3"
+    assert_includes readme, "recording_studio_followable"
+    assert_includes readme, "following recordings"
+    assert_includes readme, "coming soon"
+    assert_includes readme, "generate recording_studio_followable:install"
+    refute_includes readme, "internal template"
     refute_includes readme, "ExampleService"
     refute_includes readme, "recording_studio/v3.0.0"
   end
@@ -253,7 +222,6 @@ class GemTemplateTest < Minitest::Test
     refute_includes audit, "GHSA-8qw7-6phv-7q6p"
     refute_includes installing, "flatpack/app/components"
     assert_includes installing, "bin/rails generate flat_pack:install"
-    assert_includes installing, '@source "../../vendor/bundle/**/gem_template/app/views/**/*.erb";'
 
     importmap = File.read(File.expand_path("dummy/config/importmap.rb", __dir__))
     stimulus_loader = File.read(File.expand_path("dummy/app/javascript/controllers/index.js", __dir__))
@@ -279,64 +247,25 @@ class GemTemplateTest < Minitest::Test
     refute_includes helper, "prepend"
   end
 
-  def test_dummy_home_page_uses_demo_title_only
+  def test_dummy_home_page_uses_followable_title_only
     view_path = File.expand_path("dummy/app/views/home/index.html.erb", __dir__)
     view_source = File.read(view_path)
 
-    assert_includes view_source, 'title: "Template Demo"'
-    assert_includes view_source, 'subtitle: "This dummy app is the browser-facing demo surface for the template."'
+    assert_includes view_source, 'title: "Followable"'
+    assert_includes view_source, "coming soon"
     assert_includes view_source, "FlatPack::Card::Component"
     assert_includes view_source, "dummy_page_nav"
-    refute_includes view_source, 'title: "Demo"'
+    refute_includes view_source, 'title: "Template Demo"'
     refute_includes view_source, "FlatPack::Breadcrumb::Component"
   end
 
-  def test_dummy_docs_pages_use_minimal_flatpack_documentation_components
-    docs_view_paths = Dir[File.expand_path("dummy/app/views/docs/*.html.erb", __dir__)].reject do |view_path|
-      File.basename(view_path).start_with?("_")
-    end
-    refute_empty docs_view_paths
-
-    docs_view_paths.each do |view_path|
-      view_source = File.read(view_path)
-
-      assert_includes view_source, "dummy_page_nav"
-      assert_includes view_source, "FlatPack::PageTitle::Component"
-      refute_includes view_source, "FlatPack::Card::Component"
-      refute_includes view_source, "FlatPack::Breadcrumb::Component"
-    end
-
-    methods_view = File.read(File.expand_path("dummy/app/views/docs/methods.html.erb", __dir__))
-    assert_includes methods_view, "FlatPack::SectionTitle::Component"
-    assert_includes methods_view, "FlatPack::CodeBlock::Component"
-
-    gem_views_view = File.read(File.expand_path("dummy/app/views/docs/gem_views.html.erb", __dir__))
-    assert_includes gem_views_view, "FlatPack::Table::Component"
-    refute_includes gem_views_view, "FlatPack::List::Component"
-
-    recordable_types_view = File.read(File.expand_path("dummy/app/views/docs/recordable_types.html.erb", __dir__))
-    assert_includes recordable_types_view, "FlatPack::List::Component"
-    refute_includes recordable_types_view, "v3 parent/root"
-
-    recordings_tree_view = File.read(File.expand_path("dummy/app/views/docs/recordings_tree.html.erb", __dir__))
-    assert_includes recordings_tree_view, "FlatPack::Tree::Component"
-    refute_includes recordings_tree_view, "Current structure"
-    refute_includes recordings_tree_view, "This tree is generated from RecordingStudio::Recording records"
-  end
-
-  def test_dummy_recordings_tree_view_omits_structure_section_copy
-    recordings_tree_view = File.read(File.expand_path("dummy/app/views/docs/recordings_tree.html.erb", __dir__))
-
-    assert_includes recordings_tree_view, 'title: "Recordings tree"'
-    assert_includes recordings_tree_view, "FlatPack::Tree::Component"
-    recording_tree_partial = File.read(File.expand_path("dummy/app/views/docs/_recording_tree_node.html.erb", __dir__))
-    assert_includes recording_tree_partial, "parent_builder.node"
-    refute_includes recordings_tree_view, "Current structure"
-    refute_includes recordings_tree_view, "This tree is generated from RecordingStudio::Recording records"
+  def test_dummy_does_not_ship_template_starter_docs
+    refute File.exist?(File.expand_path("dummy/app/controllers/docs_controller.rb", __dir__))
+    assert_empty Dir[File.expand_path("dummy/app/views/docs/**/*", __dir__)]
   end
 
   def test_engine_does_not_ship_a_home_view
-    view_path = File.expand_path("../app/views/gem_template/home/index.html.erb", __dir__)
+    view_path = File.expand_path("../app/views/recording_studio_followable/home/index.html.erb", __dir__)
 
     refute File.exist?(view_path)
   end

@@ -251,7 +251,6 @@ class GemRenamer
     @files_to_update_content ||= begin
       files = glob_content_files
 
-      # Exclude files in excluded directories (but NOT test/dummy, we handle that separately)
       files.reject! do |f|
         EXCLUDED_DIRS.any? { |dir| f.include?("/#{dir}/") }
       end
@@ -430,7 +429,6 @@ class GemRenamer
   def validate_no_old_references!
     files = glob_content_files
 
-    # Exclude files in excluded directories (but NOT test/dummy, handled below)
     files.reject! { |f| EXCLUDED_DIRS.any? { |dir| f.include?("/#{dir}/") } }
 
     # Exclude gem_template documentation directory (preserve as architectural reference)
@@ -505,7 +503,6 @@ class GemRenamer
     end
   end
 
-  # recording_studio_followable -> RecordingStudio_followable
   def github_repo_name
     if @new_name.start_with?("recording_studio_")
       "RecordingStudio_#{@new_name.delete_prefix("recording_studio_")}"
