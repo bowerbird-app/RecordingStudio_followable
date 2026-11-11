@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Config loading no longer uses empty `rescue` bodies, so RuboCop `Lint/SuppressedException` stays clean while missing host config still boots.
+- The install initializer calls `RecordingStudioFollowable.configure` without an empty block.
+
 ## [0.1.0] - 2026-11-11
 
 ### Added
