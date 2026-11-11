@@ -19,3 +19,5 @@ RecordingStudioNotifications.configure do |config|
     scope: :root
   )
 end
+
+RecordingStudioNotifications.channels.register(:email, RecordingStudioNotifications::Channels::InAppAdapter.new)

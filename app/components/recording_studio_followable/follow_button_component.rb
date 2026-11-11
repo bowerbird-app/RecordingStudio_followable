@@ -3,15 +3,17 @@
 module RecordingStudioFollowable
   class FollowButtonComponent < ViewComponent::Base
     def self.frame_id(target:, root:)
-      "follow-button-#{target.id}-#{root.id}"
+      "follow-button-#{target.id}-#{root&.id || 'guest'}"
     end
 
-    def initialize(target:, root:, following:, follow_url:, unfollow_url:) # rubocop:disable Lint/MissingSuper
+    def initialize(target:, root:, following:, follow_url:, unfollow_url:, sign_in_url: nil, embedded: false) # rubocop:disable Lint/MissingSuper, Metrics/ParameterLists
       @target = target
       @root = root
       @following = following
       @follow_url = follow_url
       @unfollow_url = unfollow_url
+      @sign_in_url = sign_in_url
+      @embedded = embedded
     end
 
     def frame_id
@@ -20,10 +22,18 @@ module RecordingStudioFollowable
 
     private
 
-    attr_reader :target, :root, :following, :follow_url, :unfollow_url
+    attr_reader :target, :root, :following, :follow_url, :unfollow_url, :sign_in_url, :embedded
 
     def following?
       following
+    end
+
+    def sign_in?
+      sign_in_url.present? && !following?
+    end
+
+    def embedded?
+      embedded
     end
 
     def request_url

@@ -15,6 +15,7 @@ module RecordingStudioFollowable
 
       def call
         Authorization.assert_view!(actor: @actor, recording: @root)
+        raise NotAuthorized, "not authorized" unless Visibility.see?(actor: @actor, recording: @target)
         raise InvalidFollow, "cannot follow a follow" if follow_target?
 
         @root.with_lock do

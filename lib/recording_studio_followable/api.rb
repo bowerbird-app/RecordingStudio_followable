@@ -64,6 +64,9 @@ module RecordingStudioFollowable
         }
       )
 
+      relax_target_role!("follow")
+      relax_target_role!("unfollow")
+
       register_action(
         :followers,
         capability: :followable,
@@ -85,6 +88,18 @@ module RecordingStudioFollowable
           summary: "List follows stored in this workspace"
         }
       )
+    end
+
+    def relax_target_role!(name)
+      return unless defined?(RecordingStudioApi)
+
+      config = RecordingStudioApi.configuration
+      return if config.capability_action_role_resolver.respond_to?(:call)
+
+      roles = config.capability_action_roles
+      return if roles.key?(name) || roles.key?(name.to_sym)
+
+      roles[name] = nil
     end
 
     def register_action(name, **)

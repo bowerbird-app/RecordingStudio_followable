@@ -2,13 +2,19 @@
 
 module RecordingStudioFollowable
   module FollowButtonHelper
+    include FollowButtonSignIn
+
     def follow_button(recording, root: nil, actor: nil)
       target = RecordingStudioFollowable::RecordingIdentity.recording_for(recording)
       follow_root = resolve_follow_button_root(root)
       follow_actor = resolve_follow_button_actor(actor)
-      return unless can_render_follow_button?(follow_actor, follow_root)
+      return unless show_follow_button?(follow_actor, follow_root, target)
 
-      render_follow_button(target, follow_root)
+      if follow_actor.blank?
+        render_sign_in_follow_button(target)
+      else
+        render_follow_button(target, follow_root)
+      end
     end
 
     def follow_target_url(recording)
@@ -43,9 +49,30 @@ module RecordingStudioFollowable
       )
     end
 
-    def can_render_follow_button?(actor, root)
-      actor.present? && root.present? &&
-        RecordingStudioAccessible.authorized?(actor: actor, recording: root, role: :view)
+    def render_sign_in_follow_button(target)
+      embedded = follow_request_embedded?
+      render FollowButtonComponent.new(
+        target: target,
+        root: nil,
+        following: false,
+        follow_url: nil,
+        unfollow_url: nil,
+        sign_in_url: follow_sign_in_url(target, embedded: embedded),
+        embedded: embedded
+      )
+    end
+
+    def show_follow_button?(actor, root, target)
+      return false if target.blank?
+
+      if actor.present?
+        return false unless root.present? && Authorization.view?(actor: actor, recording: root)
+        return true if following_target?(root, target)
+
+        Visibility.see?(actor: actor, recording: target)
+      else
+        Visibility.see?(actor: nil, recording: target)
+      end
     end
 
     def following_target?(root, target)

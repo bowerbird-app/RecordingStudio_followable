@@ -16,7 +16,7 @@ class RecordingStudioDeclarationsTest < ActiveSupport::TestCase
 
   test "dummy recordable declarations validate and expose parent/root introspection" do
     assert RecordingStudio.validate_recordable_declarations!
-    assert_equal ["Workspace"], RecordingStudio.root_recordable_types
+    assert_equal ["Workspace", "RecordingStudioUser::People"], RecordingStudio.root_recordable_types
     assert_equal %w[Workspace Folder], RecordingStudio.allowed_parent_types_for("Folder")
     assert_equal %w[Workspace Folder], RecordingStudio.allowed_parent_types_for(Page)
     assert_equal %w[Workspace], RecordingStudio.allowed_parent_types_for("RecordingStudioFollowable::Follow")

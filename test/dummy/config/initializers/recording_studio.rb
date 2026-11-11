@@ -5,7 +5,15 @@ RecordingStudioFollowable.configure do |config|
 end
 
 RecordingStudio.configure do |config|
-  config.recordable_types = [ "Workspace", "Folder", "Page", "RecordingStudioFollowable::Follow" ]
+  config.recordable_types = [
+    "Workspace",
+    "Folder",
+    "Page",
+    "RecordingStudioFollowable::Follow",
+    "RecordingStudioUser::People",
+    "RecordingStudioUser::Profile",
+    "RecordingStudioAttachable::Attachment"
+  ]
 
   config.require_recordable_declarations = true
 

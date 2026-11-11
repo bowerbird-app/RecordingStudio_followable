@@ -1,0 +1,38 @@
+<div class="flex w-full flex-col gap-6">
+  <%= render FlatPack::PageTitle::Component.new(
+    title: t("recording_studio_followable.sign_in.code_title"),
+    subtitle: t("recording_studio_followable.sign_in.code_subtitle"),
+    variant: :h1
+  ) %>
+
+  <% if flash[:alert].present? %>
+    <%= render FlatPack::Alert::Component.new(description: flash[:alert], style: :danger, icon: true) %>
+  <% end %>
+
+  <%= form_with url: follow_sign_in_verify_path, method: :post, data: { turbo_frame: "_top" } do %>
+    <div class="flex flex-col gap-4">
+      <%= render FlatPack::TextInput::Component.new(
+        name: "code",
+        label: t("recording_studio_followable.sign_in.code_label"),
+        required: true,
+        max_characters: 6,
+        character_count: true
+      ) %>
+      <%= render FlatPack::Button::Component.new(
+        text: t("recording_studio_followable.sign_in.confirm"),
+        type: :submit,
+        style: :primary,
+        size: :md
+      ) %>
+    </div>
+  <% end %>
+
+  <%= render FlatPack::Button::Component.new(
+    text: t("recording_studio_followable.sign_in.resend"),
+    style: :ghost,
+    size: :md,
+    href: follow_sign_in_path,
+    method: :post,
+    data: { turbo_frame: "_top" }
+  ) %>
+</div>

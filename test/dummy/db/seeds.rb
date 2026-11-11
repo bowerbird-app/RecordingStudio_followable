@@ -47,7 +47,13 @@ begin
   end
 
   folder_recording = find_or_record_child.call(folder, root_recording, root_recording)
-  find_or_record_child.call(page, root_recording, folder_recording)
+  page_recording = find_or_record_child.call(page, root_recording, folder_recording)
+  RecordingStudioAccessible.set_audience!(
+    recording: page_recording,
+    action: :"recording_studio_followable.see",
+    audience: :public,
+    actor: admin
+  )
 
   {
     alice => :admin,
