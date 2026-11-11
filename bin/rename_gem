@@ -26,19 +26,13 @@ class GemRenamer
   STATE_FILE = ".rename_state.yml"
   
   # Directories to completely exclude from processing
-  EXCLUDED_DIRS = %w[.git node_modules vendor tmp log].freeze
+  EXCLUDED_DIRS = %w[.git node_modules vendor tmp log coverage].freeze
   
   # Files to exclude from content replacement (but still rename if needed)
-  EXCLUDED_FILES = %w[rename_verification_test.rb].freeze
+  EXCLUDED_FILES = %w[rename_verification_test.rb rename_gem_identity_test.rb].freeze
   
   # File patterns to search for content replacement
-  CONTENT_FILE_PATTERNS = %w[*.rb *.gemspec *.md *.erb *.rake Rakefile Gemfile *.sh *.yml *.yaml].freeze
-  
-  # Specific files in test/dummy that should be updated
-  DUMMY_APP_FILES = %w[
-    test/dummy/Gemfile
-    test/dummy/config/routes.rb
-  ].freeze
+  CONTENT_FILE_PATTERNS = %w[*.rb *.gemspec *.md *.erb *.rake Rakefile Gemfile *.sh *.yml *.yaml *.json].freeze
 
   # Product files that must lose leftover template identity after rename.
   LEFTOVER_IDENTITY_FILES = %w[
@@ -254,15 +248,9 @@ class GemRenamer
       
       # Exclude gem_template documentation directory (preserve as architectural reference)
       files.reject! { |f| f.include?("/docs/gem_template/") }
-      
-      # For test/dummy, only include specific whitelisted files
-      files.reject! do |f|
-        if f.include?("/test/dummy/")
-          !DUMMY_APP_FILES.any? { |allowed| f.end_with?(allowed) }
-        else
-          false
-        end
-      end
+      files.reject! { |f| f.include?("/.cursor/skills/") || f.include?("/.cursor/rules/") }
+
+      files.reject! { |f| f.end_with?("credentials.yml.enc") }
 
       # Exclude specific files that should not be modified
       files.reject! do |f|
@@ -390,6 +378,13 @@ class GemRenamer
 
     rewrite_leftover_homepages!(updated)
 
+    old_kebab = to_kebab_case(@old_name)
+    new_kebab = to_kebab_case(@new_name)
+    env_kebab = "recording-studio-#{product_suffix_kebab}"
+    updated.gsub!("recording-studio-#{old_kebab}", env_kebab)
+    updated.gsub!("RecordingStudio-#{old_kebab}", github_repo_name.tr("_", "-"))
+    updated.gsub!(/\b#{Regexp.escape(old_kebab)}\b/, new_kebab)
+
     # Replace snake_case name (with word boundaries)
     updated.gsub!(/\b#{Regexp.escape(@old_name)}\b/, @new_name)
 
@@ -426,18 +421,12 @@ class GemRenamer
 
     # Exclude gem_template documentation directory (preserve as architectural reference)
     files.reject! { |f| f.include?("/docs/gem_template/") }
+    files.reject! { |f| f.include?("/.cursor/skills/") || f.include?("/.cursor/rules/") }
+
+    files.reject! { |f| f.end_with?("credentials.yml.enc") }
 
     # Exclude files that are intentionally preserved (like verification tests)
     files.reject! { |f| EXCLUDED_FILES.any? { |excluded| f.end_with?(excluded) } }
-
-    # For test/dummy, only include specific whitelisted files
-    files.reject! do |f|
-      if f.include?("/test/dummy/")
-        !DUMMY_APP_FILES.any? { |allowed| f.end_with?(allowed) }
-      else
-        false
-      end
-    end
 
     leftovers = []
     files.each do |path|
@@ -496,8 +485,26 @@ class GemRenamer
   end
 
   def rewrite_leftover_homepages!(updated)
+    new_homepage = "https://github.com/bowerbird-app/#{github_repo_name}"
     LEFTOVER_HOMEPAGES.each do |old_homepage|
-      updated.gsub!(old_homepage, "https://github.com/bowerbird-app/#{@new_name}")
+      updated.gsub!(old_homepage, new_homepage)
+    end
+  end
+
+  # recording_studio_followable -> RecordingStudio_followable
+  def github_repo_name
+    if @new_name.start_with?("recording_studio_")
+      "RecordingStudio_#{@new_name.delete_prefix("recording_studio_")}"
+    else
+      @new_name
+    end
+  end
+
+  def product_suffix_kebab
+    if @new_name.start_with?("recording_studio_")
+      to_kebab_case(@new_name.delete_prefix("recording_studio_"))
+    else
+      to_kebab_case(@new_name)
     end
   end
 
