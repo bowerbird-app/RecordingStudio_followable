@@ -16,16 +16,7 @@
           <% card.body do %>
             <div class="flex flex-wrap items-center justify-between gap-3">
               <p class="text-sm leading-6"><%= follow_target_title(follow_recording) %></p>
-              <%= form_with url: main_app.follow_path(follow_recording), method: :delete, local: true do %>
-                <%= hidden_field_tag :root_id, @follow_root.id %>
-                <%= hidden_field_tag :target_id, follow_recording.recordable.target_recording_id %>
-                <%= render FlatPack::Button::Component.new(
-                  text: "Stop following",
-                  type: :submit,
-                  style: :ghost,
-                  size: :sm
-                ) %>
-              <% end %>
+              <%= follow_button(follow_recording.recordable.target_recording) %>
             </div>
           <% end %>
         <% end %>

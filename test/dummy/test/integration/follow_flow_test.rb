@@ -31,7 +31,7 @@ class FollowFlowTest < ActionDispatch::IntegrationTest
   test "following a page from the current workspace lists it and can ping the inbox" do
     switch_to_client_workspace
 
-    post main_app.follows_path, params: { root_id: @client.id, target_id: @page_recording.id }
+    post recording_studio_followable.follows_path, params: { root_id: @client.id, target_id: @page_recording.id }
     assert_response :redirect
     follow_redirect!
 

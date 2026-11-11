@@ -8,13 +8,7 @@
   ) %>
 
   <% if @follow_root && RecordingStudioAccessible.authorized?(actor: current_user, recording: @follow_root, role: :view) %>
-    <%= render RecordingStudioFollowable::FollowButtonComponent.new(
-      target: @page_recording,
-      root: @follow_root,
-      following: @following,
-      follow_url: main_app.follows_path,
-      unfollow_url: @following ? main_app.follow_path(@following) : main_app.follows_path
-    ) %>
+    <%= follow_button(@page_recording) %>
 
     <% if @following %>
       <%= form_with url: notify_followers_page_path(@page), method: :post, local: true do %>

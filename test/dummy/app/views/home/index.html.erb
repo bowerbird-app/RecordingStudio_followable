@@ -20,13 +20,7 @@
 
       <% card.body do %>
         <% if @page_recording && @follow_root && RecordingStudioAccessible.authorized?(actor: current_user, recording: @page_recording, role: :view) && RecordingStudioAccessible.authorized?(actor: current_user, recording: @follow_root, role: :view) %>
-          <%= render RecordingStudioFollowable::FollowButtonComponent.new(
-            target: @page_recording,
-            root: @follow_root,
-            following: @following,
-            follow_url: main_app.follows_path,
-            unfollow_url: @following ? main_app.follow_path(@following) : main_app.follows_path
-          ) %>
+          <%= follow_button(@page_recording) %>
         <% else %>
           <p class="text-sm leading-6">Open a workspace you can use, then you can follow this page.</p>
         <% end %>

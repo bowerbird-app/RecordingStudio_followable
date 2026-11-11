@@ -14,7 +14,7 @@ Rails.application.routes.draw do
       post :notify_followers
     end
   end
-  resources :follows, only: %i[index create destroy]
+  resources :follows, only: :index
 
   root "home#index"
 end

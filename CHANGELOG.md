@@ -13,7 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `RecordingStudioFollowable::Follow` recordable. It stores `target_recording_id` under a host root.
 - `follow`, `unfollow`, `follows`, and `followers` services, plus matching API capability actions (`:followable` on the target, `:follow_parent` on the root). MCP uses the same actions.
 - `RecordingStudioFollowable.notify_followers` (Ruby only). Notifications set `recording` to the Follow, `root_recording` to the Follow's root, and `notifiable` to that root's recordable. Recipients are direct Accessible grants on that root.
-- Dummy follow button, following list, ping action, and Notifications inbox.
+- Dummy Following list, ping action, and Notifications inbox, using the gem `follow_button` helper.
+- Engine `follows` routes and `follow_button(recording)`. Follow is a Flatpack button with `plus-circle`. Following is a Flatpack dropdown with `check-circle` and Unfollow (`minus-circle`). Turbo Stream replaces the button. HTML redirects back.
 
 ### Changed
 - Requires Recording Studio 6.3 or newer and pins Notifications `~> 0.14.9`.
@@ -25,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Include `Followable` on types people follow and `FollowParent` on roots that store follows.
 - Register a `:root` notification type before calling `notify_followers`.
 - Point `authorize_write` (and Follow trash) at Accessible `:view` on the follow root if anyone with access should manage Follows.
+- Mount the engine and call `follow_button(recording)` for the turnkey button.
 - Do not call `notify_followers` over the API. It is host Ruby only.
 - Inherited Accessible grants are not notified in v1.
 - Keep `title` and `body` free of secrets. Inbox access is the Follow root, not the followed item.

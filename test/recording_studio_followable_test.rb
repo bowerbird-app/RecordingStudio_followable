@@ -230,7 +230,7 @@ class RecordingStudioFollowableTest < Minitest::Test
 
     refute_includes view_source, 'title: "Followable"'
     assert_includes view_source, 'title: "Keep an eye on a page"'
-    assert_includes view_source, "FollowButtonComponent"
+    assert_includes view_source, "follow_button("
     assert_includes view_source, "FlatPack::Card::Component"
     assert_includes view_source, "dummy_page_nav"
     refute_includes view_source, 'title: "Template Demo"'

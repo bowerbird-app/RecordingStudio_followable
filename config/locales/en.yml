@@ -1,0 +1,4 @@
+en:
+  recording_studio_followable:
+    follows:
+      unauthorized: You cannot change that follow.

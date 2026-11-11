@@ -268,6 +268,19 @@ class EngineTest < Minitest::Test
     assert_equal expected_keys, RecordingStudioFollowable::Engine.send(:extension_keys_for, namespaced)
   end
 
+  def test_engine_routes_file_declares_follow_and_unfollow
+    source = File.read(File.expand_path("../config/routes.rb", __dir__))
+
+    assert_match(/post ["']follows["']/, source)
+    assert_match(/delete ["']follows["']/, source)
+    assert_includes source, "follows#create"
+    assert_includes source, "follows#destroy"
+  end
+
+  def test_helpers_initializer_is_registered
+    assert find_initializer("recording_studio_followable.helpers")
+  end
+
   def test_extension_keys_for_removes_duplicate_names
     plain = Class.new do
       def self.name

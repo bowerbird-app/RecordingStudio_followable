@@ -123,6 +123,12 @@ module RecordingStudioFollowable
       end
     end
 
+    initializer "recording_studio_followable.helpers" do
+      ActiveSupport.on_load(:action_controller_base) do
+        helper RecordingStudioFollowable::Engine.helpers
+      end
+    end
+
     initializer "recording_studio_followable.register_api" do
       config.after_initialize do
         RecordingStudioFollowable::Api.register!
