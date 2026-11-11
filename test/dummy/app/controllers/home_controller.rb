@@ -35,7 +35,7 @@ class HomeController < ApplicationController
     return RecordingStudio::Recording.none if @follow_root.blank?
     return RecordingStudio::Recording.none unless can_view?(@follow_root)
 
-    RecordingStudioFollowable.follows(root: @follow_root, actor: current_user)
+    RecordingStudioFollowable.follows(root: @follow_root, actor: current_user, limit: 5).records
   end
 
   def can_view?(recording)

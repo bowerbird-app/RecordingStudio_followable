@@ -1,0 +1,20 @@
+<% if turbo_frame_request? %>
+  <%= turbo_frame_tag follows_next_frame_id(params[:cursor]) do %>
+    <%= render "recording_studio_followable/follows/rows", follows: @follows, next_cursor: @next_cursor %>
+  <% end %>
+<% else %>
+  <div class="flex w-full flex-col gap-6">
+    <%= render FlatPack::PageTitle::Component.new(
+      title: t("recording_studio_followable.follows.title"),
+      variant: :h1
+    ) %>
+
+    <% if @follows.blank? %>
+      <p class="text-sm leading-6"><%= t("recording_studio_followable.follows.empty") %></p>
+    <% else %>
+      <div id="follows-list" class="flex flex-col gap-4">
+        <%= render "recording_studio_followable/follows/rows", follows: @follows, next_cursor: @next_cursor %>
+      </div>
+    <% end %>
+  </div>
+<% end %>

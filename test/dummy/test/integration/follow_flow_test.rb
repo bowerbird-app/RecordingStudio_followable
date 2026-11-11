@@ -35,17 +35,17 @@ class FollowFlowTest < ActionDispatch::IntegrationTest
     assert_response :redirect
     follow_redirect!
 
-    get main_app.follows_path
+    get recording_studio_followable.follows_path
     assert_response :success
     assert_includes @response.body, "Getting Started"
-    assert_includes @response.body, main_app.page_path(@page)
+    assert_includes @response.body, "/pages/#{@page.id}"
     assert_includes @response.body, "Following"
     assert_includes @response.body, "Unfollow"
     refute_includes @response.body, "Pages this workspace is watching."
     refute_includes @response.body, "Stop following"
     assert_equal 1, @response.body.scan(/<h1[\s>]/i).length
 
-    post main_app.notify_followers_page_path(@page), params: { event_key: "flow-test" }
+    post "/pages/#{@page.id}/notify_followers", params: { event_key: "flow-test" }
     follow_redirect!
 
     get "/notifications"

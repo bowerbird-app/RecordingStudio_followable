@@ -93,4 +93,101 @@ class FollowableFollowsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "plus-circle"
     refute_includes response.body, "Unfollow"
   end
+
+  test "index lists follows for the current root" do
+    switch_to_client_workspace
+    RecordingStudioFollowable.follow(target: @page_recording, root: @client, actor: @admin)
+
+    get recording_studio_followable.follows_path
+
+    assert_response :success
+    assert_includes response.body, "Following"
+    assert_includes response.body, "Getting Started"
+    assert_includes response.body, "/pages/#{@page.id}"
+    assert_includes response.body, "Unfollow"
+    refute_includes response.body, "Pages this workspace is watching."
+    assert_equal 1, response.body.scan(/<h1[\s>]/i).length
+  end
+
+  test "index is empty when the current root follows nothing" do
+    switch_to_client_workspace
+
+    get recording_studio_followable.follows_path
+
+    assert_response :success
+    assert_includes response.body, I18n.t("recording_studio_followable.follows.empty")
+    refute_includes response.body, "Load more"
+  end
+
+  test "unauthorized html index redirects with an alert" do
+    sign_in @stranger
+    Current.actor = @stranger
+    get recording_studio_followable.follows_path, headers: { "HTTP_REFERER" => "/" }
+
+    assert_redirected_to "/"
+    assert_equal I18n.t("recording_studio_followable.follows.unauthorized"), flash[:alert]
+  end
+
+  test "unauthorized turbo_stream index is forbidden" do
+    sign_in @stranger
+    Current.actor = @stranger
+    get recording_studio_followable.follows_path, as: :turbo_stream
+
+    assert_response :forbidden
+  end
+
+  test "index paginates newest first and the next frame returns the rest" do
+    switch_to_client_workspace
+    studio = RecordingStudio.root_recording_for(Workspace.find_by!(name: "Studio Workspace"))
+    titles = %w[Alpha Bravo Charlie]
+    titles.each do |title|
+      page = Page.create!(title: title)
+      recording = RecordingStudio.record!(
+        action: "created",
+        recordable: page,
+        root_recording: studio,
+        parent_recording: studio
+      ).recording
+      RecordingStudioFollowable.follow(target: recording, root: @client, actor: @admin)
+    end
+    RecordingStudioFollowable.configuration.page_size = 2
+
+    get recording_studio_followable.follows_path
+
+    assert_response :success
+    assert_includes response.body, "Charlie"
+    assert_includes response.body, "Bravo"
+    refute_includes response.body, "Alpha"
+    assert_includes response.body, "Load more"
+    assert_includes response.body, 'loading="lazy"'
+    cursor = CGI.unescape(CGI.unescapeHTML(response.body[/cursor=([^"&]+)/, 1].to_s))
+    assert cursor.present?
+
+    get recording_studio_followable.follows_path(cursor: cursor),
+        headers: { "Turbo-Frame" => "follows-page-#{cursor}" }
+
+    assert_response :success
+    assert_includes response.body, "Alpha"
+    refute_includes response.body, "Charlie"
+    refute_includes response.body, "Load more"
+    refute_includes response.body, 'loading="lazy"'
+  ensure
+    RecordingStudioFollowable.configuration.page_size = RecordingStudioFollowable::Configuration::DEFAULT_PAGE_SIZE
+  end
+
+  private
+
+  def switch_to_client_workspace
+    return unless defined?(RecordingStudioRootSwitchable)
+
+    patch "/recording_studio_root_switchable/v1/root_switch", params: {
+      scope: "all_workspaces",
+      root_switch: {
+        root_recording_id: @client.id,
+        return_to: "/"
+      }
+    }
+    assert_response :redirect
+    follow_redirect!
+  end
 end

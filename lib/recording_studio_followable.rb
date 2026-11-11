@@ -38,8 +38,8 @@ module RecordingStudioFollowable
       Services::Unfollow.call(target: target, root: root, actor: actor)
     end
 
-    def follows(root:, actor:)
-      Services::ListFollows.call(root: root, actor: actor)
+    def follows(root:, actor:, limit: nil, cursor: nil)
+      Services::ListFollows.call(root: root, actor: actor, limit: limit, cursor: cursor)
     end
 
     def followers(recording:, actor:)

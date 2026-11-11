@@ -10,7 +10,7 @@ module ApplicationHelper
       flat_pack_page_nav(round: true, style: :default)
     end
     register_page_nav "Pages", main_app.pages_path, role: :secondary
-    register_page_nav "Following", main_app.follows_path, role: :secondary
+    register_page_nav "Following", recording_studio_followable.follows_path, role: :secondary
     register_page_nav "Inbox", recording_studio_notifications.notifications_path, role: :secondary
 
     recording_studio_page_nav_right do
@@ -35,16 +35,6 @@ module ApplicationHelper
     recording_studio_notifications_async_menu(recipient: current_user, limit: limit)
   rescue StandardError
     nil
-  end
-
-  def follow_target_title(follow_recording)
-    target = follow_recording.recordable&.target_recording
-    recordable = target&.recordable
-    return "Unknown page" if recordable.blank?
-    return recordable.title if recordable.respond_to?(:title)
-    return recordable.name if recordable.respond_to?(:name)
-
-    "Item"
   end
 
   private

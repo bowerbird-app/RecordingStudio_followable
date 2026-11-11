@@ -237,15 +237,19 @@ class RecordingStudioFollowableTest < Minitest::Test
     refute_includes view_source, "FlatPack::Breadcrumb::Component"
   end
 
-  def test_dummy_following_page_keeps_one_heading
-    view_path = File.expand_path("dummy/app/views/follows/index.html.erb", __dir__)
+  def test_engine_following_page_keeps_one_heading
+    view_path = File.expand_path("../app/views/recording_studio_followable/follows/index.html.erb", __dir__)
     view_source = File.read(view_path)
 
-    assert_equal 1, view_source.scan('title: "Following"').length
-    refute_includes view_source, 'dummy_page_nav(title: "Following"'
+    refute File.exist?(File.expand_path("dummy/app/views/follows/index.html.erb", __dir__))
+    refute File.exist?(File.expand_path("dummy/app/controllers/follows_controller.rb", __dir__))
+    assert_includes view_source, "recording_studio_followable.follows.title"
     refute_includes view_source, "Pages this workspace is watching."
-    assert_includes view_source, "follow_target_url("
-    assert_includes view_source, "follow_button("
+    rows = File.read(File.expand_path("../app/views/recording_studio_followable/follows/_rows.html.erb", __dir__))
+    assert_includes rows, "follow_target_url("
+    assert_includes rows, "follow_button("
+    assert_includes rows, "loading: :lazy"
+    assert_includes rows, "recording_studio_followable.follows.load_more"
   end
 
   def test_dummy_does_not_ship_template_starter_docs

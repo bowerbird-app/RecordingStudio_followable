@@ -159,6 +159,8 @@ class InstallGeneratorTest < Minitest::Test
     assert_includes install_guide, "follow_button(recording)"
     assert_includes install_guide, "follow_target_url(recording)"
     assert_includes install_guide, "config.followed_url"
+    assert_includes install_guide, "config.current_root"
+    assert_includes install_guide, "config.page_size"
     refute_includes install_guide, "RecordingStudio v3"
   end
 

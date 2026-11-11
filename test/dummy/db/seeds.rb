@@ -70,6 +70,17 @@ begin
     manager_actor: admin
   )
   raise studio_view.error if studio_view.failure?
+
+  unless Rails.env.test?
+    extra_roots = [root_recording, accessible_root_recording]
+    30.times do |index|
+      extra_page = Page.find_or_create_by!(title: "Followed page #{format('%02d', index + 1)}")
+      extra_recording = find_or_record_child.call(extra_page, root_recording, folder_recording)
+      extra_roots.each do |follow_root|
+        RecordingStudioFollowable.follow(target: extra_recording, root: follow_root, actor: admin)
+      end
+    end
+  end
 ensure
   Current.actor = previous_actor
 end
@@ -80,3 +91,4 @@ puts "Seeded: Workspace '#{workspace.name}' with root recording ##{root_recordin
 puts "Seeded: Workspace '#{accessible_workspace.name}' with root recording ##{accessible_root_recording.id}"
 puts "Seeded: Workspace '#{private_workspace.name}' with root recording ##{private_root_recording.id}"
 puts "Seeded: Folder '#{folder.name}' and page '#{page.title}'"
+puts "Seeded: 30 extra pages followed from Studio and Client workspaces" unless Rails.env.test?

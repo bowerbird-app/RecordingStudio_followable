@@ -33,7 +33,22 @@ class ConfigurationTest < Minitest::Test
 
     assert_equal ["Workspace"], configuration.allowed_parent_types
     assert_nil configuration.followed_url
+    assert_nil configuration.current_root
+    assert_nil configuration.layout
+    assert_equal 25, configuration.page_size
     assert_instance_of RecordingStudio::Hooks, configuration.hooks
+  end
+
+  def test_page_size_rejects_zero
+    assert_raises(ArgumentError) { @configuration.page_size = 0 }
+  end
+
+  def test_resolve_current_root_calls_configured_proc
+    root = Object.new
+    @configuration.current_root = ->(context) { context == :ctl ? root : nil }
+
+    assert_equal root, @configuration.resolve_current_root(:ctl)
+    assert_nil @configuration.resolve_current_root(:other)
   end
 
   def test_merge_updates_followed_url

@@ -4,9 +4,9 @@ module RecordingStudioFollowable
   parent_controller = defined?(::ApplicationController) ? ::ApplicationController : ActionController::Base
 
   class ApplicationController < parent_controller
-    if defined?(::RecordingStudio::RootSwitchable::ControllerSupport)
-      include ::RecordingStudio::RootSwitchable::ControllerSupport
-    end
+    include RecordingStudio::ControllerLayout
+
+    recording_studio_layout { RecordingStudioFollowable.configuration.layout }
 
     protect_from_forgery with: :exception
   end

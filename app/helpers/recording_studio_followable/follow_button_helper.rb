@@ -20,6 +20,16 @@ module RecordingStudioFollowable
       default_followed_url(target)
     end
 
+    def follow_target_title(follow_recording)
+      target = follow_recording.recordable&.target_recording
+      recordable = target&.recordable
+      return "Unknown page" if recordable.blank?
+      return recordable.title if recordable.respond_to?(:title)
+      return recordable.name if recordable.respond_to?(:name)
+
+      "Item"
+    end
+
     private
 
     def render_follow_button(target, follow_root)
@@ -44,9 +54,8 @@ module RecordingStudioFollowable
 
     def resolve_follow_button_root(root)
       return RecordingStudioFollowable::RecordingIdentity.follow_root_for(root) if root.present?
-      return unless respond_to?(:current_root_recording, true)
 
-      current_root_recording
+      RecordingStudioFollowable.configuration.resolve_current_root(self)
     end
 
     def follow_button_follows_path
@@ -59,9 +68,13 @@ module RecordingStudioFollowable
 
     def default_followed_url(target)
       recordable = target&.recordable
-      return unless recordable && respond_to?(:polymorphic_path)
+      return unless recordable
 
-      polymorphic_path(recordable)
+      if respond_to?(:main_app)
+        main_app.polymorphic_path(recordable)
+      else
+        polymorphic_path(recordable)
+      end
     rescue ArgumentError, NoMethodError, ActionController::UrlGenerationError
       nil
     end

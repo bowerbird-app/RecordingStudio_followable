@@ -91,6 +91,28 @@ class FollowableServicesTest < ActiveSupport::TestCase
     assert_includes ids, @studio.id
   end
 
+  test "follows with limit returns a page and a cursor for the rest" do
+    %w[One Two Three].each do |title|
+      page = Page.create!(title: "#{title} #{SecureRandom.hex(4)}")
+      recording = RecordingStudio.record!(
+        action: "created",
+        recordable: page,
+        root_recording: @studio,
+        parent_recording: @studio
+      ).recording
+      RecordingStudioFollowable.follow(target: recording, root: @client, actor: @alice)
+    end
+
+    first = RecordingStudioFollowable.follows(root: @client, actor: @alice, limit: 2)
+    rest = RecordingStudioFollowable.follows(root: @client, actor: @alice, limit: 2, cursor: first.next_cursor)
+
+    assert_equal 2, first.records.size
+    assert first.next_cursor.present?
+    assert_equal 1, rest.records.size
+    assert_nil rest.next_cursor
+    refute_equal first.records.map(&:id), rest.records.map(&:id)
+  end
+
   test "follows lists only the requested root" do
     RecordingStudioFollowable.follow(target: @page_recording, root: @client, actor: @alice)
     RecordingStudioFollowable.follow(target: @page_recording, root: @studio, actor: @admin)

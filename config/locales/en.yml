@@ -2,3 +2,6 @@ en:
   recording_studio_followable:
     follows:
       unauthorized: You cannot change that follow.
+      title: Following
+      empty: Nothing on the list yet. Open a page and hit Follow.
+      load_more: Load more
