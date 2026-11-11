@@ -12,6 +12,8 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
 
   test "dummy app validates recordable declarations" do
     assert RecordingStudio.validate_recordable_declarations!
+    refute RecordingStudioApi.const_defined?(:AdminApi, false)
+    refute_includes RecordingStudio.configuration.recordable_types, "RecordingStudioApi::AdminApi"
     assert_equal [ "Workspace" ], RecordingStudio.root_recordable_types
     assert_equal [ "Workspace", "Folder" ], RecordingStudio.allowed_parent_types_for("Page")
     assert_equal [ "Workspace" ], RecordingStudio.allowed_parent_types_for("RecordingStudioFollowable::Follow")

@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Requires Recording Studio 6.3 or newer and pins Notifications `~> 0.14.9`.
+- Dummy home keeps one page title. Dummy Following keeps one heading. Dummy skips unused `RecordingStudioApi::AdminApi` so CI eager-load declaration checks pass.
 
 ### Upgrade notes
 - Bump to `0.2.0`. Run the followable and notifications migrations.
