@@ -88,12 +88,12 @@ The idempotency key is `followable/{follow_root_id}/{followed_recording_id}/{eve
 
 Dummy screenshots from this version:
 
-![Follow button](docs/screenshots/follow-button.png)
+![Follow button, following](docs/screenshots/follow-button.png)
 ![Following list](docs/screenshots/follows-list.png)
 ![Inbox notice](docs/screenshots/notification-inbox.png)
 
-- Home: follow button for Getting Started, short following list, ping button
-- `/follows`: full list
+- Home: one title, follow button for Getting Started in the followed state, short following list, ping button
+- `/follows`: one Following heading and the full list
 - `/notifications`: inbox from Recording Studio Notifications
 
 Alice (`alice@example.com`), Bob, and Charlie share Client Workspace. Getting Started lives in Studio Workspace.

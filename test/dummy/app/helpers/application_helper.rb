@@ -2,7 +2,7 @@ module ApplicationHelper
   include RecordingStudio::LayoutHelper
   include RecordingStudioNotifications::MenuHelper if defined?(RecordingStudioNotifications::MenuHelper)
 
-  def dummy_page_nav(title:, back_url: nil, back_label: "Home")
+  def dummy_page_nav(title: nil, back_url: nil, back_label: "Home")
     content_for(:title, title) if title.present?
     if back_url.present?
       flat_pack_page_nav(round: true, style: :default, anchor_href: back_url, anchor_tooltip: back_label)

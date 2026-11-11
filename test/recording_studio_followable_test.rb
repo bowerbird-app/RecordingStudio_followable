@@ -228,12 +228,21 @@ class RecordingStudioFollowableTest < Minitest::Test
     view_path = File.expand_path("dummy/app/views/home/index.html.erb", __dir__)
     view_source = File.read(view_path)
 
-    assert_includes view_source, 'title: "Followable"'
+    refute_includes view_source, 'title: "Followable"'
+    assert_includes view_source, 'title: "Keep an eye on a page"'
     assert_includes view_source, "FollowButtonComponent"
     assert_includes view_source, "FlatPack::Card::Component"
     assert_includes view_source, "dummy_page_nav"
     refute_includes view_source, 'title: "Template Demo"'
     refute_includes view_source, "FlatPack::Breadcrumb::Component"
+  end
+
+  def test_dummy_following_page_keeps_one_heading
+    view_path = File.expand_path("dummy/app/views/follows/index.html.erb", __dir__)
+    view_source = File.read(view_path)
+
+    assert_equal 1, view_source.scan('title: "Following"').length
+    refute_includes view_source, 'dummy_page_nav(title: "Following"'
   end
 
   def test_dummy_does_not_ship_template_starter_docs

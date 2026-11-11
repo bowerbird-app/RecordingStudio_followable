@@ -24,6 +24,8 @@ class FollowFlowTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes @response.body, "Follow"
     assert_includes @response.body, "Keep an eye on a page"
+    refute_match %r{<h1[^>]*>Followable</h1>}, @response.body
+    assert_equal 1, @response.body.scan(/<h1[\s>]/i).length
   end
 
   test "following a page from the current workspace lists it and can ping the inbox" do
@@ -36,6 +38,7 @@ class FollowFlowTest < ActionDispatch::IntegrationTest
     get main_app.follows_path
     assert_response :success
     assert_includes @response.body, "Getting Started"
+    assert_equal 1, @response.body.scan(/<h1[\s>]/i).length
 
     post main_app.notify_followers_page_path(@page), params: { event_key: "flow-test" }
     follow_redirect!
