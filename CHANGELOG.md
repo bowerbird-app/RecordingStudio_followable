@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dummy ping action and Notifications inbox, using the gem `follow_button` helper.
 - `follow_target_url(recording)` plus optional `config.followed_url`. Default is `polymorphic_path` on the followed recordable.
 - Engine `follows` routes and `follow_button(recording)`. Follow is a Flatpack button with `plus-circle`. Following is a Flatpack dropdown with `check-circle` and Unfollow (`minus-circle`). Turbo Stream replaces the button. HTML redirects back.
-- Engine Following page at `GET /follows`. One `FlatPack::List` with `FlatPack::Link` titles and `follow_button` on each row. Keyset pages (`config.page_size`, default 25) load through `FlatPack::PaginationInfinite`. `RecordingStudioFollowable.follows` accepts optional `limit` and `cursor`. `config.current_root` supplies the open workspace.
+- Engine Following page at `GET /follows`. One divided `FlatPack::List` with `FlatPack::Link` titles and `follow_button` on each row. Keyset pages (`config.page_size`, default 25) load through `FlatPack::PaginationInfinite`. `RecordingStudioFollowable.follows` accepts optional `limit` and `cursor`. `config.current_root` supplies the open workspace.
 
 ### Changed
 - Requires Recording Studio 6.3 or newer and pins Notifications `~> 0.14.9`.

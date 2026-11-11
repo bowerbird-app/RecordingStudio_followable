@@ -105,6 +105,7 @@ class FollowableFollowsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Getting Started"
     assert_includes response.body, "/pages/#{@page.id}"
     assert_includes response.body, "Unfollow"
+    assert_includes response.body, "flat-pack-list-divided"
     refute_includes response.body, "Pages this workspace is watching."
     assert_equal 1, response.body.scan(/<h1[\s>]/i).length
   end
@@ -162,6 +163,7 @@ class FollowableFollowsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Bravo"
     refute_includes response.body, "Alpha"
     assert_includes response.body, "data-pagination-content"
+    assert_includes response.body, "flat-pack-list-divided"
     assert_includes response.body, "flat-pack--pagination-infinite"
     cursor = CGI.unescape(CGI.unescapeHTML(response.body[/cursor=([^"&]+)/, 1].to_s))
     assert cursor.present?
@@ -172,6 +174,7 @@ class FollowableFollowsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "Alpha"
     refute_includes response.body, "Charlie"
+    assert_includes response.body, "flat-pack-list-divided"
     refute_includes response.body, "flat-pack--pagination-infinite"
   ensure
     RecordingStudioFollowable.configuration.page_size = RecordingStudioFollowable::Configuration::DEFAULT_PAGE_SIZE

@@ -99,7 +99,7 @@ Dummy screenshots from this version:
 
 - Home: one title and `follow_button` for Getting Started
 - Following dropdown: Unfollow with `minus-circle`
-- `/recording_studio_followable/follows`: engine Following page, one `FlatPack::List`, titles link, each row uses `follow_button`, `PaginationInfinite` as you scroll
+- `/recording_studio_followable/follows`: engine Following page, one divided `FlatPack::List`, titles link, each row uses `follow_button`, `PaginationInfinite` as you scroll
 - `/notifications`: inbox from Recording Studio Notifications
 
 Alice (`alice@example.com`), Bob, and Charlie share Client Workspace. Getting Started lives in Studio Workspace.

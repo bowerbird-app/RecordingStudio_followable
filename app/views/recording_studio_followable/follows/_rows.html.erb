@@ -1,4 +1,4 @@
-<%= render FlatPack::List::Component.new(data: { pagination_content: true }) do %>
+<%= render FlatPack::List::Component.new(divider: true, data: { pagination_content: true }) do %>
   <% follows.each do |follow_recording| %>
     <% target = follow_recording.recordable.target_recording %>
     <% url = follow_target_url(target) %>
