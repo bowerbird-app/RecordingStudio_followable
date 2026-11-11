@@ -1,0 +1,15 @@
+<div class="flex w-full flex-col gap-6">
+  <%= render FlatPack::PageTitle::Component.new(
+    title: t("recording_studio_followable.follows.title"),
+    variant: :h1
+  ) %>
+
+  <% if @follows.blank? %>
+    <%= render FlatPack::Text::Component.new(
+      text: t("recording_studio_followable.follows.empty"),
+      size: :sm
+    ) %>
+  <% else %>
+    <%= render "recording_studio_followable/follows/rows", follows: @follows, next_cursor: @next_cursor %>
+  <% end %>
+</div>

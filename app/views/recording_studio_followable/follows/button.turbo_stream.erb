@@ -1,0 +1,3 @@
+<%= turbo_stream.replace RecordingStudioFollowable::FollowButtonComponent.frame_id(target: @target_recording, root: @follow_root) do %>
+  <%= follow_button(@target_recording, root: @follow_root) %>
+<% end %>

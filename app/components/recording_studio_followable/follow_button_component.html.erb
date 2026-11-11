@@ -1,0 +1,32 @@
+<div id="<%= frame_id %>">
+  <% if following? %>
+    <%= render FlatPack::Button::Dropdown::Component.new(
+      text: "Following",
+      style: :secondary,
+      size: :md,
+      icon: "check-circle"
+    ) do |dropdown| %>
+      <% dropdown.menu_item(
+        text: "Unfollow",
+        icon: "minus-circle",
+        href: request_url,
+        data: {
+          turbo_method: :delete,
+          turbo_stream: true
+        }
+      ) %>
+    <% end %>
+  <% else %>
+    <%= form_with url: follow_url, method: :post, data: { turbo_stream: true } do %>
+      <%= hidden_field_tag :target_id, target.id, id: nil %>
+      <%= hidden_field_tag :root_id, root.id, id: nil %>
+      <%= render FlatPack::Button::Component.new(
+        text: "Follow",
+        type: :submit,
+        style: :primary,
+        size: :md,
+        icon: "plus-circle"
+      ) %>
+    <% end %>
+  <% end %>
+</div>

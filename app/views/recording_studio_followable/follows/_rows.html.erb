@@ -1,0 +1,29 @@
+<%= render FlatPack::List::Component.new(divider: true, data: { pagination_content: true }) do %>
+  <% follows.each do |follow_recording| %>
+    <% target = follow_recording.recordable.target_recording %>
+    <% url = follow_target_url(target) %>
+    <% title = follow_target_title(follow_recording) %>
+    <%= render FlatPack::List::Item.new(
+      align: :center,
+      trailing: follow_button(target, root: @follow_root)
+    ) do |item| %>
+      <% item.with_title do %>
+        <% if url.present? %>
+          <%= render FlatPack::Link::Component.new(href: url) do %>
+            <%= title %>
+          <% end %>
+        <% else %>
+          <%= title %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>
+<% if next_cursor.present? %>
+  <%= render FlatPack::PaginationInfinite::Component.new(
+    url: follows_path(cursor: next_cursor),
+    has_more: true,
+    loading_variant: :inline,
+    insert_mode: :append
+  ) %>
+<% end %>

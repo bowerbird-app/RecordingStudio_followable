@@ -103,8 +103,11 @@ module RecordingStudioFollowable
       def tailwind_source_lines
         [
           '@source "../../vendor/bundle/**/recording_studio_followable/app/views/**/*.erb";',
+          '@source "../../vendor/bundle/**/recording_studio_followable/app/components/**/*.erb";',
           '@source "../../../../../../usr/local/bundle/ruby/**/bundler/gems/' \
-          'recording_studio_followable-*/app/views/**/*.erb";'
+          'recording_studio_followable-*/app/views/**/*.erb";',
+          '@source "../../../../../../usr/local/bundle/ruby/**/bundler/gems/' \
+          'recording_studio_followable-*/app/components/**/*.erb";'
         ]
       end
     end

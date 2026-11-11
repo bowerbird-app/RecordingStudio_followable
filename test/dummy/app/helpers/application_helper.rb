@@ -1,42 +1,51 @@
 module ApplicationHelper
-  def dummy_page_nav(title:, back_url: nil, back_label: "Home")
-    recording_studio_page_nav(
-      title: title,
-      page_nav_back_url: back_url,
-      page_nav_back_label: back_label
-    )
+  include RecordingStudio::LayoutHelper
+  include RecordingStudioNotifications::MenuHelper if defined?(RecordingStudioNotifications::MenuHelper)
+
+  def dummy_page_nav(title: nil, back_url: nil, back_label: "Home")
+    content_for(:title, title) if title.present?
+    if back_url.present?
+      flat_pack_page_nav(round: true, style: :default, anchor_href: back_url, anchor_tooltip: back_label)
+    else
+      flat_pack_page_nav(round: true, style: :default)
+    end
+    register_page_nav "Pages", main_app.pages_path, role: :secondary
+    register_page_nav "Following", recording_studio_followable.follows_path, role: :secondary
+    register_page_nav "Inbox", recording_studio_notifications.notifications_path, role: :secondary
 
     recording_studio_page_nav_right do
       concat dummy_root_switch_dropdown
-      concat render(
-        FlatPack::Button::Component.new(
-          text: "Sign out",
-          style: :ghost,
-          size: :md,
-          href: main_app.destroy_user_session_path,
-          data: { turbo_method: :delete }
-        )
-      )
+      concat recording_studio_notifications_menu if respond_to?(:recording_studio_notifications_menu)
+      concat dummy_nav_button("Sign out", main_app.destroy_user_session_path, turbo_method: :delete)
     end
   end
 
-  # TODO: temporary shim. Root Switchable v0.10.0's dropdown template calls
-  # FlatPack's button_attributes, which was removed in FlatPack v0.1.320.
-  # The fix is in Root Switchable v0.11.0+, which needs recording_studio >= 6.1.
-  # Remove the shim once a Root Switchable 0.10.x fix ships or the dummy moves to RS 6.x.
   def dummy_root_switch_dropdown
-    list = recording_studio_root_switch_list_for
-    return if list.blank?
+    return unless respond_to?(:recording_studio_root_switch_dropdown)
 
-    dropdown = FlatPack::Button::Dropdown::Component.new(
-      text: list.menu_rows.current_label,
-      disabled: list.menu_rows.switch_rows.empty?,
+    recording_studio_root_switch_dropdown(style: :ghost, size: :md)
+  rescue StandardError
+    nil
+  end
+
+  def recording_studio_notifications_menu(limit: 5)
+    return unless user_signed_in?
+    return unless respond_to?(:recording_studio_notifications_async_menu)
+
+    recording_studio_notifications_async_menu(recipient: current_user, limit: limit)
+  rescue StandardError
+    nil
+  end
+
+  private
+
+  def dummy_nav_button(text, href, turbo_method: nil)
+    render FlatPack::Button::Component.new(
+      text: text,
       style: :ghost,
-      size: :md
+      size: :md,
+      href: href,
+      data: turbo_method ? { turbo_method: turbo_method } : {}
     )
-    dropdown.menu_html(
-      render(RecordingStudioRootSwitchable::RootSwitch::RowsComponent.new(menu_rows: list.menu_rows))
-    )
-    render(dropdown)
   end
 end

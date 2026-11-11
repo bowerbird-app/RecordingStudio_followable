@@ -64,7 +64,9 @@ class InstallGeneratorTest < Minitest::Test
       File.write(css_path, <<~CSS)
         @import "tailwindcss";
         @source "../../vendor/bundle/**/recording_studio_followable/app/views/**/*.erb";
+        @source "../../vendor/bundle/**/recording_studio_followable/app/components/**/*.erb";
         @source "../../../../../../usr/local/bundle/ruby/**/bundler/gems/recording_studio_followable-*/app/views/**/*.erb";
+        @source "../../../../../../usr/local/bundle/ruby/**/bundler/gems/recording_studio_followable-*/app/components/**/*.erb";
       CSS
 
       generator = build_generator(dir)
@@ -152,8 +154,13 @@ class InstallGeneratorTest < Minitest::Test
 
     assert_includes install_guide, "bin/rails generate recording_studio_followable:migrations"
     assert_includes install_guide, "bin/rails db:migrate"
-    assert_includes install_guide, "auth, layout, and current actor integration"
-    assert_includes install_guide, "recording_studio_recordable"
+    assert_includes install_guide, "notify_followers"
+    assert_includes install_guide, "Followable"
+    assert_includes install_guide, "follow_button(recording)"
+    assert_includes install_guide, "follow_target_url(recording)"
+    assert_includes install_guide, "config.followed_url"
+    assert_includes install_guide, "config.current_root"
+    assert_includes install_guide, "config.page_size"
     refute_includes install_guide, "RecordingStudio v3"
   end
 
@@ -182,8 +189,11 @@ class InstallGeneratorTest < Minitest::Test
   def tailwind_source_lines
     [
       '@source "../../vendor/bundle/**/recording_studio_followable/app/views/**/*.erb";',
+      '@source "../../vendor/bundle/**/recording_studio_followable/app/components/**/*.erb";',
       '@source "../../../../../../usr/local/bundle/ruby/**/bundler/gems/' \
-      'recording_studio_followable-*/app/views/**/*.erb";'
+      'recording_studio_followable-*/app/views/**/*.erb";',
+      '@source "../../../../../../usr/local/bundle/ruby/**/bundler/gems/' \
+      'recording_studio_followable-*/app/components/**/*.erb";'
     ]
   end
 

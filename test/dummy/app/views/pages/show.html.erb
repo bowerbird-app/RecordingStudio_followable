@@ -1,0 +1,27 @@
+<% dummy_page_nav(title: @page.title, back_url: pages_path, back_label: "Pages") %>
+
+<div class="flex w-full flex-col gap-6">
+  <%= render FlatPack::PageTitle::Component.new(
+    title: @page.title,
+    subtitle: "Follow this page from the workspace you have open.",
+    variant: :h1
+  ) %>
+
+  <% if @follow_root && RecordingStudioAccessible.authorized?(actor: current_user, recording: @follow_root, role: :view) %>
+    <%= follow_button(@page_recording) %>
+
+    <% if @following %>
+      <%= form_with url: notify_followers_page_path(@page), method: :post, local: true do %>
+        <%= hidden_field_tag :event_key, "dummy-page-#{@page.id}" %>
+        <%= render FlatPack::Button::Component.new(
+          text: "Ping followers",
+          type: :submit,
+          style: :secondary,
+          size: :md
+        ) %>
+      <% end %>
+    <% end %>
+  <% else %>
+    <p class="text-sm leading-6">Pick a workspace you can use before you follow this page.</p>
+  <% end %>
+</div>

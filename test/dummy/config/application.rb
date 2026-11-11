@@ -45,3 +45,12 @@ module Dummy
     config.generators.system_tests = nil
   end
 end
+
+# API 0.19 declares AdminApi whenever the class loads. The engine only registers
+# that type when an admin root exists. Dummy has no Admin root, so CI eager-load
+# would fail declaration validation. Skip the unused model.
+if defined?(RecordingStudioApi::Engine)
+  Rails.autoloaders.main.ignore(
+    RecordingStudioApi::Engine.root.join("app/models/recording_studio_api/admin_api.rb")
+  )
+end
