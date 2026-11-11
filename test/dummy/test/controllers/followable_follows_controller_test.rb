@@ -117,7 +117,7 @@ class FollowableFollowsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, I18n.t("recording_studio_followable.follows.empty")
-    refute_includes response.body, "Load more"
+    refute_includes response.body, "flat-pack--pagination-infinite"
   end
 
   test "unauthorized html index redirects with an alert" do
@@ -137,7 +137,7 @@ class FollowableFollowsControllerTest < ActionDispatch::IntegrationTest
     assert_response :forbidden
   end
 
-  test "index paginates newest first and the next frame returns the rest" do
+  test "index paginates newest first and the next xhr slice returns the rest" do
     list_root = RecordingStudio.root_recording_for(Workspace.create!(name: "Follow list #{SecureRandom.hex(4)}"))
     RecordingStudioAccessible.bootstrap_owner_access!(recording: list_root, actor: @admin)
     switch_to_workspace(list_root)
@@ -161,19 +161,18 @@ class FollowableFollowsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Charlie"
     assert_includes response.body, "Bravo"
     refute_includes response.body, "Alpha"
-    assert_includes response.body, "Load more"
-    assert_includes response.body, 'loading="lazy"'
+    assert_includes response.body, "data-pagination-content"
+    assert_includes response.body, "flat-pack--pagination-infinite"
     cursor = CGI.unescape(CGI.unescapeHTML(response.body[/cursor=([^"&]+)/, 1].to_s))
     assert cursor.present?
 
     get recording_studio_followable.follows_path(cursor: cursor),
-        headers: { "Turbo-Frame" => "follows-page-#{cursor}" }
+        headers: { "X-Requested-With" => "XMLHttpRequest" }
 
     assert_response :success
     assert_includes response.body, "Alpha"
     refute_includes response.body, "Charlie"
-    refute_includes response.body, "Load more"
-    refute_includes response.body, 'loading="lazy"'
+    refute_includes response.body, "flat-pack--pagination-infinite"
   ensure
     RecordingStudioFollowable.configuration.page_size = RecordingStudioFollowable::Configuration::DEFAULT_PAGE_SIZE
   end

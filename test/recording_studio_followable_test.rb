@@ -248,8 +248,9 @@ class RecordingStudioFollowableTest < Minitest::Test
     rows = File.read(File.expand_path("../app/views/recording_studio_followable/follows/_rows.html.erb", __dir__))
     assert_includes rows, "follow_target_url("
     assert_includes rows, "follow_button("
-    assert_includes rows, "loading: :lazy"
-    assert_includes rows, "recording_studio_followable.follows.load_more"
+    assert_includes rows, "FlatPack::List::Component"
+    assert_includes rows, "FlatPack::List::Item"
+    assert_includes rows, "FlatPack::PaginationInfinite::Component"
   end
 
   def test_dummy_does_not_ship_template_starter_docs

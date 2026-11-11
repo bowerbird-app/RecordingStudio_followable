@@ -1,28 +1,29 @@
-<% follows.each do |follow_recording| %>
-  <% target = follow_recording.recordable.target_recording %>
-  <%= render FlatPack::Card::Component.new do |card| %>
-    <% card.body do %>
-      <div class="flex flex-wrap items-center justify-between gap-3">
-        <% url = follow_target_url(target) %>
+<%= render FlatPack::List::Component.new(data: { pagination_content: true }) do %>
+  <% follows.each do |follow_recording| %>
+    <% target = follow_recording.recordable.target_recording %>
+    <% url = follow_target_url(target) %>
+    <% title = follow_target_title(follow_recording) %>
+    <%= render FlatPack::List::Item.new(
+      align: :center,
+      trailing: follow_button(target, root: @follow_root)
+    ) do |item| %>
+      <% item.with_title do %>
         <% if url.present? %>
-          <%= render FlatPack::Link::Component.new(href: url, class: "text-sm leading-6") do %>
-            <%= follow_target_title(follow_recording) %>
+          <%= render FlatPack::Link::Component.new(href: url) do %>
+            <%= title %>
           <% end %>
         <% else %>
-          <p class="text-sm leading-6"><%= follow_target_title(follow_recording) %></p>
+          <%= title %>
         <% end %>
-        <%= follow_button(target, root: @follow_root) %>
-      </div>
+      <% end %>
     <% end %>
   <% end %>
 <% end %>
 <% if next_cursor.present? %>
-  <%= turbo_frame_tag follows_next_frame_id(next_cursor), src: follows_path(cursor: next_cursor), loading: :lazy do %>
-    <%= render FlatPack::Button::Component.new(
-      text: t("recording_studio_followable.follows.load_more"),
-      href: follows_path(cursor: next_cursor),
-      style: :ghost,
-      size: :md
-    ) %>
-  <% end %>
+  <%= render FlatPack::PaginationInfinite::Component.new(
+    url: follows_path(cursor: next_cursor),
+    has_more: true,
+    loading_variant: :inline,
+    insert_mode: :append
+  ) %>
 <% end %>

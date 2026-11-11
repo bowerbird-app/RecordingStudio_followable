@@ -7,6 +7,7 @@ module RecordingStudioFollowable
       raise RecordingStudioFollowable::NotAuthorized if @follow_root.blank? || !view_on_root?(@follow_root)
 
       assign_follows_page
+      render_xhr_rows if request.xhr?
     rescue RecordingStudioFollowable::NotAuthorized, ActiveRecord::RecordNotFound
       respond_unauthorized
     end
@@ -20,6 +21,10 @@ module RecordingStudioFollowable
     end
 
     private
+
+    def render_xhr_rows
+      render partial: "rows", locals: { follows: @follows, next_cursor: @next_cursor }, layout: false
+    end
 
     def assign_follows_page
       page = RecordingStudioFollowable.follows(

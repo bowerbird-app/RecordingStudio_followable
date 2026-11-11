@@ -34,7 +34,7 @@ Then open the app and sign in with:
 - `/recording_studio` - redirects to `/` while the mounted Recording Studio engine stays available under that prefix for non-root routes
 - `/users/sign_in` - Devise sign-in page
 - `/up` - Rails health check
-- `/recording_studio_followable/follows` - engine Following page for the open workspace (keyset pages, lazy Load more)
+- `/recording_studio_followable/follows` - engine Following page for the open workspace (`FlatPack::List` plus `PaginationInfinite`)
 - `/pages` - pages in the open workspace
 - `/notifications` - inbox from Recording Studio Notifications
 
