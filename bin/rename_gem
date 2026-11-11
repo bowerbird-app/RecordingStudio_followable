@@ -236,10 +236,20 @@ class GemRenamer
     end
   end
 
+  def glob_content_files
+    patterns = CONTENT_FILE_PATTERNS.flat_map do |pattern|
+      [
+        File.join(@root, "**", pattern),
+        File.join(@root, ".github", "**", pattern),
+        File.join(@root, ".cursor", pattern)
+      ]
+    end
+    patterns.flat_map { |pattern| Dir.glob(pattern) }
+  end
+
   def files_to_update_content
     @files_to_update_content ||= begin
-      patterns = CONTENT_FILE_PATTERNS.map { |p| File.join(@root, "**", p) }
-      files = patterns.flat_map { |p| Dir.glob(p) }
+      files = glob_content_files
 
       # Exclude files in excluded directories (but NOT test/dummy, we handle that separately)
       files.reject! do |f|
@@ -283,7 +293,12 @@ class GemRenamer
     return false unless File.file?(path)
 
     content = File.read(path)
-    content.include?(@old_name) || content.include?(old_pascal) || content.include?(@old_name.upcase)
+    old_kebab = to_kebab_case(@old_name)
+    content.include?(@old_name) ||
+      content.include?(old_pascal) ||
+      content.include?(@old_name.upcase) ||
+      content.include?(old_kebab) ||
+      content.include?("recording-studio-#{old_kebab}")
   rescue StandardError
     false
   end
@@ -413,8 +428,7 @@ class GemRenamer
   end
 
   def validate_no_old_references!
-    scan_patterns = (CONTENT_FILE_PATTERNS + %w[*.yml *.yaml]).uniq
-    files = scan_patterns.flat_map { |p| Dir.glob(File.join(@root, "**", p)) }
+    files = glob_content_files
 
     # Exclude files in excluded directories (but NOT test/dummy, handled below)
     files.reject! { |f| EXCLUDED_DIRS.any? { |dir| f.include?("/#{dir}/") } }
