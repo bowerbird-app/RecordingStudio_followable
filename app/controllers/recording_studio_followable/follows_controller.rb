@@ -4,17 +4,9 @@ module RecordingStudioFollowable
   class FollowsController < ApplicationController
     def index
       @follow_root = configured_root
-      raise RecordingStudioFollowable::NotAuthorized if @follow_root.blank?
-      raise RecordingStudioFollowable::NotAuthorized unless view_on_root?(@follow_root)
+      raise RecordingStudioFollowable::NotAuthorized if @follow_root.blank? || !view_on_root?(@follow_root)
 
-      page = RecordingStudioFollowable.follows(
-        root: @follow_root,
-        actor: follow_actor,
-        limit: RecordingStudioFollowable.configuration.page_size,
-        cursor: params[:cursor]
-      )
-      @follows = page.records
-      @next_cursor = page.next_cursor
+      assign_follows_page
     rescue RecordingStudioFollowable::NotAuthorized, ActiveRecord::RecordNotFound
       respond_unauthorized
     end
@@ -28,6 +20,17 @@ module RecordingStudioFollowable
     end
 
     private
+
+    def assign_follows_page
+      page = RecordingStudioFollowable.follows(
+        root: @follow_root,
+        actor: follow_actor,
+        limit: RecordingStudioFollowable.configuration.page_size,
+        cursor: params[:cursor]
+      )
+      @follows = page.records
+      @next_cursor = page.next_cursor
+    end
 
     def mutate_follow(action)
       RecordingStudioFollowable.public_send(
