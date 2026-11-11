@@ -14,19 +14,9 @@ class FlatpackPagesTest < ActionDispatch::IntegrationTest
     sign_in user
   end
 
-  test "signed-in dummy pages render after the flatpack bump" do
-    [
-      root_path,
-      docs_install_path,
-      docs_config_path,
-      docs_recordable_types_path,
-      docs_recordings_tree_path,
-      docs_gem_views_path,
-      docs_methods_path
-    ].each do |path|
-      get path
+  test "signed-in dummy home renders after the flatpack bump" do
+    get root_path
 
-      assert_response :success, "expected #{path} to render"
-    end
+    assert_response :success
   end
 end

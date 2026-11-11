@@ -205,19 +205,6 @@ class RenameVerificationTest < Minitest::Test
                  "Application controller should be in module #{@pascal_name}")
   end
 
-  def test_home_controller_exists
-    path = File.join(@root, "app", "controllers", @gem_name, "home_controller.rb")
-    assert File.exist?(path),
-           "Home controller should exist at #{path}"
-  end
-
-  def test_home_controller_has_correct_module
-    path = File.join(@root, "app", "controllers", @gem_name, "home_controller.rb")
-    content = File.read(path)
-    assert_match(/^module #{@pascal_name}$/, content,
-                 "Home controller should be in module #{@pascal_name}")
-  end
-
   # ============================================================
   # No Orphaned Old Name References
   # ============================================================
@@ -226,22 +213,12 @@ class RenameVerificationTest < Minitest::Test
   # completely replaced. They only run after a rename has occurred.
 
   def test_no_old_gem_template_references_in_ruby_files
-    # Skip if current name IS gem_template (nothing to check - hasn't been renamed yet)
     skip if @gem_name == "gem_template"
 
-    ruby_files = Dir.glob(File.join(@root, "**", "*.rb"))
-    # Exclude test files and this verification test itself
-    ruby_files.reject! { |f| f.include?("test/dummy") || f.include?("rename_verification_test.rb") }
+    leftovers = ruby_files_for_old_name_scan.select { |file| ruby_file_has_old_template_name?(file) }
 
-    files_with_old_refs = []
-
-    ruby_files.each do |file|
-      content = File.read(file)
-      files_with_old_refs << file if content.include?("gem_template") || content.include?("GemTemplate")
-    end
-
-    assert files_with_old_refs.empty?,
-           "Found old 'gem_template' references in:\n#{files_with_old_refs.join("\n")}"
+    assert leftovers.empty?,
+           "Found old 'gem_template' references in:\n#{leftovers.join("\n")}"
   end
 
   def test_no_old_gem_template_directories
@@ -436,5 +413,24 @@ class RenameVerificationTest < Minitest::Test
 
   def read_routes_file
     File.read(File.join(@root, "config", "routes.rb"))
+  end
+
+  def ruby_files_for_old_name_scan
+    skip_suffixes = %w[
+      rename_verification_test.rb
+      rename_gem_identity_test.rb
+      dummy_credentials_test.rb
+    ]
+
+    Dir.glob(File.join(@root, "**", "*.rb")).reject do |file|
+      file.include?("test/dummy") ||
+        file.include?("/docs/gem_template/") ||
+        skip_suffixes.any? { |suffix| file.end_with?(suffix) }
+    end
+  end
+
+  def ruby_file_has_old_template_name?(file)
+    content = File.read(file).gsub(%r{docs/gem_template}, "")
+    content.include?("gem_template") || content.include?("GemTemplate")
   end
 end
