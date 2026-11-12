@@ -9,6 +9,8 @@ RecordingStudioFollowable.configure do |config|
   #   controller.current_root_recording if controller.respond_to?(:current_root_recording)
   # }
   # config.page_size = 25
+  # Optional Follow and Following look. Defaults are style :default and style :secondary.
+  # config.button = { follow: { style: :primary } }
   # Audience action Accessible uses to decide a signed-out visitor can see the target.
   # Mark a public page with audience :public for this action. Default is below.
   # config.visibility_action = :"recording_studio_followable.see"

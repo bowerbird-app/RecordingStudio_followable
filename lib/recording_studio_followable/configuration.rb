@@ -1,13 +1,14 @@
 # frozen_string_literal: true
 
 require "recording_studio/layout"
+require "recording_studio_followable/button_appearance"
 
 module RecordingStudioFollowable
   class Configuration
     DEFAULT_PAGE_SIZE = 25
 
     attr_accessor :allowed_parent_types, :followed_url, :current_root, :account_setup_url
-    attr_reader :hooks, :layout, :page_size, :visibility_action, :allowed_return_origins
+    attr_reader :hooks, :layout, :page_size, :visibility_action, :allowed_return_origins, :button
 
     def initialize
       @allowed_parent_types = ["Workspace"]
@@ -19,6 +20,13 @@ module RecordingStudioFollowable
       @layout = nil
       @page_size = DEFAULT_PAGE_SIZE
       @hooks = RecordingStudio::Hooks.new
+      @button = {}.freeze
+    end
+
+    def button=(value)
+      parsed = ButtonAppearance.parse(value)
+      parsed.each_value(&:freeze)
+      @button = parsed.freeze
     end
 
     def visibility_action=(value)

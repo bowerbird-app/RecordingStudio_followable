@@ -1,5 +1,9 @@
 en:
   recording_studio_followable:
+    follow_button:
+      follow: Follow
+      following: Following
+      unfollow: Unfollow
     follows:
       unauthorized: You cannot change that follow.
       title: Following

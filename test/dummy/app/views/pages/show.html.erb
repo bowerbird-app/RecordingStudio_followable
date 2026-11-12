@@ -8,7 +8,11 @@
   ) %>
 
   <% if @follow_root && RecordingStudioAccessible.authorized?(actor: current_user, recording: @follow_root, role: :view) %>
-    <%= follow_button(@page_recording) %>
+    <%= follow_button(
+          @page_recording,
+          follow: { style: :ghost, label: "Watch" },
+          following: { style: :ghost, label: "Watching" }
+        ) %>
 
     <% if @following %>
       <%= form_with url: notify_followers_page_path(@page), method: :post, local: true do %>

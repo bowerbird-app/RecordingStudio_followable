@@ -25,6 +25,7 @@ class FollowableFollowsControllerTest < ActionDispatch::IntegrationTest
 
   teardown do
     Current.actor = nil
+    RecordingStudioFollowable.configuration.button = nil
   end
 
   test "html follow creates a follow and redirects back" do
@@ -91,7 +92,60 @@ class FollowableFollowsControllerTest < ActionDispatch::IntegrationTest
     assert_equal Mime[:turbo_stream], response.media_type
     assert_includes response.body, "Follow"
     assert_includes response.body, "plus-circle"
+    assert_includes response.body, 'data-fp-style="default"'
     refute_includes response.body, "Unfollow"
+  end
+
+  test "turbo_stream follow uses the configured following look" do
+    RecordingStudioFollowable.configuration.button = { following: { label: "Tracked", style: :ghost } }
+    post recording_studio_followable.follows_path,
+         params: { target_id: @page_recording.id, root_id: @client.id },
+         as: :turbo_stream
+
+    assert_response :success
+    assert_includes response.body, "Tracked"
+    assert_includes response.body, 'data-fp-style="ghost"'
+    assert_includes response.body, "check-circle"
+  ensure
+    RecordingStudioFollowable.unfollow(target: @page_recording, root: @client, actor: @admin)
+  end
+
+  test "turbo_stream re-render keeps per-call button overrides" do
+    post recording_studio_followable.follows_path,
+         params: {
+           target_id: @page_recording.id,
+           root_id: @client.id,
+           follow_button: {
+             follow: { style: "ghost", label: "Mark" },
+             following: { label: "Kept", style: "secondary" }
+           }
+         },
+         as: :turbo_stream
+
+    assert_response :success
+    assert_includes response.body, "Kept"
+    assert_includes response.body, "check-circle"
+    assert_includes response.body, 'data-fp-style="secondary"'
+    assert_includes CGI.unescape(response.body), "follow_button[follow][label]=Mark"
+    assert_includes CGI.unescape(response.body), "follow_button[follow][style]=ghost"
+
+    delete recording_studio_followable.follows_path,
+           params: {
+             target_id: @page_recording.id,
+             root_id: @client.id,
+             follow_button: {
+               follow: { style: "ghost", label: "Mark" },
+               following: { label: "Kept" }
+             }
+           },
+           as: :turbo_stream
+
+    assert_response :success
+    assert_includes response.body, ">Mark</span>"
+    assert_includes response.body, "plus-circle"
+    assert_includes response.body, 'data-fp-style="ghost"'
+    assert_includes response.body, 'name="follow_button[following][label]"'
+    assert_includes response.body, 'value="Kept"'
   end
 
   test "index lists follows for the current root" do

@@ -42,7 +42,7 @@ include RecordingStudio::Capabilities::FollowParent.to
 ```
 
 5. Let Accessible `:view` on the follow root create and trash Follows. Dummy `authorize_write` treats Follow creates as `:view`. Trashable on Follow also uses `:view`.
-6. Mount the engine (`generate recording_studio_followable:install` does this). Then render `follow_button(recording)` on a host page. The helper uses the current root and actor, and the button updates in place over Turbo. Without JavaScript it redirects back. The Following page is `GET` on the mount's `/follows`. Set `config.current_root` to the open workspace (dummy uses `current_root_recording`). `follow_target_url(recording)` is the path for a followed item. It uses `polymorphic_path` on the recordable. Set `config.followed_url` when the host path is different. `config.page_size` (default 25) is the Following page slice. `FlatPack::PaginationInfinite` fetches the next slice as you scroll.
+6. Mount the engine (`generate recording_studio_followable:install` does this). Then render `follow_button(recording)` on a host page. The helper uses the current root and actor, and the button updates in place over Turbo. Without JavaScript it redirects back. The Following page is `GET` on the mount's `/follows`. Set `config.current_root` to the open workspace (dummy uses `current_root_recording`). `follow_target_url(recording)` is the path for a followed item. It uses `polymorphic_path` on the recordable. Set `config.followed_url` when the host path is different. `config.page_size` (default 25) is the Following page slice. `FlatPack::PaginationInfinite` fetches the next slice as you scroll. See Button look to change the style, icon, or label.
 7. Register a Notifications type with `scope: :root` before you call `notify_followers`. Dummy registers `:followed_update`.
 8. Register the followed type and the root type with Recording Studio API so `follow`, `unfollow`, `followers`, and `follows` appear. Do not register `notify_followers`. Recording Studio MCP exposes the same capability actions once the host pins a MCP gem that accepts your API version. MCP 0.28.0 still requires API `< 0.18`, so this dummy pins API 0.19 without MCP.
 
@@ -63,6 +63,35 @@ Without `limit`, `follows` returns the full relation, newest first (`created_at`
 The actor needs Accessible `:view` on the follow root to create, list, or remove Follows. Listing a recording's followers also needs `:view` on that recording. Listing follows needs `:view` on the follow root.
 
 Following the item itself uses a seeable check. A kept Accessible `:view` grant counts. A public page also counts, with no grant, when Accessible's audience for `config.visibility_action` (default `:"recording_studio_followable.see"`) is `:public`. A private item the actor cannot see is refused. The same check is used by `follow_button`, the HTTP follow action, and the API/MCP `follow` handler. `followers` and `follows` stay on `:view`. The API gem still only routes a member action to a recording inside the credential's accessible scope. The handler no longer adds a second `:view` grant check on the target. `unfollow` still needs `:view` on the follow root only.
+
+## Button look
+
+Follow uses FlatPack style `:default`, icon `plus-circle`, and the label Follow. Following uses style `:secondary`, icon `check-circle`, and the label Following. Unfollow stays `minus-circle`. The signed-out link uses that same Follow look. A Turbo Stream replace uses it too.
+
+Set a global default, a per-call override, or both. Omit a key to keep that part of the default. A label you pass wins over the translation. Unknown keys raise `ArgumentError`.
+
+```ruby
+RecordingStudioFollowable.configure do |config|
+  config.button = {
+    follow: { style: :ghost, icon: "plus-circle", label: "Watch" },
+    following: { style: :ghost, icon: "check-circle", label: "Watching" }
+  }
+end
+```
+
+```ruby
+follow_button(recording, root: workspace, follow: { style: :primary }, following: { label: "Saved" })
+```
+
+Translations are `recording_studio_followable.follow_button.follow`, `.following`, and `.unfollow`.
+
+To restore the 0.3.0 primary Follow button:
+
+```ruby
+config.button = { follow: { style: :primary } }
+```
+
+A per-call override is sent with the follow and unfollow request, so the Turbo Stream replace keeps it.
 
 ## Signed-out follow
 
@@ -151,11 +180,13 @@ The idempotency key is `followable/{follow_root_id}/{followed_recording_id}/{eve
 Dummy screenshots from this version:
 
 ![Follow](docs/screenshots/follow-button.png)
-![Following, with Unfollow open](docs/screenshots/following-button.png)
+![Following](docs/screenshots/following-button.png)
+![Watching, ghost style on a page](docs/screenshots/follow-button-override.png)
 ![Following list](docs/screenshots/follows-list.png)
 ![Inbox notice](docs/screenshots/notification-inbox.png)
 
-- Home: one title and `follow_button` for Getting Started
+- Home: one title and `follow_button` for Getting Started, using the default look
+- A page show uses `follow: { style: :ghost, label: "Watch" }` and `following: { style: :ghost, label: "Watching" }`
 - Following dropdown: Unfollow with `minus-circle`
 - `/recording_studio_followable/follows`: engine Following page, one divided `FlatPack::List`, titles link, each row uses `follow_button`, `PaginationInfinite` as you scroll
 - `/notifications`: inbox from Recording Studio Notifications
@@ -164,4 +195,4 @@ Alice (`alice@example.com`), Bob, and Charlie share Client Workspace. Getting St
 
 ## Version
 
-The gem version is `0.3.0`.
+The gem version is `0.4.0`.

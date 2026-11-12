@@ -1,14 +1,14 @@
 <div id="<%= frame_id %>">
   <% if following? %>
     <%= render FlatPack::Button::Dropdown::Component.new(
-      text: "Following",
-      style: :secondary,
+      text: appearance.following.label,
+      style: appearance.following.style,
       size: :md,
-      icon: "check-circle"
+      icon: appearance.following.icon
     ) do |dropdown| %>
       <% dropdown.menu_item(
-        text: "Unfollow",
-        icon: "minus-circle",
+        text: appearance.unfollow_label,
+        icon: appearance.unfollow_icon,
         href: request_url,
         data: {
           turbo_method: :delete,
@@ -18,10 +18,10 @@
     <% end %>
   <% elsif sign_in? %>
     <%= render FlatPack::Button::Component.new(
-      text: "Follow",
-      style: :primary,
+      text: appearance.follow.label,
+      style: appearance.follow.style,
       size: :md,
-      icon: "plus-circle",
+      icon: appearance.follow.icon,
       href: sign_in_url,
       target: (embedded? ? "_blank" : nil),
       rel: (embedded? ? "noopener" : nil),
@@ -31,12 +31,15 @@
     <%= form_with url: follow_url, method: :post, data: { turbo_stream: true } do %>
       <%= hidden_field_tag :target_id, target.id, id: nil %>
       <%= hidden_field_tag :root_id, root.id, id: nil %>
+      <% appearance.fields.each do |name, value| %>
+        <%= hidden_field_tag name, value, id: nil %>
+      <% end %>
       <%= render FlatPack::Button::Component.new(
-        text: "Follow",
+        text: appearance.follow.label,
         type: :submit,
-        style: :primary,
+        style: appearance.follow.style,
         size: :md,
-        icon: "plus-circle"
+        icon: appearance.follow.icon
       ) %>
     <% end %>
   <% end %>

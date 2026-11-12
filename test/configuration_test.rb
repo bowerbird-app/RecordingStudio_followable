@@ -80,4 +80,39 @@ class ConfigurationTest < Minitest::Test
 
     assert_kind_of RecordingStudioFollowable::Configuration, RecordingStudioFollowable.configuration
   end
+
+  def test_button_defaults_to_an_empty_override
+    assert_equal({}, @configuration.button)
+  end
+
+  def test_button_stores_a_partial_override
+    @configuration.button = { follow: { style: :primary, label: "Watch" } }
+
+    assert_equal({ follow: { style: :primary, label: "Watch" } }, @configuration.button)
+  end
+
+  def test_button_rejects_an_unknown_state
+    error = assert_raises(ArgumentError) { @configuration.button = { unfollow: { style: :ghost } } }
+
+    assert_includes error.message, "unknown button state"
+  end
+
+  def test_button_rejects_an_unknown_setting
+    error = assert_raises(ArgumentError) { @configuration.button = { follow: { color: "red" } } }
+
+    assert_includes error.message, "unknown follow button setting"
+  end
+
+  def test_merge_updates_button
+    @configuration.merge!(button: { following: { icon: "check-circle" } })
+
+    assert_equal({ following: { icon: "check-circle" } }, @configuration.button)
+  end
+
+  def test_button_nil_clears_overrides
+    @configuration.button = { follow: { style: :primary } }
+    @configuration.button = nil
+
+    assert_equal({}, @configuration.button)
+  end
 end

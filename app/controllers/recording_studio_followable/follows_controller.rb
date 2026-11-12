@@ -38,6 +38,7 @@ module RecordingStudioFollowable
     end
 
     def mutate_follow(action)
+      @button_overrides = button_overrides
       RecordingStudioFollowable.public_send(
         action,
         target: target_recording,
@@ -103,6 +104,11 @@ module RecordingStudioFollowable
 
     def after_change_fallback
       main_app.respond_to?(:root_path) ? main_app.root_path : "/"
+    end
+
+    def button_overrides
+      permitted = params.permit(ButtonAppearance::PARAM_KEY => ButtonAppearance.permit_shape)
+      ButtonAppearance.parse(permitted.to_h[ButtonAppearance::PARAM_KEY.to_s])
     end
   end
 end

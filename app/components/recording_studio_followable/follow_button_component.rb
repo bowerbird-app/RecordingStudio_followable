@@ -6,12 +6,22 @@ module RecordingStudioFollowable
       "follow-button-#{target.id}-#{root&.id || 'guest'}"
     end
 
-    def initialize(target:, root:, following:, follow_url:, unfollow_url:, sign_in_url: nil, embedded: false) # rubocop:disable Lint/MissingSuper, Metrics/ParameterLists
+    def initialize( # rubocop:disable Lint/MissingSuper, Metrics/ParameterLists
+      target:,
+      root:,
+      following:,
+      follow_url:,
+      unfollow_url:,
+      appearance:,
+      sign_in_url: nil,
+      embedded: false
+    )
       @target = target
       @root = root
       @following = following
       @follow_url = follow_url
       @unfollow_url = unfollow_url
+      @appearance = appearance
       @sign_in_url = sign_in_url
       @embedded = embedded
     end
@@ -22,7 +32,7 @@ module RecordingStudioFollowable
 
     private
 
-    attr_reader :target, :root, :following, :follow_url, :unfollow_url, :sign_in_url, :embedded
+    attr_reader :target, :root, :following, :follow_url, :unfollow_url, :appearance, :sign_in_url, :embedded
 
     def following?
       following
@@ -37,9 +47,10 @@ module RecordingStudioFollowable
     end
 
     def request_url
-      query = { target_id: target.id, root_id: root.id }.to_query
+      query = { target_id: target.id, root_id: root.id }
+      query[ButtonAppearance::PARAM_KEY] = appearance.carry if appearance.carry.present?
       separator = unfollow_url.include?("?") ? "&" : "?"
-      "#{unfollow_url}#{separator}#{query}"
+      "#{unfollow_url}#{separator}#{query.to_query}"
     end
   end
 end
