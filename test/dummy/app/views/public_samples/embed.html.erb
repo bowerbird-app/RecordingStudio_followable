@@ -1,0 +1,5 @@
+<% content_for(:title, "Embedded page") %>
+<% content_for(:subtitle, "The public page sits in a frame, the way a third-party site would show it.") %>
+<%= flat_pack_page_nav(round: true, style: :default) %>
+
+<iframe src="<%= public_sample_path %>" title="Public page" class="h-[640px] w-full"></iframe>

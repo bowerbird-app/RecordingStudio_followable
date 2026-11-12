@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-11-11
+
+### Added
+- Signed-out `follow_button` on a publicly seeable item. The button matches Follow (`plus-circle`) and starts an email-code sign-in.
+- Email-code routes under the engine mount. The code uses Recording Studio Users (`request_otp!`, `verify_otp!`, `complete_email_proof!`) and Devise/Warden. Messages is not a dependency.
+- `config.visibility_action` (default `:"recording_studio_followable.see"`), `config.account_setup_url`, and `config.allowed_return_origins`.
+- Setup state when the signed-in person has no usable workspace. No Follow is created, and the host can redirect with `account_setup_url`.
+- Iframe sign-in opens in a new tab. A same-origin Turbo frame breaks out to the top window.
+
+### Changed
+- Follow allows any target the actor can see. A `:view` grant still counts. A public Accessible audience for `visibility_action` counts with no grant. A private target without access is refused on the helper, the HTTP follow action, and the API/MCP `follow` handler.
+- API `follow` and `unfollow` no longer pre-authorize `:view` on the target. `followers` and `follows` still require `:view`.
+
+### Upgrade notes
+- Bump to `0.3.0`. Signed-in follow of an item the actor can already see stays the same.
+- To show Follow to signed-out visitors, add `recording_studio_user`, enable OTP, configure the Accessible audience action, enable `:action_audiences` on public types, and set those recordings to audience `:public`.
+- Set `config.account_setup_url` when a new account should leave the setup page for the host's own setup flow.
+- Set `config.allowed_return_origins` when an embedded follow should return to a third-party parent URL. Same-host return URLs work without that list.
+- Do not call `notify_followers` over HTTP, the API, or MCP.
+
 ## [0.2.0] - 2026-11-11
 
 ### Added
@@ -45,6 +65,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Notes
 - Follow features are coming soon. This version does not ship a follow API, models, or public helpers.
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_followable/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_followable/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/bowerbird-app/RecordingStudio_followable/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/bowerbird-app/RecordingStudio_followable/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/bowerbird-app/RecordingStudio_followable/releases/tag/v0.1.0

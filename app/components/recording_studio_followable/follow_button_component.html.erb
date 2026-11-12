@@ -16,6 +16,17 @@
         }
       ) %>
     <% end %>
+  <% elsif sign_in? %>
+    <%= render FlatPack::Button::Component.new(
+      text: "Follow",
+      style: :primary,
+      size: :md,
+      icon: "plus-circle",
+      href: sign_in_url,
+      target: (embedded? ? "_blank" : nil),
+      rel: (embedded? ? "noopener" : nil),
+      data: embedded? ? { turbo: false } : { turbo_frame: "_top" }
+    ) %>
   <% else %>
     <%= form_with url: follow_url, method: :post, data: { turbo_stream: true } do %>
       <%= hidden_field_tag :target_id, target.id, id: nil %>

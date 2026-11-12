@@ -63,10 +63,35 @@ class FollowableServicesTest < ActiveSupport::TestCase
   end
 
   test "anyone with access to the follow root can follow and unfollow" do
+    publish(@page_recording)
     RecordingStudioFollowable.follow(target: @page_recording, root: @client, actor: @charlie)
     RecordingStudioFollowable.unfollow(target: @page_recording, root: @client, actor: @bob)
 
     assert_empty RecordingStudioFollowable.follows(root: @client, actor: @alice)
+  end
+
+  test "a private page without access is refused" do
+    assert_raises(RecordingStudioFollowable::NotAuthorized) do
+      RecordingStudioFollowable.follow(target: @page_recording, root: @client, actor: @charlie)
+    end
+
+    assert_empty RecordingStudioFollowable.follows(root: @client, actor: @alice)
+  end
+
+  test "a public page can be followed without a grant on that page" do
+    RecordingStudioAccessible.set_audience!(
+      recording: @page_recording,
+      action: :"recording_studio_followable.see",
+      audience: :public,
+      actor: @admin
+    )
+
+    follow_recording = RecordingStudioFollowable.follow(target: @page_recording, root: @client, actor: @charlie)
+
+    assert_equal @page_recording.id, follow_recording.recordable.target_recording_id
+    assert_raises(RecordingStudioFollowable::NotAuthorized) do
+      RecordingStudioFollowable.followers(recording: @page_recording, actor: @charlie)
+    end
   end
 
   test "a stranger cannot follow into a root they cannot see" do
@@ -75,7 +100,8 @@ class FollowableServicesTest < ActiveSupport::TestCase
     end
   end
 
-  test "view on the follow root is enough to follow a page in another root" do
+  test "a public page in another root is followed under the actor's workspace" do
+    publish(@page_recording)
     follow_recording = RecordingStudioFollowable.follow(target: @page_recording, root: @client, actor: @charlie)
 
     assert_equal @client.id, follow_recording.root_recording_id
@@ -198,6 +224,14 @@ class FollowableServicesTest < ActiveSupport::TestCase
     assert_equal :follow_parent, follows.capability
     assert_equal :view, follows.required_role
 
+    follow = RecordingStudioApi.capability_action(:follow)
+    assert_nil RecordingStudioApi.configuration.capability_action_role_for(
+      action: follow,
+      recording: @page_recording,
+      api_client: nil,
+      access_grant: nil
+    )
+
     actions = RecordingStudioApi.capability_actions_for("Page").map { |action| action.name.to_sym }
     assert_includes actions, :follow
     assert_includes actions, :unfollow
@@ -225,6 +259,30 @@ class FollowableServicesTest < ActiveSupport::TestCase
     assert_equal @client.id, payload[:root_id]
   end
 
+  test "API follow allows a public page when the grant would refuse view" do
+    RecordingStudioAccessible.set_audience!(
+      recording: @page_recording,
+      action: :"recording_studio_followable.see",
+      audience: :public,
+      actor: @admin
+    )
+    grant = Struct.new(:actor) do
+      def authorize!(*)
+        raise "target view was required"
+      end
+    end.new(@charlie)
+
+    context = Struct.new(:recording, :access_grant, :actor, :params).new(
+      @page_recording,
+      grant,
+      @charlie,
+      { root_id: @client.id }
+    )
+    payload = RecordingStudioFollowable::Api::Actions::Follow.call(context)
+
+    assert_equal @page_recording.id, payload[:target_id]
+  end
+
   private
 
   def users(email)
@@ -237,6 +295,15 @@ class FollowableServicesTest < ActiveSupport::TestCase
   def bootstrap(recording, actor)
     result = RecordingStudioAccessible.bootstrap_owner_access!(recording: recording, actor: actor)
     raise result.error if result.failure?
+  end
+
+  def publish(recording)
+    RecordingStudioAccessible.set_audience!(
+      recording: recording,
+      action: :"recording_studio_followable.see",
+      audience: :public,
+      actor: @admin
+    )
   end
 
   def grant(recording, actor, role)

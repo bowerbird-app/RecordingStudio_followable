@@ -16,7 +16,6 @@ module RecordingStudioFollowable
 
       module Follow
         def self.call(context)
-          context.access_grant.authorize!(recording: context.recording, role: :view)
           root = RecordingStudio::Recording.find(root_id_from(context))
           recording = RecordingStudioFollowable.follow(
             target: context.recording,
@@ -24,6 +23,16 @@ module RecordingStudioFollowable
             actor: context.actor
           )
           Actions::FOLLOW_SERIALIZER.call(recording)
+        rescue RecordingStudioFollowable::NotAuthorized
+          deny_follow!
+        end
+
+        def self.deny_follow!
+          if defined?(RecordingStudioApi::AuthorizationError)
+            raise RecordingStudioApi::AuthorizationError, "not authorized"
+          end
+
+          raise RecordingStudioFollowable::NotAuthorized, "not authorized"
         end
 
         def self.root_id_from(context)
@@ -34,7 +43,6 @@ module RecordingStudioFollowable
 
       module Unfollow
         def self.call(context)
-          context.access_grant.authorize!(recording: context.recording, role: :view)
           root = RecordingStudio::Recording.find(Follow.root_id_from(context))
           recording = RecordingStudioFollowable.unfollow(
             target: context.recording,
@@ -42,6 +50,8 @@ module RecordingStudioFollowable
             actor: context.actor
           )
           recording ? Actions::FOLLOW_SERIALIZER.call(recording) : { unfollowed: true }
+        rescue RecordingStudioFollowable::NotAuthorized
+          Follow.deny_follow!
         end
       end
 

@@ -60,7 +60,65 @@ RecordingStudioFollowable.followers(recording: page_recording, actor: current_us
 
 Without `limit`, `follows` returns the full relation, newest first (`created_at`, then `id`). With `limit`, it returns a `FollowsPage` of that slice plus `next_cursor` for the next keyset page.
 
-The actor needs Accessible `:view` on the follow root to create, list, or remove Follows. Listing a recording's followers also needs `:view` on that recording. The HTTP/MCP `follow` action still uses API `:view` on the followed item, because it is a member action on that item.
+The actor needs Accessible `:view` on the follow root to create, list, or remove Follows. Listing a recording's followers also needs `:view` on that recording. Listing follows needs `:view` on the follow root.
+
+Following the item itself uses a seeable check. A kept Accessible `:view` grant counts. A public page also counts, with no grant, when Accessible's audience for `config.visibility_action` (default `:"recording_studio_followable.see"`) is `:public`. A private item the actor cannot see is refused. The same check is used by `follow_button`, the HTTP follow action, and the API/MCP `follow` handler. `followers` and `follows` stay on `:view`. The API gem still only routes a member action to a recording inside the credential's accessible scope. The handler no longer adds a second `:view` grant check on the target. `unfollow` still needs `:view` on the follow root only.
+
+## Signed-out follow
+
+`follow_button` renders for a signed-out visitor when the target is publicly seeable. The button looks like Follow (`plus-circle`) and opens an email-code sign-in. The code path uses Recording Studio Users (`request_otp!`, `verify_otp!`, `complete_email_proof!`) and then Devise/Warden. This gem does not depend on Recording Studio Messages.
+
+Add the Users gem in the host app. It is not a dependency of this gemspec, so signed-in-only hosts can skip it. Users profiles include Attachable, so the host also needs that gem. This gemspec does not depend on either one.
+
+```ruby
+gem "recording_studio_attachable", github: "bowerbird-app/RecordingStudio_attachable", tag: "v0.22.0"
+gem "recording_studio_user", github: "bowerbird-app/RecordingStudio_users", tag: "v0.27.2"
+```
+
+Then:
+
+```bash
+bin/rails generate recording_studio_user:migrations
+bin/rails db:migrate
+```
+
+```ruby
+RecordingStudioUser.configure do |config|
+  config.otp_enabled = true
+  config.otp_registration_channels = %i[email]
+  config.otp_login_channels = %i[email]
+end
+
+RecordingStudioNotifications.channels.register(:email, email_adapter)
+
+Rails.application.config.to_prepare do
+  RecordingStudioUser::Engine.apply_otp_setup!(User)
+end
+
+RecordingStudioAccessible.configuration.action_audiences[:"recording_studio_followable.see"] = {
+  allowed: %i[public signed_in granted],
+  default: :granted,
+  granted_roles: %i[view],
+  granted_override: true
+}
+```
+
+Enable `:action_audiences` on types that can be public, and mark those recordings with audience `:public` for `config.visibility_action`. A page with no audience rule stays at the default, which is a `:view` grant.
+
+Register `RecordingStudioUser::People`, `RecordingStudioUser::Profile`, and `RecordingStudioAttachable::Attachment` in `recordable_types`. OTP delivery needs a registered email channel. The code itself is stored on the Users challenge. The email adapter only has to deliver the notification.
+
+The follow is stored on `config.current_root` after sign-in. That is the workspace the person is signed into. A new account with no usable workspace does not get a Follow. The engine renders "Finish setting up your account first", or redirects to `config.account_setup_url` when that is set.
+
+Inside a third-party iframe (`Sec-Fetch-Dest: iframe`) the button opens sign-in in a new tab (`target="_blank"`) so the code step can set a first-party cookie. A same-origin Turbo frame uses `data-turbo-frame="_top"`. After sign-in the visitor returns to an allowlisted parent URL (`config.allowed_return_origins`), otherwise the page they were on, otherwise the canonical followed URL. Same-host URLs are allowed. Other absolute URLs are not.
+
+Routes, mounted with the engine:
+
+- `GET /follow_sign_in`
+- `POST /follow_sign_in`
+- `GET /follow_sign_in/verify`
+- `POST /follow_sign_in/verify`
+
+Skip the host's signed-in filter on those routes. The engine skips `authenticate_user!` when the host defines it.
 
 ## notify_followers
 
@@ -106,4 +164,4 @@ Alice (`alice@example.com`), Bob, and Charlie share Client Workspace. Getting St
 
 ## Version
 
-The gem version is `0.2.0`.
+The gem version is `0.3.0`.

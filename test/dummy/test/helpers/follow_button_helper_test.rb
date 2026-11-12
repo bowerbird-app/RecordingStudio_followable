@@ -11,6 +11,7 @@ class FollowButtonHelperTest < ActionView::TestCase
       user.password_confirmation = "Password"
     end
     Current.actor = @admin
+    @view_actor = @admin
     load Rails.root.join("db/seeds.rb")
     @page = Page.find_by!(title: "Getting Started")
     @page_recording = RecordingStudio::Recording.find_by!(recordable: @page)
@@ -28,6 +29,7 @@ class FollowButtonHelperTest < ActionView::TestCase
     assert_includes html, "Follow"
     assert_includes html, "plus-circle"
     refute_includes html, "Unfollow"
+    refute_includes html, "follow_sign_in"
   end
 
   test "follow_button renders Following and Unfollow when the root is following" do
@@ -38,6 +40,17 @@ class FollowButtonHelperTest < ActionView::TestCase
     assert_includes html, "check-circle"
     assert_includes html, "Unfollow"
     assert_includes html, "minus-circle"
+  end
+
+  test "follow_button renders for a signed-out visitor on a public page" do
+    @view_actor = nil
+    Current.actor = nil
+    html = follow_button(@page_recording)
+
+    assert_includes html, "Follow"
+    assert_includes html, "plus-circle"
+    assert_includes html, "follow_sign_in"
+    assert_includes html, @page_recording.id
   end
 
   test "follow_button is blank without view on the follow root" do
@@ -60,7 +73,7 @@ class FollowButtonHelperTest < ActionView::TestCase
   end
 
   def current_user
-    @admin
+    @view_actor
   end
 
   def current_root_recording

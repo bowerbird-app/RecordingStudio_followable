@@ -1,0 +1,5 @@
+<% content_for(:title, @page.title) %>
+<% content_for(:subtitle, "A public page. Follow it from the workspace you use.") %>
+<%= flat_pack_page_nav(round: true, style: :default) %>
+
+<%= follow_button(@page_recording) %>
