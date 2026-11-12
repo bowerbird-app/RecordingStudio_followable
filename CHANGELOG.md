@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-11-12
+
+### Added
+- `config.button` and `follow_button(recording, follow:, following:)` set the FlatPack style, icon, and label for Follow and for Following. Omit a key to keep that part of the default. An explicit label wins over I18n. Unknown keys raise `ArgumentError`.
+- Button labels are translated at `recording_studio_followable.follow_button.follow`, `.following`, and `.unfollow`.
+
+### Changed
+- Follow and the signed-out link use FlatPack style `:default`. Following stays `:secondary`.
+
+### Upgrade notes
+- Bump to `0.4.0`. Follow no longer uses the primary button, so it no longer competes with the host's main action.
+- To restore the 0.3.0 primary Follow button, set `config.button = { follow: { style: :primary } }`.
+- Icons stay `plus-circle`, `check-circle`, and `minus-circle` when you set nothing. Unfollow stays on `minus-circle`.
+- A per-call override is posted with follow and unfollow, so a Turbo Stream replace keeps it. The signed-out link uses the Follow look.
+
 ## [0.3.0] - 2026-11-11
 
 ### Added
@@ -65,7 +80,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Notes
 - Follow features are coming soon. This version does not ship a follow API, models, or public helpers.
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_followable/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_followable/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/bowerbird-app/RecordingStudio_followable/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/bowerbird-app/RecordingStudio_followable/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/bowerbird-app/RecordingStudio_followable/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/bowerbird-app/RecordingStudio_followable/releases/tag/v0.1.0

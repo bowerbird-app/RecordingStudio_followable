@@ -1,5 +1,17 @@
 # Development notes
 
+## Host upgrade to 0.4.0
+
+Follow and the signed-out link use FlatPack style `:default`. Following stays `:secondary`. Icons are unchanged. To restore the 0.3.0 primary Follow button:
+
+```ruby
+RecordingStudioFollowable.configure do |config|
+  config.button = { follow: { style: :primary } }
+end
+```
+
+Per-call overrides use the same keys. `follow_button(recording, follow: { style:, icon:, label: }, following: { style:, icon:, label: })`. A label you pass wins over `recording_studio_followable.follow_button`. Unknown keys raise `ArgumentError`.
+
 ## Host upgrade to 0.3.0
 
 Signed-in follow of an item the person can already see does not change. Hosts that want signed-out Follow on a public page need to:

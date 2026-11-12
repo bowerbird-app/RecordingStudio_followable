@@ -4,17 +4,13 @@ module RecordingStudioFollowable
   module FollowButtonHelper
     include FollowButtonSignIn
 
-    def follow_button(recording, root: nil, actor: nil)
+    def follow_button(recording, root: nil, actor: nil, follow: nil, following: nil)
       target = RecordingStudioFollowable::RecordingIdentity.recording_for(recording)
       follow_root = resolve_follow_button_root(root)
       follow_actor = resolve_follow_button_actor(actor)
       return unless show_follow_button?(follow_actor, follow_root, target)
 
-      if follow_actor.blank?
-        render_sign_in_follow_button(target)
-      else
-        render_follow_button(target, follow_root)
-      end
+      render_visible_follow_button(target, follow_root, follow_actor, follow: follow, following: following)
     end
 
     def follow_target_url(recording)
@@ -38,27 +34,33 @@ module RecordingStudioFollowable
 
     private
 
-    def render_follow_button(target, follow_root)
+    def render_visible_follow_button(target, follow_root, follow_actor, follow:, following:)
+      appearance = ButtonAppearance.resolve(
+        config: RecordingStudioFollowable.configuration.button, follow: follow, following: following
+      )
+      return render_sign_in_follow_button(target, appearance) if follow_actor.blank?
+
+      render_follow_button(target, follow_root, appearance)
+    end
+
+    def render_follow_button(target, follow_root, appearance)
       follows_url = follow_button_follows_path
       render FollowButtonComponent.new(
         target: target,
         root: follow_root,
         following: following_target?(follow_root, target),
         follow_url: follows_url,
-        unfollow_url: follows_url
+        unfollow_url: follows_url,
+        appearance: appearance
       )
     end
 
-    def render_sign_in_follow_button(target)
+    def render_sign_in_follow_button(target, appearance)
       embedded = follow_request_embedded?
       render FollowButtonComponent.new(
-        target: target,
-        root: nil,
-        following: false,
-        follow_url: nil,
-        unfollow_url: nil,
-        sign_in_url: follow_sign_in_url(target, embedded: embedded),
-        embedded: embedded
+        target: target, root: nil, following: false, follow_url: nil, unfollow_url: nil,
+        appearance: appearance, embedded: embedded,
+        sign_in_url: follow_sign_in_url(target, embedded: embedded)
       )
     end
 
