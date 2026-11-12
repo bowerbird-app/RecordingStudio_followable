@@ -2,82 +2,97 @@
 
 module RecordingStudioFollowable
   class FollowSignInsController < ApplicationController
-    include FollowSignInFinish
-
-    SESSION_KEY = :recording_studio_followable_sign_in
-
-    skip_before_action :authenticate_user!, raise: false
+    skip_before_action :authenticate_user!, only: :new, raise: false
 
     def new
-      remember_target!
-      return finish_follow if signed_in_actor.present?
+      intent = FollowIntent.read(params[:intent])
+      return redirect_missing if intent.blank?
 
-      render :new
+      @return_to = follow_sign_in_path(intent: params[:intent])
     end
 
     def create
-      remember_target!
-      EmailCode.request!(email: submitted_email, request: request, session: session)
-      redirect_to follow_sign_in_verify_path
-    rescue EmailCode::Failed => e
-      flash.now[:alert] = e.message
-      render :new, status: :unprocessable_entity
+      intent = FollowIntent.read(params[:intent])
+      target = recording_for(intent)
+      return redirect_missing if target.blank?
+
+      root = usable_root
+      return redirect_setup if root.blank?
+
+      RecordingStudioFollowable.follow(target: target, root: root, actor: follow_actor)
+      render_followed(intent, target, root)
+    rescue NotAuthorized
+      redirect_to destination(intent, target), alert: I18n.t("recording_studio_followable.follows.unauthorized")
     end
 
-    def verify
-      render :verify
-    end
-
-    def submit
-      user = EmailCode.verify!(code: params[:code], session: session)
-      sign_in_actor(user)
-      finish_follow
-    rescue EmailCode::Failed => e
-      flash.now[:alert] = e.message
-      render :verify, status: :unprocessable_entity
-    end
+    def setup; end
 
     private
 
-    def remember_target!
-      session[SESSION_KEY] = sign_in_state.merge(incoming_sign_in_state)
-    end
-
-    def incoming_sign_in_state
-      state = {}
-      state["target_id"] = params[:target_id] if params[:target_id].present?
-      state["email"] = submitted_email if params[:email].present?
-      state.merge(return_state)
-    end
-
-    def return_state
-      state = {}
-      state["return_to"] = params[:return_to] if params.key?(:return_to)
-      state["parent_url"] = params[:parent_url] if params.key?(:parent_url)
-      state
-    end
-
-    def submitted_email
-      params[:email].presence || sign_in_state["email"]
-    end
-
-    def sign_in_state
-      raw = session[SESSION_KEY]
-      raw.respond_to?(:to_h) ? raw.to_h.stringify_keys : {}
-    end
-
-    def signed_in_actor
-      actor = current_user if respond_to?(:current_user, true)
-      actor.presence || (defined?(Current) ? Current.actor : nil)
-    end
-
-    def sign_in_actor(user)
-      if respond_to?(:sign_in, true) && defined?(Devise::Mapping)
-        sign_in(Devise::Mapping.find_scope!(user), user)
-      elsif (warden = request.env["warden"])
-        warden.set_user(user, scope: :user)
+    def render_followed(intent, target, root)
+      @target_recording = target
+      @follow_root = root
+      @button_overrides = button_overrides(intent)
+      @button_frame_id = FollowButtonComponent.frame_id(target: target, root: nil)
+      respond_to do |format|
+        format.turbo_stream { render template: "recording_studio_followable/follows/button" }
+        format.html { redirect_to destination(intent, target) }
       end
-      Current.actor = user if defined?(Current)
+    end
+
+    def recording_for(intent)
+      return if intent.blank?
+
+      RecordingStudio::Recording.find_by(id: intent.target_id)
+    end
+
+    def usable_root
+      root = RecordingStudioFollowable.configuration.resolve_current_root(self)
+      return if root.blank?
+      return unless Authorization.view?(actor: follow_actor, recording: root)
+
+      root
+    end
+
+    def redirect_setup
+      url = setup_url
+      if url.present?
+        redirect_to url
+      else
+        redirect_to follow_sign_in_setup_path
+      end
+    end
+
+    def setup_url
+      configured = RecordingStudioFollowable.configuration.account_setup_url
+      return if configured.blank?
+
+      configured.respond_to?(:call) ? configured.call(self) : configured.to_s
+    end
+
+    def redirect_missing
+      redirect_to main_app.root_path, alert: I18n.t("recording_studio_followable.sign_in.missing_page")
+    end
+
+    def destination(intent, target)
+      ReturnTo.preferred(
+        parent_url: intent&.parent_url,
+        return_to: intent&.page,
+        canonical: helpers.follow_target_url(target).presence || main_app.root_path,
+        host: request.host,
+        allowed_origins: RecordingStudioFollowable.configuration.allowed_return_origins
+      )
+    end
+
+    def button_overrides(intent)
+      ButtonAppearance.parse(intent.button)
+    rescue ArgumentError
+      {}
+    end
+
+    def follow_actor
+      user = current_user if respond_to?(:current_user, true)
+      user.presence || (defined?(Current) ? Current.actor : nil)
     end
   end
 end

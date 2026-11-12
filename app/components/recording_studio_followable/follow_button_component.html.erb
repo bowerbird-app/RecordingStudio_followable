@@ -16,17 +16,36 @@
         }
       ) %>
     <% end %>
-  <% elsif sign_in? %>
+  <% elsif sign_in? && embedded? %>
     <%= render FlatPack::Button::Component.new(
       text: appearance.follow.label,
       style: appearance.follow.style,
       size: :md,
       icon: appearance.follow.icon,
       href: sign_in_url,
-      target: (embedded? ? "_blank" : nil),
-      rel: (embedded? ? "noopener" : nil),
-      data: embedded? ? { turbo: false } : { turbo_frame: "_top" }
+      target: "_blank",
+      rel: "noopener",
+      data: { turbo: false }
     ) %>
+  <% elsif sign_in? %>
+    <% modal_id = "follow-sign-in-#{target.id}" %>
+    <%= render FlatPack::Button::Component.new(
+      text: appearance.follow.label,
+      style: appearance.follow.style,
+      size: :md,
+      icon: appearance.follow.icon,
+      type: :button,
+      data: { modal_id: modal_id }
+    ) %>
+    <%= render FlatPack::Modal::Component.new(
+      id: modal_id,
+      title: t("recording_studio_followable.sign_in.title"),
+      size: :md
+    ) do |modal| %>
+      <% modal.body do %>
+        <%= render "recording_studio_followable/follow_sign_ins/email_form", return_to: sign_in_url %>
+      <% end %>
+    <% end %>
   <% else %>
     <%= form_with url: follow_url, method: :post, data: { turbo_stream: true } do %>
       <%= hidden_field_tag :target_id, target.id, id: nil %>

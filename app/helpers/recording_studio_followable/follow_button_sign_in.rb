@@ -4,11 +4,20 @@ module RecordingStudioFollowable
   module FollowButtonSignIn
     private
 
-    def follow_sign_in_url(target, embedded:)
-      query = { target_id: target.id }
-      query[:return_to] = follow_return_path if follow_return_path.present?
-      query[:parent_url] = follow_parent_url if embedded && follow_parent_url.present?
-      follow_sign_in_route(query)
+    def follow_sign_in_url(target, embedded:, appearance:)
+      token = FollowIntent.issue(follow_intent_request(target, embedded:, appearance:))
+      follow_sign_in_route(intent: token)
+    end
+
+    def follow_intent_request(target, embedded:, appearance:)
+      FollowIntent::Request.new(
+        target_id: target.id,
+        page: follow_return_path,
+        parent_url: embedded ? follow_parent_url : nil,
+        button: appearance.carry,
+        host: request.host,
+        allowed_origins: RecordingStudioFollowable.configuration.allowed_return_origins
+      )
     end
 
     def follow_sign_in_route(query)

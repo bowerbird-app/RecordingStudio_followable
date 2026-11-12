@@ -95,13 +95,13 @@ A per-call override is sent with the follow and unfollow request, so the Turbo S
 
 ## Signed-out follow
 
-`follow_button` renders for a signed-out visitor when the target is publicly seeable. The button looks like Follow (`plus-circle`) and opens an email-code sign-in. The code path uses Recording Studio Users (`request_otp!`, `verify_otp!`, `complete_email_proof!`) and then Devise/Warden. This gem does not depend on Recording Studio Messages.
+`follow_button` renders for a signed-out visitor when the target is publicly seeable and Users OTP start is routed. The button looks like Follow (`plus-circle`) and opens a modal. The email posts to Recording Studio Users. The code step is `RecordingStudioUser::OtpCodeForm`. This gem does not depend on Recording Studio Messages, and it does not collect the code itself.
 
-Add the Users gem in the host app. It is not a dependency of this gemspec, so signed-in-only hosts can skip it. Users profiles include Attachable, so the host also needs that gem. This gemspec does not depend on either one.
+Add the Users gem in the host app. It is not a dependency of this gemspec, so signed-in-only hosts can skip it. Users profiles include Attachable, so the host also needs that gem. This gemspec does not depend on either one. Signed-out Follow needs Users `v0.28.1`.
 
 ```ruby
 gem "recording_studio_attachable", github: "bowerbird-app/RecordingStudio_attachable", tag: "v0.22.0"
-gem "recording_studio_user", github: "bowerbird-app/RecordingStudio_users", tag: "v0.27.2"
+gem "recording_studio_user", github: "bowerbird-app/RecordingStudio_users", tag: "v0.28.1"
 ```
 
 Then:
@@ -136,18 +136,23 @@ Enable `:action_audiences` on types that can be public, and mark those recording
 
 Register `RecordingStudioUser::People`, `RecordingStudioUser::Profile`, and `RecordingStudioAttachable::Attachment` in `recordable_types`. OTP delivery needs a registered email channel. The code itself is stored on the Users challenge. The email adapter only has to deliver the notification.
 
-The follow is stored on `config.current_root` after sign-in. That is the workspace the person is signed into. A new account with no usable workspace does not get a Follow. The engine renders "Finish setting up your account first", or redirects to `config.account_setup_url` when that is set.
+Draw the Users inline OTP routes. `recording_studio_user_auth_for` draws the `/users/otp` routes when that helper owns sign-in. A host that already has `devise_for :users` adds those routes beside Devise, plus `POST /auth/otp/challenge` and `POST /auth/otp/resend`. The code box posts to the `/auth` paths. See `MIGRATION_NOTES.md`.
 
-Inside a third-party iframe (`Sec-Fetch-Dest: iframe`) the button opens sign-in in a new tab (`target="_blank"`) so the code step can set a first-party cookie. A same-origin Turbo frame uses `data-turbo-frame="_top"`. After sign-in the visitor returns to an allowlisted parent URL (`config.allowed_return_origins`), otherwise the page they were on, otherwise the canonical followed URL. Same-host URLs are allowed. Other absolute URLs are not.
+The modal keeps the visitor on the page. Users emails the code and renders the code box, including a terms checkbox when a new address still has pending Terms. The host sends that form as Users rendered it. Without `accept_terms=1`, verify does not sign the person in.
+
+On `recording_studio_user:signed_in`, the page posts to `POST /follow_sign_in` with the fresh `csrf_token` from the event. The `return_to` query carries a signed `intent` (target, page, allowlisted parent, button look, 15 minutes). Finish reads that token again. It follows only when the person can view the workspace root and the target is seeable. A second post does not create a second Follow.
+
+The follow is stored on `config.current_root` after sign-in. That is the workspace the person is signed into. A new account with no usable workspace does not get a Follow. Finish redirects to `GET /follow_sign_in/setup`, or to `config.account_setup_url` when that is set.
+
+Inside a third-party iframe (`Sec-Fetch-Dest: iframe`) the button opens sign-in in a new tab (`target="_blank"`) so the code step can set a first-party cookie. After sign-in the new tab goes to an allowlisted parent URL (`config.allowed_return_origins`), otherwise the page they were on, otherwise the canonical followed URL. Same-host URLs are allowed. Other absolute URLs are not.
 
 Routes, mounted with the engine:
 
-- `GET /follow_sign_in`
-- `POST /follow_sign_in`
-- `GET /follow_sign_in/verify`
-- `POST /follow_sign_in/verify`
+- `GET /follow_sign_in` (email step, no sign-in required)
+- `POST /follow_sign_in` (signed-in finish)
+- `GET /follow_sign_in/setup`
 
-Skip the host's signed-in filter on those routes. The engine skips `authenticate_user!` when the host defines it.
+The engine skips `authenticate_user!` on `GET /follow_sign_in` when the host defines it. Leave the filter on the finish post.
 
 ## notify_followers
 
@@ -195,4 +200,4 @@ Alice (`alice@example.com`), Bob, and Charlie share Client Workspace. Getting St
 
 ## Version
 
-The gem version is `0.4.0`.
+The gem version is `0.5.0`.

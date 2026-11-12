@@ -56,12 +56,24 @@ module RecordingStudioFollowable
     end
 
     def render_sign_in_follow_button(target, appearance)
+      return unless users_otp_start?
+
       embedded = follow_request_embedded?
       render FollowButtonComponent.new(
         target: target, root: nil, following: false, follow_url: nil, unfollow_url: nil,
         appearance: appearance, embedded: embedded,
-        sign_in_url: follow_sign_in_url(target, embedded: embedded)
+        sign_in_url: follow_sign_in_url(target, embedded: embedded, appearance: appearance)
       )
+    end
+
+    def users_otp_start?
+      return false unless defined?(RecordingStudioUser)
+      return false unless RecordingStudioUser.config.otp_enabled?
+      return false unless respond_to?(:main_app)
+
+      main_app.respond_to?(:recording_studio_user_otp_start_path)
+    rescue StandardError
+      false
     end
 
     def show_follow_button?(actor, root, target)
