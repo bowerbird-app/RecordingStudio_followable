@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-11-12
+
+### Changed
+- Signed-out Follow stays in a modal and uses Recording Studio Users 0.28.1 inline OTP. The email posts to `POST /users/otp/start`. The code step is `RecordingStudioUser::OtpCodeForm`.
+- `recording_studio_user:signed_in` carries `csrf_param` and `csrf_token`. The open page posts that token to `POST /follow_sign_in` and follows once.
+- The page to follow is a url-safe signed `intent` on the Users `return_to` (purpose `recording_studio_followable.follow`, 15 minutes). Users rotates the session on sign-in, so the target is not stored there.
+- Finish checks Accessible `:view` on the workspace root, then `RecordingStudioFollowable.follow`. A public target still needs to be seeable. It does not need its own `:view` grant.
+
+### Added
+- `GET /follow_sign_in/setup` when the signed-in person has no usable workspace.
+
+### Removed
+- Followable's own code screen, `EmailCode`, and `GET`/`POST /follow_sign_in/verify`.
+- `POST /follow_sign_in` no longer accepts an email. It finishes a follow for someone who is already signed in.
+
+### Upgrade notes
+- Breaking. Bump to `0.5.0` and pin `recording_studio_user` at tag `v0.28.1`.
+- Draw Users OTP routes `otp/start`, `otp/challenge`, and `otp/resend`. `recording_studio_user_auth_for` draws them when you are not using `devise_for` for sessions. A host that already has `devise_for :users` should add those three routes beside it.
+- `GET /follow_sign_in` stays open. `POST /follow_sign_in` requires a signed-in person. Drop any host links to `/follow_sign_in/verify`.
+- A new address with pending Terms must tick the checkbox in the Users code box (`accept_terms=1`). Verify does not sign them in without it. An existing login does not see the box.
+- Signed-in-only hosts can still skip Users. The signed-out button stays hidden when OTP start is not routed.
+
 ## [0.4.0] - 2026-11-12
 
 ### Added
@@ -80,7 +102,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Notes
 - Follow features are coming soon. This version does not ship a follow API, models, or public helpers.
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_followable/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_followable/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/bowerbird-app/RecordingStudio_followable/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/bowerbird-app/RecordingStudio_followable/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/bowerbird-app/RecordingStudio_followable/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/bowerbird-app/RecordingStudio_followable/compare/v0.1.0...v0.2.0

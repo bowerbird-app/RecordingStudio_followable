@@ -13,16 +13,6 @@ en:
       subtitle: We'll email you a code.
       email_label: Email
       send: Send code
-      code_title: Enter your code
-      code_subtitle: We sent a 6-digit code.
-      code_label: Code
-      confirm: Confirm
-      resend: Resend code
       setup_title: Finish setting up your account first
       setup_body: You need a workspace before you can follow.
-      users_required: Email codes are not turned on yet.
-      email_invalid: Enter an email address.
-      wait: Give it a minute, then try again.
-      could_not_send: We couldn't send a code. Try another email.
-      code_mismatch: That code didn't match. Try again.
       missing_page: That page is not available.

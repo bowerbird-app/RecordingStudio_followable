@@ -1,5 +1,6 @@
 <% overrides = @button_overrides || {} %>
-<%= turbo_stream.replace RecordingStudioFollowable::FollowButtonComponent.frame_id(target: @target_recording, root: @follow_root) do %>
+<% frame = @button_frame_id.presence || RecordingStudioFollowable::FollowButtonComponent.frame_id(target: @target_recording, root: @follow_root) %>
+<%= turbo_stream.replace frame do %>
   <%= follow_button(
         @target_recording,
         root: @follow_root,

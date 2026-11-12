@@ -1,0 +1,90 @@
+<% finish_path = return_to.to_s.split("?").first %>
+<div data-followable-finish="<%= finish_path %>">
+  <%= javascript_tag nonce: true do %>
+    if (!window.recordingStudioFollowableFinish) {
+      window.recordingStudioFollowableFinish = true
+      var frameId = "<%= RecordingStudioUser::OtpCodeForm::FRAME_ID %>"
+
+      function replaceOtpFrame(html) {
+        var next = new DOMParser().parseFromString(html, "text/html").getElementById(frameId)
+        var current = document.getElementById(frameId)
+        if (!next || !current) return
+        current.replaceWith(next)
+        next.querySelectorAll("script").forEach(function (oldScript) {
+          var script = document.createElement("script")
+          script.text = oldScript.textContent
+          document.body.appendChild(script)
+          script.remove()
+        })
+      }
+
+      document.addEventListener("submit", function (event) {
+        var form = event.target
+        if (!form.closest || !form.closest("[data-followable-finish]")) return
+        event.preventDefault()
+        event.stopPropagation()
+        fetch(form.action, {
+          method: "POST",
+          credentials: "same-origin",
+          headers: { "Accept": "text/html", "Turbo-Frame": frameId },
+          body: new FormData(form)
+        }).then(function (response) {
+          return response.text().then(replaceOtpFrame)
+        })
+      }, true)
+
+      document.addEventListener("recording_studio_user:signed_in", function (event) {
+        var detail = event.detail || {}
+        var finish = document.querySelector("[data-followable-finish]")
+        if (!finish || !detail.return_to || !detail.csrf_token) return
+        var target
+        try { target = new URL(detail.return_to, window.location.origin) } catch (error) { return }
+        if (target.origin !== window.location.origin) return
+        if (target.pathname !== finish.getAttribute("data-followable-finish")) return
+        var modal = document.querySelector("[data-controller~='flat-pack--modal'].flex")
+        var body = new URLSearchParams()
+        body.set(detail.csrf_param || "authenticity_token", detail.csrf_token)
+        fetch(target.pathname + target.search, {
+          method: "POST",
+          credentials: "same-origin",
+          headers: {
+            "Accept": modal ? "text/vnd.turbo-stream.html" : "text/html",
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-CSRF-Token": detail.csrf_token
+          },
+          body: body
+        }).then(function (response) {
+          var type = response.headers.get("content-type") || ""
+          if (type.indexOf("turbo-stream") !== -1 && window.Turbo) {
+            return response.text().then(function (html) { window.Turbo.renderStreamMessage(html) })
+          }
+          if (response.url) window.location.assign(response.url)
+        })
+      })
+    }
+  <% end %>
+
+  <%= turbo_frame_tag RecordingStudioUser::OtpCodeForm::FRAME_ID do %>
+    <%= render FlatPack::Content::Component.new do %>
+      <%= t("recording_studio_followable.sign_in.subtitle") %>
+    <% end %>
+
+    <%= form_with url: main_app.recording_studio_user_otp_start_path, method: :post, data: { turbo: false } do %>
+      <%= hidden_field_tag :return_to, return_to, id: nil %>
+      <div class="flex flex-col gap-4">
+        <%= render FlatPack::EmailInput::Component.new(
+          name: "email",
+          label: t("recording_studio_followable.sign_in.email_label"),
+          placeholder: "you@example.com",
+          required: true
+        ) %>
+        <%= render FlatPack::Button::Component.new(
+          text: t("recording_studio_followable.sign_in.send"),
+          type: :submit,
+          style: :primary,
+          size: :md
+        ) %>
+      </div>
+    <% end %>
+  <% end %>
+</div>
