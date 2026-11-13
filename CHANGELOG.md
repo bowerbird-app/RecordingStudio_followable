@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-11-13
+
+### Changed
+- 0.x addon bounds stay open through the next major. `recording_studio_accessible` is `>= 0.18.0, < 1.0`. `recording_studio_notifications` is `>= 0.14.9, < 1.0`, so `0.15.0` resolves. `recording_studio_trashable` is `>= 0.12.0, < 1.0`.
+- `recording_studio` is `~> 6.0` with a floor of `>= 6.3.0`.
+- Development and dummy Gemfiles pin Notifications `v0.15.0` and Flatpack `v0.1.356`. Notifications `0.15.0` requires Flatpack `>= 0.1.353`.
+
+### Upgrade notes
+- Bump to `0.5.1`. No migration.
+- A host pinned to Notifications `~> 0.14.9` can use `>= 0.14.9, < 1.0`. Notifications `0.15.0` needs Flatpack `>= 0.1.353`.
+
 ## [0.5.0] - 2026-11-12
 
 ### Changed
@@ -102,7 +113,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Notes
 - Follow features are coming soon. This version does not ship a follow API, models, or public helpers.
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_followable/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_followable/compare/v0.5.1...HEAD
+[0.5.1]: https://github.com/bowerbird-app/RecordingStudio_followable/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/bowerbird-app/RecordingStudio_followable/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/bowerbird-app/RecordingStudio_followable/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/bowerbird-app/RecordingStudio_followable/compare/v0.2.0...v0.3.0

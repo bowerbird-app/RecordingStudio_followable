@@ -77,11 +77,11 @@ GIT
 
 GIT
   remote: https://github.com/bowerbird-app/RecordingStudio_notifications.git
-  revision: 5d7bfa387d2b036c707002d5a9d2b4aae5d4271f
-  tag: v0.14.9
+  revision: ece0dea87640f2d2fb74a49ac0edc91e6875d73f
+  tag: v0.15.0
   specs:
-    recording_studio_notifications (0.14.9)
-      flat_pack (>= 0.1.341)
+    recording_studio_notifications (0.15.0)
+      flat_pack (>= 0.1.353)
       rails (~> 8.1.0)
       recording_studio (>= 6.3.0)
       recording_studio_accessible (~> 0.18)
@@ -101,24 +101,24 @@ GIT
 
 GIT
   remote: https://github.com/bowerbird-app/flatpack.git
-  revision: 374c9b7f7130057954df596597ff75f139c72b50
-  tag: v0.1.341
+  revision: 7f669689ce8aa080bb5de8b0f14ed01b395d6054
+  tag: v0.1.356
   specs:
-    flat_pack (0.1.341)
+    flat_pack (0.1.356)
       pagy (~> 9.0)
       rails (>= 7.1, < 9)
-      tailwind_merge (~> 0.13)
+      tailwind_merge (>= 0.13, < 2)
       view_component (>= 4.14, < 5)
 
 PATH
   remote: .
   specs:
-    recording_studio_followable (0.5.0)
+    recording_studio_followable (0.5.1)
       rails (~> 8.1.0)
-      recording_studio (>= 6.3.0)
-      recording_studio_accessible (~> 0.18)
-      recording_studio_notifications (~> 0.14.9)
-      recording_studio_trashable (>= 0.12.0)
+      recording_studio (~> 6.0, >= 6.3.0)
+      recording_studio_accessible (>= 0.18.0, < 1.0)
+      recording_studio_notifications (>= 0.14.9, < 1.0)
+      recording_studio_trashable (>= 0.12.0, < 1.0)
 
 GEM
   remote: https://rubygems.org/
@@ -460,7 +460,7 @@ CHECKSUMS
   drb (2.2.3) sha256=0b00d6fdb50995fe4a45dea13663493c841112e4068656854646f418fda13373
   erb (6.0.7) sha256=c5ca6dc25b0ef974a44dc8f59fe847577122483b1968a38dec305c60bf91ee92
   erubi (1.13.1) sha256=a082103b0885dbc5ecf1172fede897f9ebdb745a4b97a5e8dc63953db1ee4ad9
-  flat_pack (0.1.341)
+  flat_pack (0.1.356)
   globalid (1.4.0) sha256=037f12fbf1d9d7a014d501c2d5c77356fd4ddd96d7a7991d6700bba96706f427
   i18n (1.15.2) sha256=00f9eb62412fe593b2a65a97daa75300d37abb8f7202ec748e94b6d46a9dd1b5
   io-console (0.9.4) sha256=a403304f32928ee85e56d457b4612ca43f2703b561a3258844992bd24085fbb1
@@ -512,12 +512,12 @@ CHECKSUMS
   recording_studio (6.6.0)
   recording_studio_accessible (0.27.0)
   recording_studio_api (0.19.0)
-  recording_studio_followable (0.5.0)
+  recording_studio_followable (0.5.1)
   recording_studio_icons (0.2.1)
   recording_studio_logs (0.7.4)
   recording_studio_metrics (0.7.3)
   recording_studio_moveable (4.1.1)
-  recording_studio_notifications (0.14.9)
+  recording_studio_notifications (0.15.0)
   recording_studio_trashable (0.12.3)
   redis (5.4.1) sha256=b5e675b57ad22b15c9bcc765d5ac26f60b675408af916d31527af9bd5a81faae
   redis-client (0.31.0) sha256=6820cb2a21e6795a823141f50fd25e655de2b8dc8ff833b43509a27b0263fd75

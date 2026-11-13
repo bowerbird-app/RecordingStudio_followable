@@ -4,7 +4,7 @@ require "test_helper"
 
 class RecordingStudioFollowableTest < Minitest::Test
   def test_version_matches_release
-    assert_equal "0.5.0", ::RecordingStudioFollowable::VERSION
+    assert_equal "0.5.1", ::RecordingStudioFollowable::VERSION
   end
 
   def test_engine_exists
@@ -14,8 +14,10 @@ class RecordingStudioFollowableTest < Minitest::Test
   def test_gemspec_pins_recording_studio_6_3
     gemspec = File.read(File.expand_path("../recording_studio_followable.gemspec", __dir__))
 
-    assert_includes gemspec, 'spec.add_dependency "recording_studio", ">= 6.3.0"'
-    assert_includes gemspec, 'spec.add_dependency "recording_studio_notifications", "~> 0.14.9"'
+    assert_includes gemspec, 'spec.add_dependency "recording_studio", "~> 6.0", ">= 6.3.0"'
+    assert_includes gemspec, 'spec.add_dependency "recording_studio_accessible", ">= 0.18.0", "< 1.0"'
+    assert_includes gemspec, 'spec.add_dependency "recording_studio_notifications", ">= 0.14.9", "< 1.0"'
+    assert_includes gemspec, 'spec.add_dependency "recording_studio_trashable", ">= 0.12.0", "< 1.0"'
   end
 
   def test_gemspec_excludes_cursor_config
@@ -48,10 +50,10 @@ class RecordingStudioFollowableTest < Minitest::Test
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio", tag: "v6.6.0"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.27.0"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_trashable", tag: "v0.12.3"'
-    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_notifications", tag: "v0.14.9"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_notifications", tag: "v0.15.0"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_root_switchable", tag: "v0.14.0"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_metrics", tag: "v0.7.3"'
-    assert_includes gemfile, 'github: "bowerbird-app/flatpack", tag: "v0.1.341"'
+    assert_includes gemfile, 'github: "bowerbird-app/flatpack", tag: "v0.1.356"'
     refute_includes gemfile, 'tag: "v4.7.1"'
     refute_includes gemfile, "recording_studio/v3.0.0"
   end
