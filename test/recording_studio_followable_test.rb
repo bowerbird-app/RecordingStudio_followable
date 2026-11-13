@@ -47,15 +47,31 @@ class RecordingStudioFollowableTest < Minitest::Test
   def test_dummy_gemfile_pins_verified_6x_github_tags
     gemfile = File.read(File.expand_path("dummy/Gemfile", __dir__))
 
-    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio", tag: "v6.6.0"'
-    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.27.0"'
-    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_trashable", tag: "v0.12.3"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio", tag: "v6.7.0"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.32.0"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_trashable", tag: "v0.14.0"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_notifications", tag: "v0.15.0"'
-    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_root_switchable", tag: "v0.14.0"'
-    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_metrics", tag: "v0.7.3"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_root_switchable", tag: "v0.15.0"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_metrics", tag: "v0.8.0"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_cache", tag: "v0.6.3"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_attachable", tag: "v0.23.0"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_api", tag: "v0.23.0"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_admin", tag: "v2.13.0"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_users", tag: "v0.28.1"'
     assert_includes gemfile, 'github: "bowerbird-app/flatpack", tag: "v0.1.356"'
+    refute_includes gemfile, 'branch: "main"'
+    refute_match(/ref:\s*"/, gemfile)
     refute_includes gemfile, 'tag: "v4.7.1"'
     refute_includes gemfile, "recording_studio/v3.0.0"
+
+    root_gemfile = File.read(File.expand_path("../Gemfile", __dir__))
+    assert_includes root_gemfile, 'github: "bowerbird-app/RecordingStudio", tag: "v6.7.0"'
+    assert_includes root_gemfile, 'github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.32.0"'
+    assert_includes root_gemfile, 'github: "bowerbird-app/RecordingStudio_api", tag: "v0.23.0"'
+    assert_includes root_gemfile, 'github: "bowerbird-app/RecordingStudio_metrics", tag: "v0.8.0"'
+    assert_includes root_gemfile, 'github: "bowerbird-app/RecordingStudio_trashable", tag: "v0.14.0"'
+    refute_includes root_gemfile, 'branch: "main"'
+    refute_match(/ref:\s*"/, root_gemfile)
   end
 
   def test_dummy_schema_includes_accessible_depends_on_recording_id
@@ -101,6 +117,18 @@ class RecordingStudioFollowableTest < Minitest::Test
     assert rule_migration, "expected access rules migration in dummy db/migrate"
     assert_includes File.read(constraint_migration), "create_table :recording_studio_access_constraints"
     assert_includes File.read(rule_migration), "create_table :recording_studio_access_rules"
+
+    assert_includes schema, 't.datetime "purge_at"'
+    assert_includes schema, "idx_rs_recordings_due_purge_at"
+    purge_migration = File.read(
+      File.expand_path(
+        "dummy/db/migrate/20261113120000_add_purge_at_to_recording_studio_recordings.rb",
+        __dir__
+      )
+    )
+    assert_includes purge_migration, "add_column :recording_studio_recordings, :purge_at, :datetime"
+    assert_includes purge_migration, 'DUE_INDEX_WHERE = "trashed_at IS NOT NULL"'
+    assert_includes purge_migration, "where: DUE_INDEX_WHERE"
   end
 
   def test_template_does_not_ship_copied_core_hooks_or_base_service

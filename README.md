@@ -100,7 +100,7 @@ A per-call override is sent with the follow and unfollow request, so the Turbo S
 Add the Users gem in the host app. It is not a dependency of this gemspec, so signed-in-only hosts can skip it. Users profiles include Attachable, so the host also needs that gem. This gemspec does not depend on either one. Signed-out Follow needs Users `v0.28.1`.
 
 ```ruby
-gem "recording_studio_attachable", github: "bowerbird-app/RecordingStudio_attachable", tag: "v0.22.0"
+gem "recording_studio_attachable", github: "bowerbird-app/RecordingStudio_attachable", tag: "v0.23.0"
 gem "recording_studio_user", github: "bowerbird-app/RecordingStudio_users", tag: "v0.28.1"
 ```
 

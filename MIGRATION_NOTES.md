@@ -47,7 +47,7 @@ Per-call overrides use the same keys. `follow_button(recording, follow: { style:
 
 Signed-in follow of an item the person can already see does not change. Hosts that want signed-out Follow on a public page need to:
 
-1. Add `recording_studio_user` (tag `v0.27.2` in the dummy) and `recording_studio_attachable` (tag `v0.22.0`). Users profiles include Attachable, so the host must load it. Neither gem is a gemspec dependency. Run `bin/rails generate recording_studio_user:migrations`. Register `RecordingStudioUser::People`, `RecordingStudioUser::Profile`, and `RecordingStudioAttachable::Attachment` as recordable types.
+1. Add `recording_studio_user` (tag `v0.28.1` in the dummy) and `recording_studio_attachable` (tag `v0.23.0`). Users profiles include Attachable, so the host must load it. Neither gem is a gemspec dependency. Run `bin/rails generate recording_studio_user:migrations`. Register `RecordingStudioUser::People`, `RecordingStudioUser::Profile`, and `RecordingStudioAttachable::Attachment` as recordable types.
 2. Enable OTP, call `RecordingStudioUser::Engine.apply_otp_setup!(User)`, and register a Notifications email channel. Point `otp_registration_channels` and `otp_login_channels` at that channel.
 3. Configure Accessible `action_audiences` for `config.visibility_action` (`:"recording_studio_followable.see"` by default) with `:public` allowed and default `:granted`.
 4. Enable `:action_audiences` on recordable types that can be public, and set those recordings' audience to `:public`.
@@ -59,12 +59,12 @@ HTTP follow of a private item the actor cannot see now fails. It previously succ
 
 - Ruby 3.3 or newer
 - Rails 8.1 or newer
-- Recording Studio 6.3 or newer (dummy GitHub tag `v6.6.0`)
-- Accessible dummy tag `v0.27.0`
-- Trashable dummy tag `v0.12.3`
+- Recording Studio 6.3 or newer (dummy GitHub tag `v6.7.0`)
+- Accessible dummy tag `v0.32.0`
+- Trashable dummy tag `v0.14.0` (`purge_at` on recordings)
 - Notifications dummy tag `v0.15.0`
-- Root Switchable dummy tag `v0.14.0`
-- Metrics dummy tag `v0.7.3`
+- Root Switchable dummy tag `v0.15.0` (mounted switch page needs Accessible `:view` on the current root)
+- Metrics dummy tag `v0.8.0`
 - FlatPack dummy tag `v0.1.356`
 
 ## Verification
