@@ -10,7 +10,7 @@ Add the gem and a compatible Notifications pin:
 
 ```ruby
 gem "recording_studio_followable", github: "bowerbird-app/RecordingStudio_followable"
-gem "recording_studio_notifications", github: "bowerbird-app/RecordingStudio_notifications", tag: "v0.14.9"
+gem "recording_studio_notifications", github: "bowerbird-app/RecordingStudio_notifications", tag: "v0.15.0"
 ```
 
 Then:
@@ -200,4 +200,4 @@ Alice (`alice@example.com`), Bob, and Charlie share Client Workspace. Getting St
 
 ## Version
 
-The gem version is `0.5.0`.
+The gem version is `0.5.1`.

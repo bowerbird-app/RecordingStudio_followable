@@ -1,5 +1,9 @@
 # Development notes
 
+## Host upgrade to 0.5.1
+
+Runtime bounds for the 0.x addons are open through `< 1.0`. Notifications accepts `>= 0.14.9, < 1.0`. No migration. Notifications `0.15.0` needs Flatpack `>= 0.1.353` (dummy pins `v0.1.356`).
+
 ## Host upgrade to 0.5.0
 
 Signed-out Follow no longer has its own code screen. Pin `recording_studio_user` at tag `v0.28.1`. The `v0.27.2` pin in the 0.3.0 notes is out of date.
@@ -58,10 +62,10 @@ HTTP follow of a private item the actor cannot see now fails. It previously succ
 - Recording Studio 6.3 or newer (dummy GitHub tag `v6.6.0`)
 - Accessible dummy tag `v0.27.0`
 - Trashable dummy tag `v0.12.3`
-- Notifications dummy tag `v0.14.9`
+- Notifications dummy tag `v0.15.0`
 - Root Switchable dummy tag `v0.14.0`
 - Metrics dummy tag `v0.7.3`
-- FlatPack dummy tag `v0.1.341`
+- FlatPack dummy tag `v0.1.356`
 
 ## Verification
 

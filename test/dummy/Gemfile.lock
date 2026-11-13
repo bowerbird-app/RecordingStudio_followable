@@ -111,11 +111,11 @@ GIT
 
 GIT
   remote: https://github.com/bowerbird-app/RecordingStudio_notifications.git
-  revision: 5d7bfa387d2b036c707002d5a9d2b4aae5d4271f
-  tag: v0.14.9
+  revision: ece0dea87640f2d2fb74a49ac0edc91e6875d73f
+  tag: v0.15.0
   specs:
-    recording_studio_notifications (0.14.9)
-      flat_pack (>= 0.1.341)
+    recording_studio_notifications (0.15.0)
+      flat_pack (>= 0.1.353)
       rails (~> 8.1.0)
       recording_studio (>= 6.3.0)
       recording_studio_accessible (~> 0.18)
@@ -173,24 +173,24 @@ GIT
 
 GIT
   remote: https://github.com/bowerbird-app/flatpack.git
-  revision: 374c9b7f7130057954df596597ff75f139c72b50
-  tag: v0.1.341
+  revision: 7f669689ce8aa080bb5de8b0f14ed01b395d6054
+  tag: v0.1.356
   specs:
-    flat_pack (0.1.341)
+    flat_pack (0.1.356)
       pagy (~> 9.0)
       rails (>= 7.1, < 9)
-      tailwind_merge (~> 0.13)
+      tailwind_merge (>= 0.13, < 2)
       view_component (>= 4.14, < 5)
 
 PATH
   remote: ../..
   specs:
-    recording_studio_followable (0.5.0)
+    recording_studio_followable (0.5.1)
       rails (~> 8.1.0)
-      recording_studio (>= 6.3.0)
-      recording_studio_accessible (~> 0.18)
-      recording_studio_notifications (~> 0.14.9)
-      recording_studio_trashable (>= 0.12.0)
+      recording_studio (~> 6.0, >= 6.3.0)
+      recording_studio_accessible (>= 0.18.0, < 1.0)
+      recording_studio_notifications (>= 0.14.9, < 1.0)
+      recording_studio_trashable (>= 0.12.0, < 1.0)
 
 GEM
   remote: https://rubygems.org/
@@ -773,7 +773,7 @@ CHECKSUMS
   ffi (1.17.4-x86_64-darwin) sha256=aa70390523cf3235096cf64962b709b4cfbd5c082a2cb2ae714eb0fe2ccda496
   ffi (1.17.4-x86_64-linux-gnu) sha256=9d3db14c2eae074b382fa9c083fe95aec6e0a1451da249eab096c34002bc752d
   ffi (1.17.4-x86_64-linux-musl) sha256=3fdf9888483de005f8ef8d1cf2d3b20d86626af206cbf780f6a6a12439a9c49e
-  flat_pack (0.1.341)
+  flat_pack (0.1.356)
   fugit (1.14.0) sha256=e311a9cc85a54bb67649df45060e721282a1e2c8ebad40e41874a3a7d576f37e
   globalid (1.4.0) sha256=037f12fbf1d9d7a014d501c2d5c77356fd4ddd96d7a7991d6700bba96706f427
   hashie (5.2.0) sha256=357a22635195c2e3911fbbc3de9a7d528843d1f42ab0aae02171048f16332d72
@@ -861,12 +861,12 @@ CHECKSUMS
   recording_studio_api (0.19.0)
   recording_studio_attachable (0.22.0)
   recording_studio_cache (0.6.2)
-  recording_studio_followable (0.5.0)
+  recording_studio_followable (0.5.1)
   recording_studio_icons (0.2.1)
   recording_studio_logs (0.7.4)
   recording_studio_metrics (0.7.3)
   recording_studio_moveable (4.1.1)
-  recording_studio_notifications (0.14.9)
+  recording_studio_notifications (0.15.0)
   recording_studio_root_switchable (0.14.0)
   recording_studio_trashable (0.12.3)
   recording_studio_user (0.28.1)
