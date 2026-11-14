@@ -131,6 +131,28 @@ class PublicFollowSignInTest < ActionDispatch::IntegrationTest
     assert_redirected_to "/welcome"
   end
 
+  test "finish does not follow a trashed page" do
+    sign_in @alice
+    intent = RecordingStudioFollowable::FollowIntent.issue(
+      RecordingStudioFollowable::FollowIntent::Request.new(
+        target_id: @page_recording.id,
+        page: "/public_sample",
+        parent_url: nil,
+        button: {},
+        host: "www.example.com",
+        allowed_origins: []
+      )
+    )
+    RecordingStudioTrashable.void_recording!(@page_recording)
+
+    assert_no_difference -> { follows_for_page } do
+      post recording_studio_followable.follow_sign_in_path, params: { intent: intent }
+    end
+
+    assert_redirected_to "/"
+    assert_equal I18n.t("recording_studio_followable.sign_in.missing_page"), flash[:alert]
+  end
+
   test "a forged intent does not follow" do
     sign_in @alice
     before = follows_for_page

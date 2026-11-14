@@ -43,7 +43,7 @@ module RecordingStudioFollowable
     def recording_for(intent)
       return if intent.blank?
 
-      RecordingStudio::Recording.find_by(id: intent.target_id)
+      RecordingStudio::Recording.kept.find_by(id: intent.target_id)
     end
 
     def usable_root

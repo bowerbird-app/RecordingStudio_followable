@@ -1,5 +1,13 @@
 # Development notes
 
+## Host upgrade to 0.6.0
+
+No Followable migration. Require Recording Studio `>= 6.14.0`, Trashable `>= 0.16.0`, and Accessible `>= 0.42.0`. Follow lookups use `Recording.kept`. A trashed target or follow root cannot be followed. `Follow#target_recording` is nil when the target is trashed, and the Following page skips that row.
+
+Accessible 0.36 requires `config.access_management_actor_scope`. The dummy sets it to `User.order(:email)`.
+
+Hosts that are not already on Recording Studio 6.9 need core migration `20261114090000_add_root_recording_id_to_recording_studio_events` before writing events.
+
 ## Host upgrade to 0.5.1
 
 Runtime bounds for the 0.x addons are open through `< 1.0`. Notifications accepts `>= 0.14.9, < 1.0`. No migration. Notifications `0.15.0` needs Flatpack `>= 0.1.353` (dummy pins `v0.1.356`).
@@ -59,9 +67,9 @@ HTTP follow of a private item the actor cannot see now fails. It previously succ
 
 - Ruby 3.3 or newer
 - Rails 8.1 or newer
-- Recording Studio 6.3 or newer (dummy GitHub tag `v6.7.0`)
-- Accessible dummy tag `v0.32.0`
-- Trashable dummy tag `v0.14.0` (`purge_at` on recordings)
+- Recording Studio 6.14 or newer (dummy GitHub tag `v6.14.0`)
+- Accessible dummy tag `v0.42.0`
+- Trashable dummy tag `v0.16.0` (`Recording.kept`)
 - Notifications dummy tag `v0.15.0`
 - Root Switchable dummy tag `v0.15.0` (mounted switch page needs Accessible `:view` on the current root)
 - Metrics dummy tag `v0.8.0`

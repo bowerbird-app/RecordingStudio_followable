@@ -4,20 +4,20 @@ require "test_helper"
 
 class RecordingStudioFollowableTest < Minitest::Test
   def test_version_matches_release
-    assert_equal "0.5.1", ::RecordingStudioFollowable::VERSION
+    assert_equal "0.6.0", ::RecordingStudioFollowable::VERSION
   end
 
   def test_engine_exists
     assert_kind_of Class, ::RecordingStudioFollowable::Engine
   end
 
-  def test_gemspec_pins_recording_studio_6_3
+  def test_gemspec_pins_recording_studio_6_14
     gemspec = File.read(File.expand_path("../recording_studio_followable.gemspec", __dir__))
 
-    assert_includes gemspec, 'spec.add_dependency "recording_studio", "~> 6.0", ">= 6.3.0"'
-    assert_includes gemspec, 'spec.add_dependency "recording_studio_accessible", ">= 0.18.0", "< 1.0"'
+    assert_includes gemspec, 'spec.add_dependency "recording_studio", "~> 6.0", ">= 6.14.0"'
+    assert_includes gemspec, 'spec.add_dependency "recording_studio_accessible", ">= 0.42.0", "< 1.0"'
     assert_includes gemspec, 'spec.add_dependency "recording_studio_notifications", ">= 0.14.9", "< 1.0"'
-    assert_includes gemspec, 'spec.add_dependency "recording_studio_trashable", ">= 0.12.0", "< 1.0"'
+    assert_includes gemspec, 'spec.add_dependency "recording_studio_trashable", ">= 0.16.0", "< 1.0"'
   end
 
   def test_gemspec_excludes_cursor_config
@@ -47,9 +47,9 @@ class RecordingStudioFollowableTest < Minitest::Test
   def test_dummy_gemfile_pins_verified_6x_github_tags
     gemfile = File.read(File.expand_path("dummy/Gemfile", __dir__))
 
-    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio", tag: "v6.7.0"'
-    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.32.0"'
-    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_trashable", tag: "v0.14.0"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio", tag: "v6.14.0"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.42.0"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_trashable", tag: "v0.16.0"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_notifications", tag: "v0.15.0"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_root_switchable", tag: "v0.15.0"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_metrics", tag: "v0.8.0"'
@@ -65,11 +65,11 @@ class RecordingStudioFollowableTest < Minitest::Test
     refute_includes gemfile, "recording_studio/v3.0.0"
 
     root_gemfile = File.read(File.expand_path("../Gemfile", __dir__))
-    assert_includes root_gemfile, 'github: "bowerbird-app/RecordingStudio", tag: "v6.7.0"'
-    assert_includes root_gemfile, 'github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.32.0"'
+    assert_includes root_gemfile, 'github: "bowerbird-app/RecordingStudio", tag: "v6.14.0"'
+    assert_includes root_gemfile, 'github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.42.0"'
     assert_includes root_gemfile, 'github: "bowerbird-app/RecordingStudio_api", tag: "v0.23.0"'
     assert_includes root_gemfile, 'github: "bowerbird-app/RecordingStudio_metrics", tag: "v0.8.0"'
-    assert_includes root_gemfile, 'github: "bowerbird-app/RecordingStudio_trashable", tag: "v0.14.0"'
+    assert_includes root_gemfile, 'github: "bowerbird-app/RecordingStudio_trashable", tag: "v0.16.0"'
     refute_includes root_gemfile, 'branch: "main"'
     refute_match(/ref:\s*"/, root_gemfile)
   end
@@ -118,6 +118,15 @@ class RecordingStudioFollowableTest < Minitest::Test
     assert_includes File.read(constraint_migration), "create_table :recording_studio_access_constraints"
     assert_includes File.read(rule_migration), "create_table :recording_studio_access_rules"
 
+    assert_includes schema, 't.uuid "root_recording_id", null: false'
+    assert_includes schema, "index_rs_events_on_root_and_timeline"
+    events_migration = File.read(
+      File.expand_path(
+        "dummy/db/migrate/20261114090000_add_root_recording_id_to_recording_studio_events.rb",
+        __dir__
+      )
+    )
+    assert_includes events_migration, "add_column :recording_studio_events, :root_recording_id, :uuid"
     assert_includes schema, 't.datetime "purge_at"'
     assert_includes schema, "idx_rs_recordings_due_purge_at"
     purge_migration = File.read(

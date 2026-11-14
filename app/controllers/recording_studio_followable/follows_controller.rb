@@ -67,7 +67,7 @@ module RecordingStudioFollowable
     end
 
     def target_recording
-      @target_recording ||= RecordingStudio::Recording.find(params.require(:target_id))
+      @target_recording ||= RecordingStudio::Recording.kept.find(params.require(:target_id))
     end
 
     def follow_root
@@ -80,7 +80,7 @@ module RecordingStudioFollowable
     def resolve_follow_root
       root_id = params.permit(:root_id).fetch(:root_id, nil)
       if root_id.present?
-        RecordingStudio::Recording.find(root_id)
+        RecordingStudio::Recording.kept.find(root_id)
       else
         configured_root
       end

@@ -14,7 +14,6 @@ class PublicSamplesController < ApplicationController
   private
 
   def page_recording_for(page)
-    RecordingStudio::Recording.where(RecordingStudio::Recording.recording_studio_trashable_kept_sql)
-                              .find_by(recordable: page)
+    RecordingStudio::Recording.kept.find_by(recordable: page)
   end
 end

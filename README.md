@@ -23,7 +23,7 @@ bin/rails generate recording_studio_notifications:migrations
 bin/rails db:migrate
 ```
 
-Requires Recording Studio 6.3 or newer.
+Requires Recording Studio 6.14 or newer, Trashable 0.16 or newer, and Accessible 0.42 or newer.
 
 ## Host setup
 
@@ -200,4 +200,4 @@ Alice (`alice@example.com`), Bob, and Charlie share Client Workspace. Getting St
 
 ## Version
 
-The gem version is `0.5.1`.
+The gem version is `0.6.0`.

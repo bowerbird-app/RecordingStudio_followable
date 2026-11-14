@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_13_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_14_090000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -88,11 +88,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_13_120000) do
     t.uuid "recordable_id", null: false
     t.string "recordable_type", null: false
     t.uuid "recording_id", null: false
+    t.uuid "root_recording_id", null: false
     t.index ["action", "occurred_at"], name: "index_rs_events_on_action_and_occurred_at"
     t.index ["actor_type", "actor_id", "occurred_at"], name: "index_rs_events_on_actor_and_occurred_at"
+    t.index ["impersonator_type", "impersonator_id", "occurred_at"], name: "index_rs_events_on_impersonator_and_occurred_at"
     t.index ["recording_id", "idempotency_key"], name: "index_recording_studio_events_on_recording_and_idempotency_key", unique: true, where: "(idempotency_key IS NOT NULL)"
     t.index ["recording_id", "occurred_at", "created_at"], name: "index_rs_events_on_recording_and_timeline", order: { occurred_at: :desc, created_at: :desc }
     t.index ["recording_id"], name: "index_recording_studio_events_on_recording_id"
+    t.index ["root_recording_id", "occurred_at", "created_at", "id"], name: "index_rs_events_on_root_and_timeline", order: { occurred_at: :desc, created_at: :desc, id: :desc }
   end
 
   create_table "recording_studio_follows", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -268,7 +271,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_13_120000) do
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
-    t.check_constraint "registered_with::text = ANY (ARRAY['password'::character varying, 'otp'::character varying]::text[])", name: "users_registered_with_check"
+    t.check_constraint "registered_with::text = ANY (ARRAY['password'::character varying::text, 'otp'::character varying::text])", name: "users_registered_with_check"
   end
 
   create_table "workspaces", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -279,6 +282,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_13_120000) do
 
   add_foreign_key "recording_studio_access_invitations", "recording_studio_recordings", column: "recording_id"
   add_foreign_key "recording_studio_events", "recording_studio_recordings", column: "recording_id"
+  add_foreign_key "recording_studio_events", "recording_studio_recordings", column: "root_recording_id"
   add_foreign_key "recording_studio_notifications_deliveries", "recording_studio_notifications_notifications", column: "notification_id"
   add_foreign_key "recording_studio_recordings", "recording_studio_recordings", column: "parent_recording_id"
   add_foreign_key "recording_studio_recordings", "recording_studio_recordings", column: "root_recording_id"

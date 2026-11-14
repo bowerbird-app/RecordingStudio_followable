@@ -33,6 +33,25 @@ class FollowableServicesTest < ActiveSupport::TestCase
     Current.actor = nil
   end
 
+  test "a trashed target is not returned and cannot be followed through the API root lookup" do
+    follow_recording = RecordingStudioFollowable.follow(target: @page_recording, root: @client, actor: @alice)
+    RecordingStudioTrashable.void_recording!(@page_recording)
+
+    assert_nil follow_recording.recordable.target_recording
+
+    context = Struct.new(:recording, :access_grant, :actor, :params).new(
+      @page_recording,
+      nil,
+      @alice,
+      { root_id: @client.id }
+    )
+    RecordingStudioTrashable.void_recording!(@client)
+
+    assert_raises(ActiveRecord::RecordNotFound) do
+      RecordingStudioFollowable::Api::Actions::Follow.call(context)
+    end
+  end
+
   test "follow stores a pointer under the follow root for a target in another root" do
     follow_recording = RecordingStudioFollowable.follow(target: @page_recording, root: @client, actor: @alice)
 
