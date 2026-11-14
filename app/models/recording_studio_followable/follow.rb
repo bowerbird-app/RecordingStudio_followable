@@ -12,7 +12,7 @@ module RecordingStudioFollowable
     include RecordingStudio::Capabilities::Trashable.to
 
     def target_recording
-      RecordingStudio::Recording.find_by(id: target_recording_id)
+      RecordingStudio::Recording.kept.find_by(id: target_recording_id)
     end
   end
 end

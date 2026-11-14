@@ -20,8 +20,7 @@ class HomeController < ApplicationController
   def page_recording_for(page)
     return if page.blank?
 
-    RecordingStudio::Recording.where(RecordingStudio::Recording.recording_studio_trashable_kept_sql)
-                              .find_by(recordable: page)
+    RecordingStudio::Recording.kept.find_by(recordable: page)
   end
 
   def following_demo_page?

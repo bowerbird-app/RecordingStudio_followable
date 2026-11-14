@@ -7,8 +7,7 @@ module RecordingStudioFollowable
     module_function
 
     def kept_follow_recordings
-      RecordingStudio::Recording.where(RecordingStudio::Recording.recording_studio_trashable_kept_sql)
-                                .of_type("RecordingStudioFollowable::Follow")
+      RecordingStudio::Recording.kept.of_type("RecordingStudioFollowable::Follow")
     end
 
     def active_for(root:, target:)

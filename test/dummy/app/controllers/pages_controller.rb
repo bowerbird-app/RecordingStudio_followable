@@ -44,15 +44,14 @@ class PagesController < ApplicationController
     root = current_follow_root
     return Page.none if root.blank?
 
-    ids = RecordingStudio::Recording.where(RecordingStudio::Recording.recording_studio_trashable_kept_sql)
+    ids = RecordingStudio::Recording.kept
                                     .where(root_recording: root, recordable_type: "Page")
                                     .pluck(:recordable_id)
     Page.where(id: ids).order(:title)
   end
 
   def page_recording_for(page)
-    RecordingStudio::Recording.where(RecordingStudio::Recording.recording_studio_trashable_kept_sql)
-                              .find_by(recordable: page)
+    RecordingStudio::Recording.kept.find_by(recordable: page)
   end
 
   def current_follow_root

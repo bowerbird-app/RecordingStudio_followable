@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-11-14
+
+### Changed
+- Kept follow lookups use `RecordingStudio::Recording.kept`. `FollowQuery` no longer calls `recording_studio_trashable_kept_sql`.
+- `Follow#target_recording`, the HTTP follow and root lookup, the API root lookup, and the sign-in finish use `.kept`. A trashed recording cannot be followed, and the Following page skips it.
+- `recording_studio` is `~> 6.0` with a floor of `>= 6.14.0`. `recording_studio_trashable` is `>= 0.16.0, < 1.0`. `recording_studio_accessible` is `>= 0.42.0, < 1.0`. Development Gemfiles pin Recording Studio `v6.14.0`, Trashable `v0.16.0`, and Accessible `v0.42.0`.
+
+### Upgrade notes
+- Bump to `0.6.0`. No Followable migration.
+- Require Recording Studio `>= 6.14.0`, Trashable `>= 0.16.0`, and Accessible `>= 0.42.0`. Older Accessible releases still call the Trashable SQL helpers that 0.16.0 removed.
+- Hosts moving onto Recording Studio 6.9 or newer need core migration `20261114090000_add_root_recording_id_to_recording_studio_events` before writing events.
+- A trashed target or follow root is refused. `Follow#target_recording` is nil when that target is trashed.
+
 ## [0.5.1] - 2026-11-13
 
 ### Changed
@@ -113,7 +126,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Notes
 - Follow features are coming soon. This version does not ship a follow API, models, or public helpers.
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_followable/compare/v0.5.1...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_followable/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/bowerbird-app/RecordingStudio_followable/compare/v0.5.1...v0.6.0
 [0.5.1]: https://github.com/bowerbird-app/RecordingStudio_followable/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/bowerbird-app/RecordingStudio_followable/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/bowerbird-app/RecordingStudio_followable/compare/v0.3.0...v0.4.0

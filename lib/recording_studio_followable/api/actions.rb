@@ -16,7 +16,7 @@ module RecordingStudioFollowable
 
       module Follow
         def self.call(context)
-          root = RecordingStudio::Recording.find(root_id_from(context))
+          root = RecordingStudio::Recording.kept.find(root_id_from(context))
           recording = RecordingStudioFollowable.follow(
             target: context.recording,
             root: root,
@@ -43,7 +43,7 @@ module RecordingStudioFollowable
 
       module Unfollow
         def self.call(context)
-          root = RecordingStudio::Recording.find(Follow.root_id_from(context))
+          root = RecordingStudio::Recording.kept.find(Follow.root_id_from(context))
           recording = RecordingStudioFollowable.unfollow(
             target: context.recording,
             root: root,

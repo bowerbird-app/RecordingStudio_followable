@@ -28,6 +28,40 @@ class FollowableFollowsControllerTest < ActionDispatch::IntegrationTest
     RecordingStudioFollowable.configuration.button = nil
   end
 
+  test "html follow of a trashed page is refused" do
+    RecordingStudioTrashable.void_recording!(@page_recording)
+
+    post recording_studio_followable.follows_path,
+         params: { target_id: @page_recording.id, root_id: @client.id },
+         headers: { "HTTP_REFERER" => "/" }
+
+    assert_redirected_to "/"
+    assert_equal I18n.t("recording_studio_followable.follows.unauthorized"), flash[:alert]
+    assert_nil RecordingStudioFollowable::FollowQuery.active_for(root: @client, target: @page_recording)
+  end
+
+  test "html follow under a trashed root is refused" do
+    RecordingStudioTrashable.void_recording!(@client)
+
+    post recording_studio_followable.follows_path,
+         params: { target_id: @page_recording.id, root_id: @client.id },
+         headers: { "HTTP_REFERER" => "/" }
+
+    assert_redirected_to "/"
+    assert_equal I18n.t("recording_studio_followable.follows.unauthorized"), flash[:alert]
+  end
+
+  test "index skips a follow whose target was trashed" do
+    switch_to_client_workspace
+    RecordingStudioFollowable.follow(target: @page_recording, root: @client, actor: @admin)
+    RecordingStudioTrashable.void_recording!(@page_recording)
+
+    get recording_studio_followable.follows_path
+
+    assert_response :success
+    refute_includes response.body, "Getting Started"
+  end
+
   test "html follow creates a follow and redirects back" do
     post recording_studio_followable.follows_path,
          params: { target_id: @page_recording.id, root_id: @client.id },
