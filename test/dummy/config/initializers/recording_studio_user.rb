@@ -4,6 +4,7 @@ RecordingStudioUser.configure do |config|
   config.otp_enabled = true
   config.otp_registration_channels = %i[email]
   config.otp_login_channels = %i[email]
+  config.minimum_password_length = 6
 end
 
 Rails.application.config.to_prepare do

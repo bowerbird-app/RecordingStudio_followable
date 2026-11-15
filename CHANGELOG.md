@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-11-15
+
+### Changed
+- Requires Recording Studio 7. `recording_studio` is `>= 7.0, < 8.0`.
+- `recording_studio_accessible` is `>= 0.44.0, < 1.0`. `recording_studio_notifications` is `>= 0.18.0, < 1.0`. `recording_studio_trashable` is `>= 0.17.0, < 1.0`.
+- Development Gemfiles pin Recording Studio `v7.0.0`, Accessible `v0.44.0`, Trashable `v0.17.0`, Notifications `v0.18.0`, Metrics `v0.9.0`, Logs `v0.8.0`, and API `v0.23.4`. The dummy also pins Root Switchable `v0.16.0`, Admin `v2.16.0`, and Users `v0.30.0`.
+- Seeds and tests create roots with `RecordingStudio.create_root_recording!(recordable, actor:)`. Lookups stay on `root_recording_for`.
+- Development locks update Puma to 8.1.0 and msgpack to 1.8.7.
+
+### Upgrade notes
+- Breaking. Bump to `0.7.0`. No Followable migration.
+- Require Recording Studio `>= 7.0, < 8.0`, Accessible `>= 0.44.0`, Notifications `>= 0.18.0`, and Trashable `>= 0.17.0`.
+- `root_recording_for` only finds a root. Create one with `RecordingStudio.create_root_recording!(recordable, actor:)`. A second call returns the same root.
+- Set `config.authorize_write`. Leave `allow_unauthorized_writes` unset. The dummy callback still treats a Follow create as Accessible `:view` on the parent.
+- Follow access is unchanged: `:view` on the follow root, a seeable target, and `.kept` lookups.
+- Users `v0.30.0` defaults `minimum_password_length` to 12. The dummy sets it to 6 so the seeded password still signs in. Attachable stays at `v0.23.0`.
+
 ## [0.6.1] - 2026-11-15
 
 ### Changed

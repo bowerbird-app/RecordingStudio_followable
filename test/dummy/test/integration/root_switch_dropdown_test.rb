@@ -114,7 +114,7 @@ class RootSwitchDropdownTest < ActionDispatch::IntegrationTest
     previous = Current.actor
     Current.actor = @admin
     (Workspace.all.to_a | workspaces).uniq.each do |workspace|
-      recording = RecordingStudio.root_recording_for(workspace)
+      recording = RecordingStudio.create_root_recording!(workspace, actor: @admin)
       next if RecordingStudioAccessible.authorized?(actor: user, recording: recording, role: :view)
 
       result = if RecordingStudioAccessible::AccessGrantList.rows_for(recording).none?

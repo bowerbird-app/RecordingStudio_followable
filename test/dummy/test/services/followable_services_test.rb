@@ -11,8 +11,8 @@ class FollowableServicesTest < ActiveSupport::TestCase
     @stranger = users("stranger@example.com")
 
     Current.actor = @admin
-    @studio = RecordingStudio.root_recording_for(Workspace.create!(name: "Studio #{SecureRandom.hex(4)}"))
-    @client = RecordingStudio.root_recording_for(Workspace.create!(name: "Client #{SecureRandom.hex(4)}"))
+    @studio = RecordingStudio.create_root_recording!(Workspace.create!(name: "Studio #{SecureRandom.hex(4)}"), actor: @admin)
+    @client = RecordingStudio.create_root_recording!(Workspace.create!(name: "Client #{SecureRandom.hex(4)}"), actor: @admin)
     bootstrap(@studio, @admin)
     bootstrap(@client, @admin)
     grant(@client, @alice, :admin)
@@ -205,7 +205,7 @@ class FollowableServicesTest < ActiveSupport::TestCase
   end
 
   test "notify_followers is idempotent for the same event key and still separates two roots" do
-    other_client = RecordingStudio.root_recording_for(Workspace.create!(name: "Other #{SecureRandom.hex(4)}"))
+    other_client = RecordingStudio.create_root_recording!(Workspace.create!(name: "Other #{SecureRandom.hex(4)}"), actor: @admin)
     bootstrap(other_client, @admin)
     grant(other_client, @alice, :view)
     RecordingStudioFollowable.follow(target: @page_recording, root: @client, actor: @alice)
