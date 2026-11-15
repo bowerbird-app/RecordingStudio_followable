@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `recording_studio_accessible` is `>= 0.44.0, < 1.0`. `recording_studio_notifications` is `>= 0.18.0, < 1.0`. `recording_studio_trashable` is `>= 0.17.0, < 1.0`.
 - Development Gemfiles pin Recording Studio `v7.0.0`, Accessible `v0.44.0`, Trashable `v0.17.0`, Notifications `v0.18.0`, Metrics `v0.9.0`, Logs `v0.8.0`, and API `v0.23.4`. The dummy also pins Root Switchable `v0.16.0`, Admin `v2.16.0`, and Users `v0.30.0`.
 - Seeds and tests create roots with `RecordingStudio.create_root_recording!(recordable, actor:)`. Lookups stay on `root_recording_for`.
+- Development locks update Puma to 8.1.0 and msgpack to 1.8.7.
 
 ### Upgrade notes
 - Breaking. Bump to `0.7.0`. No Followable migration.
