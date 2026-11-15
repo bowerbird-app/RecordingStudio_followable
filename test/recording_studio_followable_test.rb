@@ -4,7 +4,7 @@ require "test_helper"
 
 class RecordingStudioFollowableTest < Minitest::Test
   def test_version_matches_release
-    assert_equal "0.6.0", ::RecordingStudioFollowable::VERSION
+    assert_equal "0.6.1", ::RecordingStudioFollowable::VERSION
   end
 
   def test_engine_exists
@@ -14,7 +14,7 @@ class RecordingStudioFollowableTest < Minitest::Test
   def test_gemspec_pins_recording_studio_6_14
     gemspec = File.read(File.expand_path("../recording_studio_followable.gemspec", __dir__))
 
-    assert_includes gemspec, 'spec.add_dependency "recording_studio", "~> 6.0", ">= 6.14.0"'
+    assert_includes gemspec, 'spec.add_dependency "recording_studio", ">= 6.14.0", "< 8.0"'
     assert_includes gemspec, 'spec.add_dependency "recording_studio_accessible", ">= 0.42.0", "< 1.0"'
     assert_includes gemspec, 'spec.add_dependency "recording_studio_notifications", ">= 0.14.9", "< 1.0"'
     assert_includes gemspec, 'spec.add_dependency "recording_studio_trashable", ">= 0.16.0", "< 1.0"'

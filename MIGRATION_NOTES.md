@@ -1,5 +1,9 @@
 # Development notes
 
+## Host upgrade to 0.6.1
+
+No migration. `recording_studio` is `>= 6.14.0, < 8.0`. This release does not require core 7. Development lockfiles stay on Recording Studio `v6.14.0`.
+
 ## Host upgrade to 0.6.0
 
 No Followable migration. Require Recording Studio `>= 6.14.0`, Trashable `>= 0.16.0`, and Accessible `>= 0.42.0`. Follow lookups use `Recording.kept`. A trashed target or follow root cannot be followed. `Follow#target_recording` is nil when the target is trashed, and the Following page skips that row.

@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.1] - 2026-11-15
+
+### Changed
+- Allow recording_studio < 8.0 (core 7 phase 1).
+
+### Upgrade notes
+- Bump to `0.6.1`. No migration.
+- `recording_studio` is `>= 6.14.0, < 8.0`. This release does not require core 7.
+
 ## [0.6.0] - 2026-11-14
 
 ### Changed
