@@ -1,5 +1,17 @@
 # Development notes
 
+## Host upgrade to 0.7.0
+
+Breaking. No Followable migration. Require Recording Studio `>= 7.0, < 8.0`, Accessible `>= 0.44.0`, Notifications `>= 0.18.0`, and Trashable `>= 0.17.0`.
+
+`RecordingStudio.root_recording_for` only finds a root and returns `nil` when there is none. Create a root with `RecordingStudio.create_root_recording!(recordable, actor:)`. A later call returns that root and does not append another event.
+
+Set `config.authorize_write`. Do not set `allow_unauthorized_writes`. Root creation calls that callback with `parent_recording: nil`. The dummy callback allows that when an actor is present, and it still treats a Follow create as Accessible `:view` on the follow root.
+
+Follow access is unchanged. The actor needs `:view` on the follow root. The target must be seeable. Lookups use `Recording.kept`.
+
+Users 0.30 defaults `minimum_password_length` to 12. The dummy sets it to 6 so the seeded password still signs in. Attachable stays at `v0.23.0`.
+
 ## Host upgrade to 0.6.1
 
 No migration. `recording_studio` is `>= 6.14.0, < 8.0`. This release does not require core 7. Development lockfiles stay on Recording Studio `v6.14.0`.
@@ -71,12 +83,16 @@ HTTP follow of a private item the actor cannot see now fails. It previously succ
 
 - Ruby 3.3 or newer
 - Rails 8.1 or newer
-- Recording Studio 6.14 or newer (dummy GitHub tag `v6.14.0`)
-- Accessible dummy tag `v0.42.0`
-- Trashable dummy tag `v0.16.0` (`Recording.kept`)
-- Notifications dummy tag `v0.15.0`
-- Root Switchable dummy tag `v0.15.0` (mounted switch page needs Accessible `:view` on the current root)
-- Metrics dummy tag `v0.8.0`
+- Recording Studio 7 (dummy GitHub tag `v7.0.0`)
+- Accessible dummy tag `v0.44.0`
+- Trashable dummy tag `v0.17.0` (`Recording.kept`)
+- Notifications dummy tag `v0.18.0`
+- Root Switchable dummy tag `v0.16.0` (mounted switch page needs Accessible `:view` on the current root)
+- Metrics dummy tag `v0.9.0`
+- Logs dummy tag `v0.8.0`
+- API dummy tag `v0.23.4`
+- Admin dummy tag `v2.16.0`
+- Users dummy tag `v0.30.0` (signed-out follow)
 - FlatPack dummy tag `v0.1.356`
 
 ## Verification

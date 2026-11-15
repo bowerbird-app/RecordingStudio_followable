@@ -10,7 +10,7 @@ Add the gem and a compatible Notifications pin:
 
 ```ruby
 gem "recording_studio_followable", github: "bowerbird-app/RecordingStudio_followable"
-gem "recording_studio_notifications", github: "bowerbird-app/RecordingStudio_notifications", tag: "v0.15.0"
+gem "recording_studio_notifications", github: "bowerbird-app/RecordingStudio_notifications", tag: "v0.18.0"
 ```
 
 Then:
@@ -23,7 +23,7 @@ bin/rails generate recording_studio_notifications:migrations
 bin/rails db:migrate
 ```
 
-Requires Recording Studio 6.14 or newer, Trashable 0.16 or newer, and Accessible 0.42 or newer.
+Requires Recording Studio 7 (`>= 7.0, < 8.0`), Trashable 0.17 or newer, Accessible 0.44 or newer, and Notifications 0.18 or newer. Create a root with `RecordingStudio.create_root_recording!(recordable, actor:)`. `root_recording_for` only finds one. Set `config.authorize_write` and leave `allow_unauthorized_writes` unset.
 
 ## Host setup
 
@@ -44,7 +44,7 @@ include RecordingStudio::Capabilities::FollowParent.to
 5. Let Accessible `:view` on the follow root create and trash Follows. Dummy `authorize_write` treats Follow creates as `:view`. Trashable on Follow also uses `:view`.
 6. Mount the engine (`generate recording_studio_followable:install` does this). Then render `follow_button(recording)` on a host page. The helper uses the current root and actor, and the button updates in place over Turbo. Without JavaScript it redirects back. The Following page is `GET` on the mount's `/follows`. Set `config.current_root` to the open workspace (dummy uses `current_root_recording`). `follow_target_url(recording)` is the path for a followed item. It uses `polymorphic_path` on the recordable. Set `config.followed_url` when the host path is different. `config.page_size` (default 25) is the Following page slice. `FlatPack::PaginationInfinite` fetches the next slice as you scroll. See Button look to change the style, icon, or label.
 7. Register a Notifications type with `scope: :root` before you call `notify_followers`. Dummy registers `:followed_update`.
-8. Register the followed type and the root type with Recording Studio API so `follow`, `unfollow`, `followers`, and `follows` appear. Do not register `notify_followers`. Recording Studio MCP exposes the same capability actions once the host pins a MCP gem that accepts your API version. MCP 0.28.0 still requires API `< 0.18`, so this dummy pins API 0.19 without MCP.
+8. Register the followed type and the root type with Recording Studio API so `follow`, `unfollow`, `followers`, and `follows` appear. Do not register `notify_followers`. Recording Studio MCP exposes the same capability actions once the host pins a MCP gem that accepts your API version. MCP 0.28.0 still requires API `< 0.18`, so this dummy pins API `v0.23.4` without MCP.
 
 ## Follow API
 
@@ -97,11 +97,11 @@ A per-call override is sent with the follow and unfollow request, so the Turbo S
 
 `follow_button` renders for a signed-out visitor when the target is publicly seeable and Users OTP start is routed. The button looks like Follow (`plus-circle`) and opens a modal. The email posts to Recording Studio Users. The code step is `RecordingStudioUser::OtpCodeForm`. This gem does not depend on Recording Studio Messages, and it does not collect the code itself.
 
-Add the Users gem in the host app. It is not a dependency of this gemspec, so signed-in-only hosts can skip it. Users profiles include Attachable, so the host also needs that gem. This gemspec does not depend on either one. Signed-out Follow needs Users `v0.28.1`.
+Add the Users gem in the host app. It is not a dependency of this gemspec, so signed-in-only hosts can skip it. Users profiles include Attachable, so the host also needs that gem. This gemspec does not depend on either one. Signed-out Follow on Recording Studio 7 needs Users `v0.30.0`.
 
 ```ruby
 gem "recording_studio_attachable", github: "bowerbird-app/RecordingStudio_attachable", tag: "v0.23.0"
-gem "recording_studio_user", github: "bowerbird-app/RecordingStudio_users", tag: "v0.28.1"
+gem "recording_studio_user", github: "bowerbird-app/RecordingStudio_users", tag: "v0.30.0"
 ```
 
 Then:

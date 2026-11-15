@@ -35,9 +35,9 @@ previous_actor = Current.actor
 Current.actor = admin
 
 begin
-  root_recording = RecordingStudio.root_recording_for(workspace)
-  accessible_root_recording = RecordingStudio.root_recording_for(accessible_workspace)
-  private_root_recording = RecordingStudio.root_recording_for(private_workspace)
+  root_recording = RecordingStudio.create_root_recording!(workspace, actor: admin)
+  accessible_root_recording = RecordingStudio.create_root_recording!(accessible_workspace, actor: admin)
+  private_root_recording = RecordingStudio.create_root_recording!(private_workspace, actor: admin)
 
   [root_recording, accessible_root_recording, private_root_recording].each do |recording|
     next if RecordingStudioAccessible::AccessGrantList.rows_for(recording).any?

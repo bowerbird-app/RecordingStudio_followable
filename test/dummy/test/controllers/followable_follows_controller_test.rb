@@ -227,7 +227,7 @@ class FollowableFollowsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "index paginates newest first and the next xhr slice returns the rest" do
-    list_root = RecordingStudio.root_recording_for(Workspace.create!(name: "Follow list #{SecureRandom.hex(4)}"))
+    list_root = RecordingStudio.create_root_recording!(Workspace.create!(name: "Follow list #{SecureRandom.hex(4)}"), actor: @admin)
     RecordingStudioAccessible.bootstrap_owner_access!(recording: list_root, actor: @admin)
     switch_to_workspace(list_root)
     studio = RecordingStudio.root_recording_for(Workspace.find_by!(name: "Studio Workspace"))

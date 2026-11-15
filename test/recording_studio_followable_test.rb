@@ -4,20 +4,20 @@ require "test_helper"
 
 class RecordingStudioFollowableTest < Minitest::Test
   def test_version_matches_release
-    assert_equal "0.6.1", ::RecordingStudioFollowable::VERSION
+    assert_equal "0.7.0", ::RecordingStudioFollowable::VERSION
   end
 
   def test_engine_exists
     assert_kind_of Class, ::RecordingStudioFollowable::Engine
   end
 
-  def test_gemspec_pins_recording_studio_6_14
+  def test_gemspec_pins_recording_studio_7
     gemspec = File.read(File.expand_path("../recording_studio_followable.gemspec", __dir__))
 
-    assert_includes gemspec, 'spec.add_dependency "recording_studio", ">= 6.14.0", "< 8.0"'
-    assert_includes gemspec, 'spec.add_dependency "recording_studio_accessible", ">= 0.42.0", "< 1.0"'
-    assert_includes gemspec, 'spec.add_dependency "recording_studio_notifications", ">= 0.14.9", "< 1.0"'
-    assert_includes gemspec, 'spec.add_dependency "recording_studio_trashable", ">= 0.16.0", "< 1.0"'
+    assert_includes gemspec, 'spec.add_dependency "recording_studio", ">= 7.0", "< 8.0"'
+    assert_includes gemspec, 'spec.add_dependency "recording_studio_accessible", ">= 0.44.0", "< 1.0"'
+    assert_includes gemspec, 'spec.add_dependency "recording_studio_notifications", ">= 0.18.0", "< 1.0"'
+    assert_includes gemspec, 'spec.add_dependency "recording_studio_trashable", ">= 0.17.0", "< 1.0"'
   end
 
   def test_gemspec_excludes_cursor_config
@@ -44,32 +44,36 @@ class RecordingStudioFollowableTest < Minitest::Test
     assert_includes install_script, "fetch-skills.sh"
   end
 
-  def test_dummy_gemfile_pins_verified_6x_github_tags
+  def test_dummy_gemfile_pins_verified_core_7_github_tags
     gemfile = File.read(File.expand_path("dummy/Gemfile", __dir__))
 
-    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio", tag: "v6.14.0"'
-    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.42.0"'
-    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_trashable", tag: "v0.16.0"'
-    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_notifications", tag: "v0.15.0"'
-    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_root_switchable", tag: "v0.15.0"'
-    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_metrics", tag: "v0.8.0"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio", tag: "v7.0.0"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.44.0"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_trashable", tag: "v0.17.0"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_notifications", tag: "v0.18.0"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_root_switchable", tag: "v0.16.0"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_metrics", tag: "v0.9.0"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_logs", tag: "v0.8.0"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_cache", tag: "v0.6.3"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_attachable", tag: "v0.23.0"'
-    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_api", tag: "v0.23.0"'
-    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_admin", tag: "v2.13.0"'
-    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_users", tag: "v0.28.1"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_api", tag: "v0.23.4"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_admin", tag: "v2.16.0"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_users", tag: "v0.30.0"'
     assert_includes gemfile, 'github: "bowerbird-app/flatpack", tag: "v0.1.356"'
     refute_includes gemfile, 'branch: "main"'
     refute_match(/ref:\s*"/, gemfile)
     refute_includes gemfile, 'tag: "v4.7.1"'
     refute_includes gemfile, "recording_studio/v3.0.0"
+    refute_includes gemfile, "allow_unauthorized_writes"
 
     root_gemfile = File.read(File.expand_path("../Gemfile", __dir__))
-    assert_includes root_gemfile, 'github: "bowerbird-app/RecordingStudio", tag: "v6.14.0"'
-    assert_includes root_gemfile, 'github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.42.0"'
-    assert_includes root_gemfile, 'github: "bowerbird-app/RecordingStudio_api", tag: "v0.23.0"'
-    assert_includes root_gemfile, 'github: "bowerbird-app/RecordingStudio_metrics", tag: "v0.8.0"'
-    assert_includes root_gemfile, 'github: "bowerbird-app/RecordingStudio_trashable", tag: "v0.16.0"'
+    assert_includes root_gemfile, 'github: "bowerbird-app/RecordingStudio", tag: "v7.0.0"'
+    assert_includes root_gemfile, 'github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.44.0"'
+    assert_includes root_gemfile, 'github: "bowerbird-app/RecordingStudio_api", tag: "v0.23.4"'
+    assert_includes root_gemfile, 'github: "bowerbird-app/RecordingStudio_logs", tag: "v0.8.0"'
+    assert_includes root_gemfile, 'github: "bowerbird-app/RecordingStudio_metrics", tag: "v0.9.0"'
+    assert_includes root_gemfile, 'github: "bowerbird-app/RecordingStudio_notifications", tag: "v0.18.0"'
+    assert_includes root_gemfile, 'github: "bowerbird-app/RecordingStudio_trashable", tag: "v0.17.0"'
     refute_includes root_gemfile, 'branch: "main"'
     refute_match(/ref:\s*"/, root_gemfile)
   end
@@ -203,7 +207,9 @@ class RecordingStudioFollowableTest < Minitest::Test
     initializer_source = File.read(initializer_path)
 
     assert_includes initializer_source, "config.require_recordable_declarations = true"
+    assert_includes initializer_source, "config.authorize_write"
     assert_includes initializer_source, "RecordingStudioFollowable::Follow"
+    refute_includes initializer_source, "allow_unauthorized_writes"
     refute_includes initializer_source, "config.include_children"
     refute_includes initializer_source, "config.features."
     refute_includes initializer_source, "v3"
