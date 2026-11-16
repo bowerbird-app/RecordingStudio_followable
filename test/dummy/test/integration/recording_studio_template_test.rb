@@ -47,6 +47,8 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     page_recording = RecordingStudio::Recording.find_by!(recordable: page)
 
     assert_nil Current.actor
+    assert User.find_by!(email: "admin@admin.com").confirmed?
+    assert User.find_by!(email: "alice@example.com").confirmed?
     assert_nil root_recording.parent_recording_id
     assert_nil accessible_root_recording.parent_recording_id
     assert_nil private_root_recording.parent_recording_id

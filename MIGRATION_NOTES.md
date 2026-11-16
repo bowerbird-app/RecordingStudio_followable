@@ -79,21 +79,29 @@ Signed-in follow of an item the person can already see does not change. Hosts th
 
 HTTP follow of a private item the actor cannot see now fails. It previously succeeded when the actor could view the follow root only. API `follow` no longer requires a `:view` grant on the target beyond that seeable check. `followers` and `follows` still require `:view`.
 
+## Dummy password accounts
+
+Users 0.31 refuses password sign-in until the account is confirmed. Seeded password users are confirmed so `admin@admin.com` / `Password` still signs in. One-time-code sign-up stays unconfirmed until the code step.
+
 ## Requirements
 
 - Ruby 3.3 or newer
 - Rails 8.1 or newer
-- Recording Studio 7 (dummy GitHub tag `v7.0.0`)
-- Accessible dummy tag `v0.44.0`
-- Trashable dummy tag `v0.17.0` (`Recording.kept`)
-- Notifications dummy tag `v0.18.0`
+- Recording Studio 7 (dummy GitHub tag `v7.3.0`)
+- Accessible dummy tag `v0.45.1`
+- Trashable dummy tag `v1.0.1` (`Recording.kept`)
+- Notifications dummy tag `v0.19.1`
 - Root Switchable dummy tag `v0.16.0` (mounted switch page needs Accessible `:view` on the current root)
 - Metrics dummy tag `v0.9.0`
 - Logs dummy tag `v0.8.0`
-- API dummy tag `v0.23.4`
-- Admin dummy tag `v2.16.0`
-- Users dummy tag `v0.30.0` (signed-out follow)
-- FlatPack dummy tag `v0.1.356`
+- Cache dummy tag `v0.7.0`
+- Icons dummy tag `v0.4.0`
+- Moveable dummy tag `v6.0.0`
+- Attachable dummy tag `v0.31.0`
+- API dummy tag `v1.2.1`
+- Admin dummy tag `v2.18.0`
+- Users dummy tag `v0.32.0` (signed-out follow)
+- FlatPack dummy tag `v0.1.377`
 
 ## Verification
 

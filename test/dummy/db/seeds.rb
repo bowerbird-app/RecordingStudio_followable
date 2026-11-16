@@ -24,6 +24,7 @@ admin = ensure_user.call("admin@admin.com")
 alice = ensure_user.call("alice@example.com")
 bob = ensure_user.call("bob@example.com")
 charlie = ensure_user.call("charlie@example.com")
+[admin, alice, bob, charlie].each(&:confirm_for_password_sign_in!)
 
 workspace = Workspace.find_or_create_by!(name: "Studio Workspace")
 accessible_workspace = Workspace.find_or_create_by!(name: "Client Workspace")

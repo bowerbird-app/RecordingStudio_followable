@@ -12,6 +12,7 @@ class FlatpackPagesTest < ActionDispatch::IntegrationTest
       record.password_confirmation = "Password123!"
     end
     sign_in user
+    assert user.reload.confirmed?
   end
 
   test "signed-in dummy home renders after the flatpack bump" do

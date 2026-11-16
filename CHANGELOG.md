@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Development Gemfiles pin the latest release tags: Recording Studio `v7.3.0`, Accessible `v0.45.1`, Trashable `v1.0.1`, Notifications `v0.19.1`, Cache `v0.7.0`, Icons `v0.4.0`, Moveable `v6.0.0`, Attachable `v0.31.0`, API `v1.2.1`, Admin `v2.18.0`, Users `v0.32.0`, and Flatpack `v0.1.377`. Root Switchable stays `v0.16.0`, Metrics `v0.9.0`, and Logs `v0.8.0`.
+
+### Upgrade notes
+- No Followable migration. Gemspec floors are unchanged.
+- Users 0.31 refuses password sign-in for an unconfirmed account. The dummy confirms seeded password users. One-time-code sign-up stays unconfirmed until the code step.
+
 ## [0.8.0] - 2026-11-16
 
 ### Changed
