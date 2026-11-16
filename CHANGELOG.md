@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-11-16
+
+### Changed
+- Recording Studio runtime dependencies keep their last-tested floors and gain an upper cap. 0.x dependencies cap at `< 2.0`. `recording_studio` stays `>= 7.0, < 8.0`.
+- `recording_studio_accessible` is `>= 0.44.0, < 2.0`. `recording_studio_notifications` is `>= 0.18.0, < 2.0`. `recording_studio_trashable` is `>= 0.17.0, < 2.0`.
+
+### Upgrade notes
+- Bump to `0.8.0`. No Followable migration.
+- Accessible, Notifications, and Trashable may resolve through 1.x. The previous cap was `< 1.0`. Floors are unchanged.
+
 ## [0.7.0] - 2026-11-15
 
 ### Changed
