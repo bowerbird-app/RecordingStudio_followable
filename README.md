@@ -44,7 +44,7 @@ include RecordingStudio::Capabilities::FollowParent.to
 5. Let Accessible `:view` on the follow root create and trash Follows. Dummy `authorize_write` treats Follow creates as `:view`. Trashable on Follow also uses `:view`.
 6. Mount the engine (`generate recording_studio_followable:install` does this). Then render `follow_button(recording)` on a host page. The helper uses the current root and actor, and the button updates in place over Turbo. Without JavaScript it redirects back. The Following page is `GET` on the mount's `/follows`. Set `config.current_root` to the open workspace (dummy uses `current_root_recording`). `follow_target_url(recording)` is the path for a followed item. It uses `polymorphic_path` on the recordable. Set `config.followed_url` when the host path is different. `config.page_size` (default 25) is the Following page slice. `FlatPack::PaginationInfinite` fetches the next slice as you scroll. See Button look to change the style, icon, or label.
 7. Register a Notifications type with `scope: :root` before you call `notify_followers`. Dummy registers `:followed_update`.
-8. Register the followed type and the root type with Recording Studio API so `follow`, `unfollow`, `followers`, and `follows` appear. Do not register `notify_followers`. Recording Studio MCP exposes the same capability actions once the host pins a MCP gem that accepts your API version. MCP 0.28.0 still requires API `< 0.18`, so this dummy pins API `v1.2.1` without MCP.
+8. Register the followed type and the root type with Recording Studio API so `follow`, `unfollow`, `followers`, and `follows` appear. Do not register `notify_followers`. Recording Studio MCP exposes the same capability actions once the host pins a MCP gem that accepts your API version. MCP 0.28.0 still requires API `< 0.18`, so this dummy pins API `v1.2.1` without MCP. `follow`, `unfollow`, and `followers` carry titles, summaries, action text, and `root_id` field descriptions for those MCP pages.
 
 ## Follow API
 
@@ -200,4 +200,4 @@ Alice (`alice@example.com`), Bob, and Charlie share Client Workspace. Getting St
 
 ## Version
 
-The gem version is `0.6.0`.
+The gem version is `0.8.1`.

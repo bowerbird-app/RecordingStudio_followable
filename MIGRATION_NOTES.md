@@ -1,5 +1,9 @@
 # Development notes
 
+## Host upgrade to 0.8.1
+
+No Followable migration. MCP and OpenAPI text for `follow`, `unfollow`, and `followers` changed. Action names and fields did not.
+
 ## Host upgrade to 0.7.0
 
 Breaking. No Followable migration. Require Recording Studio `>= 7.0, < 8.0`, Accessible `>= 0.44.0`, Notifications `>= 0.18.0`, and Trashable `>= 0.17.0`.

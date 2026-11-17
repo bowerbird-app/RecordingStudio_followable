@@ -14,6 +14,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - No Followable migration. Gemspec floors are unchanged.
 - Users 0.31 refuses password sign-in for an unconfirmed account. The dummy confirms seeded password users. One-time-code sign-up stays unconfirmed until the code step.
 
+## [0.8.1] - 2026-11-17
+
+### Changed
+- MCP copy for this gem's `follow`, `unfollow`, and `followers` actions. Titles, summaries, action text, and `root_id` field descriptions follow the Press Kit MCP style. `follows` wording is unchanged.
+
+### Upgrade notes
+- Bump to `0.8.1`. No Followable migration. MCP and OpenAPI text for `follow`, `unfollow`, and `followers` changed. Action names and fields did not.
+
 ## [0.8.0] - 2026-11-16
 
 ### Changed

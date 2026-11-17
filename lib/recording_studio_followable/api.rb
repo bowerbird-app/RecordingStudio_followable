@@ -7,6 +7,7 @@ rescue LoadError
 end
 
 require "recording_studio_followable/api/actions"
+require "recording_studio_followable/api/followable_action_specs"
 
 module RecordingStudioFollowable
   module Api
@@ -18,65 +19,10 @@ module RecordingStudioFollowable
       return unless defined?(RecordingStudioApi)
       return unless RecordingStudioApi.respond_to?(:register_capability_action)
 
-      register_action(
-        :follow,
-        capability: :followable,
-        http_verb: :post,
-        handler: Actions::Follow,
-        input_contract: {
-          reject_unknown: true,
-          fields: {
-            root_id: { type: :string, required: true }
-          }
-        },
-        openapi: {
-          summary: "Follow this item from a workspace",
-          request_body: {
-            required: true,
-            content: {
-              "application/json" => {
-                schema: {
-                  type: "object",
-                  required: ["root_id"],
-                  properties: {
-                    root_id: { type: "string", description: "Workspace to keep the follow in" }
-                  }
-                }
-              }
-            }
-          }
-        }
-      )
-
-      register_action(
-        :unfollow,
-        capability: :followable,
-        http_verb: :post,
-        handler: Actions::Unfollow,
-        input_contract: {
-          reject_unknown: true,
-          fields: {
-            root_id: { type: :string, required: true }
-          }
-        },
-        openapi: {
-          summary: "Stop following this item from a workspace"
-        }
-      )
+      FOLLOWABLE_ACTION_SPECS.each { |spec| register_followable_action(spec) }
 
       relax_target_role!("follow")
       relax_target_role!("unfollow")
-
-      register_action(
-        :followers,
-        capability: :followable,
-        http_verb: :get,
-        handler: Actions::Followers,
-        input_contract: { reject_unknown: true, fields: {} },
-        openapi: {
-          summary: "List follows that point at this item"
-        }
-      )
 
       register_action(
         :follows,
@@ -88,6 +34,45 @@ module RecordingStudioFollowable
           summary: "List follows stored in this workspace"
         }
       )
+    end
+
+    def register_followable_action(spec)
+      register_action(
+        spec.fetch(:name),
+        capability: :followable,
+        http_verb: spec.fetch(:http_verb),
+        handler: spec.fetch(:handler),
+        input_contract: { reject_unknown: true, fields: spec.fetch(:fields) },
+        openapi: followable_openapi(spec)
+      )
+    end
+
+    def followable_openapi(spec)
+      openapi = {
+        title: spec.fetch(:title),
+        summary: spec.fetch(:summary),
+        description: spec.fetch(:description)
+      }
+      fields = spec.fetch(:fields)
+      openapi[:request_body] = followable_request_body(fields) if fields.any?
+      openapi
+    end
+
+    def followable_request_body(fields)
+      {
+        required: true,
+        content: {
+          "application/json" => { schema: followable_request_schema(fields) }
+        }
+      }
+    end
+
+    def followable_request_schema(fields)
+      {
+        type: "object",
+        required: fields.select { |_name, field| field[:required] }.keys.map(&:to_s),
+        properties: fields.transform_values { |field| { type: "string", description: field[:description] } }
+      }
     end
 
     def relax_target_role!(name)
