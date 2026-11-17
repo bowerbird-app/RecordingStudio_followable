@@ -259,6 +259,52 @@ class FollowableServicesTest < ActiveSupport::TestCase
     assert_includes workspace_actions, :follows
   end
 
+  test "follow unfollow and followers expose this gem's MCP copy" do
+    specs = RecordingStudioFollowable::Api::FOLLOWABLE_ACTION_SPECS.to_h { |spec| [ spec.fetch(:name), spec ] }
+
+    follow = RecordingStudioApi.capability_action(:follow)
+    follow_spec = specs.fetch(:follow)
+    assert_equal "Follow", follow.openapi.fetch(:title)
+    assert_equal follow_spec.fetch(:summary), follow.openapi.fetch(:summary)
+    assert_includes follow.openapi.fetch(:description), "Pass root_id"
+    assert_includes follow.openapi.fetch(:description), "cannot follow a follow"
+    assert_includes follow.openapi.fetch(:description), "already follows this recording"
+    assert_includes follow.openapi.fetch(:description), "Returns the follow"
+    root_id = follow.input_contract.as_json.fetch(:fields).fetch(:root_id)
+    assert_includes root_id.fetch(:description), "workspace's id from list or show"
+    request_root = follow.openapi.dig(:request_body, :content, :"application/json", :schema, :properties, :root_id)
+    assert_includes request_root.fetch(:description), "rejected as not found"
+
+    unfollow = RecordingStudioApi.capability_action(:unfollow)
+    assert_equal "Unfollow", unfollow.openapi.fetch(:title)
+    assert_includes unfollow.openapi.fetch(:description), "unfollowed true"
+    assert_includes unfollow.openapi.fetch(:description), "If it is following"
+
+    followers = RecordingStudioApi.capability_action(:followers)
+    assert_equal "Followers", followers.openapi.fetch(:title)
+    assert_includes followers.openapi.fetch(:description), "list is empty"
+    assert_includes followers.openapi.fetch(:description), "Calling again"
+
+    [ follow, unfollow, followers ].each do |action|
+      fields = action.input_contract.as_json.fetch(:fields)
+      blob = [
+        action.openapi[:title],
+        action.openapi[:summary],
+        action.openapi[:description],
+        fields.values.map { |field| field[:description] }
+      ].join(" ")
+      refute_includes blob, "Access"
+      refute_includes blob, "role"
+      refute_includes blob, ":edit"
+      refute_includes blob, ":view"
+      refute_includes blob, "Admin"
+      refute_includes blob, "View"
+      refute_includes blob, "permission"
+      refute_includes blob, "Press Kit"
+      refute_includes blob, "Press Center"
+    end
+  end
+
   test "API follow handler uses the same service as the UI" do
     grant = Struct.new(:actor) do
       def authorize!(recording:, role:)
