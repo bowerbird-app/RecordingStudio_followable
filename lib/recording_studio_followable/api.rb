@@ -8,6 +8,7 @@ end
 
 require "recording_studio_followable/api/actions"
 require "recording_studio_followable/api/followable_action_specs"
+require "recording_studio_followable/api/openapi_overrides"
 
 module RecordingStudioFollowable
   module Api
@@ -43,8 +44,25 @@ module RecordingStudioFollowable
         http_verb: spec.fetch(:http_verb),
         handler: spec.fetch(:handler),
         input_contract: { reject_unknown: true, fields: spec.fetch(:fields) },
-        openapi: followable_openapi(spec)
+        openapi: followable_openapi(spec),
+        openapi_for: ->(type:, action:) { OpenapiOverrides.fetch(type, spec_for!(action).fetch(:name)) }
       )
+    end
+
+    def override_openapi(type:, action:, title:, description:)
+      OpenapiOverrides.store(type: type, action: action, title: title, description: description)
+    end
+
+    def openapi_for(type:, action:)
+      spec = spec_for!(action)
+      base = followable_openapi(spec)
+      overlay = OpenapiOverrides.fetch(type, spec.fetch(:name))
+      overlay ? base.merge(overlay) : base
+    end
+
+    def spec_for!(action)
+      name = OpenapiOverrides.known_action!(action)
+      FOLLOWABLE_ACTION_SPECS.find { |spec| spec.fetch(:name) == name }
     end
 
     def followable_openapi(spec)

@@ -46,6 +46,35 @@ include RecordingStudio::Capabilities::FollowParent.to
 7. Register a Notifications type with `scope: :root` before you call `notify_followers`. Dummy registers `:followed_update`.
 8. Register the followed type and the root type with Recording Studio API so `follow`, `unfollow`, `followers`, and `follows` appear. Do not register `notify_followers`. Recording Studio MCP exposes the same capability actions once the host pins a MCP gem that accepts your API version. MCP 0.28.0 still requires API `< 0.18`, so this dummy pins API `v1.2.1` without MCP. `follow`, `unfollow`, and `followers` carry titles, summaries, action text, and `root_id` field descriptions for those MCP pages.
 
+## Per-type action copy
+
+MCP 0.36.5 reads a per-type title and description from `openapi_for(type:, action:)` on `follow`, `unfollow`, and `followers`. Set that copy for one recordable type. Every other type keeps the shared titles Follow, Unfollow, and Followers. Summary, `root_id`, and the request body stay the shared copy. `follows` keeps its shared summary. `notify_followers` stays off HTTP and MCP.
+
+Pass the recordable class name MCP sends as `recordable_type`. An unknown action name raises `ArgumentError`.
+
+```ruby
+RecordingStudioFollowable::Api.override_openapi(
+  type: "RecordingStudioPressCenters::PressCenter",
+  action: :follow,
+  title: "Follow press center",
+  description: "Follow this press center from a workspace."
+)
+
+RecordingStudioFollowable::Api.override_openapi(
+  type: "RecordingStudioPressCenters::PressCenter",
+  action: :unfollow,
+  title: "Unfollow press center",
+  description: "Stop following this press center from a workspace."
+)
+
+RecordingStudioFollowable::Api.override_openapi(
+  type: "RecordingStudioPressCenters::PressCenter",
+  action: :followers,
+  title: "List press center followers",
+  description: "List the follows that point at this press center."
+)
+```
+
 ## Follow API
 
 ```ruby
@@ -200,4 +229,4 @@ Alice (`alice@example.com`), Bob, and Charlie share Client Workspace. Getting St
 
 ## Version
 
-The gem version is `0.8.1`.
+The gem version is `0.9.0`.
