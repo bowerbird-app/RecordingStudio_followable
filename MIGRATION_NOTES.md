@@ -1,5 +1,11 @@
 # Development notes
 
+## Host upgrade to 0.9.0
+
+No Followable migration. The Recording Studio API pin stays `v1.2.1`.
+
+Call `RecordingStudioFollowable::Api.override_openapi(type:, action:, title:, description:)` to set the OpenAPI title and description for `follow`, `unfollow`, or `followers` on one recordable type. Pass the recordable class name MCP sends as `recordable_type`, for example `RecordingStudioPressCenters::PressCenter`. MCP 0.36.5 reads the override from `openapi_for(type:, action:)`. Shared titles stay Follow, Unfollow, and Followers when that type has no override. An unknown action name raises `ArgumentError`. `notify_followers` stays off HTTP and MCP.
+
 ## Host upgrade to 0.8.1
 
 No Followable migration. MCP and OpenAPI text for `follow`, `unfollow`, and `followers` changed. Action names and fields did not.

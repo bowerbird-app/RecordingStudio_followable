@@ -14,6 +14,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - No Followable migration. Gemspec floors are unchanged.
 - Users 0.31 refuses password sign-in for an unconfirmed account. The dummy confirms seeded password users. One-time-code sign-up stays unconfirmed until the code step.
 
+## [0.9.0] - 2026-11-18
+
+### Added
+- `RecordingStudioFollowable::Api.override_openapi(type:, action:, title:, description:)` sets the OpenAPI title and description for `follow`, `unfollow`, or `followers` on one recordable type. MCP 0.36.5 reads that copy from `openapi_for(type:, action:)` on `describe` and the docs page.
+
+### Upgrade notes
+- Bump to `0.9.0`. No Followable migration. The Recording Studio API pin stays `v1.2.1`. That release already accepts a per-type `openapi_for` proc on a capability action.
+- Shared titles stay Follow, Unfollow, and Followers until a host sets an override for that type. Summary and `root_id` stay the shared copy. `notify_followers` stays off HTTP and MCP.
+
 ## [0.8.1] - 2026-11-17
 
 ### Changed
