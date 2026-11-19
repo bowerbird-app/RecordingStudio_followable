@@ -112,7 +112,7 @@ class FollowableFollowsControllerTest < ActionDispatch::IntegrationTest
     assert_equal Mime[:turbo_stream], response.media_type
     assert_includes response.body, 'action="replace"'
     assert_includes response.body, "Following"
-    assert_includes response.body, "check-circle"
+    assert_includes response.body, "M9 12.75 11.25 15 15 9.75M21"
     assert_includes response.body, "Unfollow"
   end
 
@@ -125,7 +125,7 @@ class FollowableFollowsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_equal Mime[:turbo_stream], response.media_type
     assert_includes response.body, "Follow"
-    assert_includes response.body, "plus-circle"
+    assert_includes response.body, "M12 9v6m3-3H9m12"
     assert_includes response.body, 'data-fp-style="default"'
     refute_includes response.body, "Unfollow"
   end
@@ -139,7 +139,7 @@ class FollowableFollowsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "Tracked"
     assert_includes response.body, 'data-fp-style="ghost"'
-    assert_includes response.body, "check-circle"
+    assert_includes response.body, "M9 12.75 11.25 15 15 9.75M21"
   ensure
     RecordingStudioFollowable.unfollow(target: @page_recording, root: @client, actor: @admin)
   end
@@ -158,7 +158,7 @@ class FollowableFollowsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, "Kept"
-    assert_includes response.body, "check-circle"
+    assert_includes response.body, "M9 12.75 11.25 15 15 9.75M21"
     assert_includes response.body, 'data-fp-style="secondary"'
     assert_includes CGI.unescape(response.body), "follow_button[follow][label]=Mark"
     assert_includes CGI.unescape(response.body), "follow_button[follow][style]=ghost"
@@ -176,7 +176,7 @@ class FollowableFollowsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, ">Mark</span>"
-    assert_includes response.body, "plus-circle"
+    assert_includes response.body, "M12 9v6m3-3H9m12"
     assert_includes response.body, 'data-fp-style="ghost"'
     assert_includes response.body, 'name="follow_button[following][label]"'
     assert_includes response.body, 'value="Kept"'

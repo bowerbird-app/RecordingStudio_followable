@@ -1,5 +1,15 @@
 # Development notes
 
+## Host upgrade to 0.10.0
+
+No Followable migration. Gemspec floors are unchanged.
+
+Hosts MUST run the Recording Studio 7.4, 7.5 and 7.7 migrations if they have not.
+
+flat_pack 0.2.0 is supported; hosts moving to 0.2 must remove the manual `flat_pack/heroicons` importmap pin and any `flat-pack--icon` controller registration.
+
+Development Gemfiles pin Recording Studio `v7.8.0`, Flatpack `v0.2.0`, Accessible `v0.58.0`, API `v1.21.2`, Icons `v0.5.0`, Logs `v0.9.0`, Metrics `v0.10.0`, Moveable `v6.1.0`, Notifications `v0.21.0`, and Trashable `v1.3.0`. The dummy also pins Admin `v2.20.0`, Attachable `v0.34.0`, Cache `v0.8.0`, and Root Switchable `v0.17.0`. Users stays `v0.32.0`.
+
 ## Host upgrade to 0.9.0
 
 No Followable migration. The Recording Studio API pin stays `v1.2.1`.
@@ -97,21 +107,21 @@ Users 0.31 refuses password sign-in until the account is confirmed. Seeded passw
 
 - Ruby 3.3 or newer
 - Rails 8.1 or newer
-- Recording Studio 7 (dummy GitHub tag `v7.3.0`)
-- Accessible dummy tag `v0.45.1`
-- Trashable dummy tag `v1.0.1` (`Recording.kept`)
-- Notifications dummy tag `v0.19.1`
-- Root Switchable dummy tag `v0.16.0` (mounted switch page needs Accessible `:view` on the current root)
-- Metrics dummy tag `v0.9.0`
-- Logs dummy tag `v0.8.0`
-- Cache dummy tag `v0.7.0`
-- Icons dummy tag `v0.4.0`
-- Moveable dummy tag `v6.0.0`
-- Attachable dummy tag `v0.31.0`
-- API dummy tag `v1.2.1`
-- Admin dummy tag `v2.18.0`
+- Recording Studio 7 (dummy GitHub tag `v7.8.0`)
+- Accessible dummy tag `v0.58.0`
+- Trashable dummy tag `v1.3.0` (`Recording.kept`)
+- Notifications dummy tag `v0.21.0`
+- Root Switchable dummy tag `v0.17.0` (mounted switch page needs Accessible `:view` on the current root)
+- Metrics dummy tag `v0.10.0`
+- Logs dummy tag `v0.9.0`
+- Cache dummy tag `v0.8.0`
+- Icons dummy tag `v0.5.0`
+- Moveable dummy tag `v6.1.0`
+- Attachable dummy tag `v0.34.0`
+- API dummy tag `v1.21.2`
+- Admin dummy tag `v2.20.0`
 - Users dummy tag `v0.32.0` (signed-out follow)
-- FlatPack dummy tag `v0.1.377`
+- FlatPack dummy tag `v0.2.0`
 
 ## Verification
 

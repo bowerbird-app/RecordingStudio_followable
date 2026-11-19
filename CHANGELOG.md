@@ -7,11 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-11-19
+
 ### Changed
-- Development Gemfiles pin the latest release tags: Recording Studio `v7.3.0`, Accessible `v0.45.1`, Trashable `v1.0.1`, Notifications `v0.19.1`, Cache `v0.7.0`, Icons `v0.4.0`, Moveable `v6.0.0`, Attachable `v0.31.0`, API `v1.2.1`, Admin `v2.18.0`, Users `v0.32.0`, and Flatpack `v0.1.377`. Root Switchable stays `v0.16.0`, Metrics `v0.9.0`, and Logs `v0.8.0`.
+- Development Gemfiles pin Recording Studio `~> 7.8` (`v7.8.0`), Flatpack `~> 0.2` (`v0.2.0`), Accessible `~> 0.58` (`v0.58.0`), API `~> 1.21` (`v1.21.2`), Icons `~> 0.5` (`v0.5.0`), Logs `~> 0.9` (`v0.9.0`), Metrics `~> 0.10` (`v0.10.0`), Moveable `~> 6.1` (`v6.1.0`), Notifications `~> 0.21` (`v0.21.0`), and Trashable `~> 1.3` (`v1.3.0`).
+- The dummy also pins Admin `~> 2.20` (`v2.20.0`), Attachable `~> 0.34` (`v0.34.0`), Cache `~> 0.8` (`v0.8.0`), and Root Switchable `~> 0.17` (`v0.17.0`). Users stays `v0.32.0`.
+- The dummy drops the manual `flat_pack/heroicons` importmap pin and the `flat-pack--icon` controller pin. Flatpack 0.2 renders icons on the server.
+- Users stays `v0.32.0`. API 1.21 requires `required_role` on `users_update` when `scope_id` is false. The dummy registers that endpoint with `required_role: :edit` before Users does, so Users skips its own registration.
 
 ### Upgrade notes
-- No Followable migration. Gemspec floors are unchanged.
+- Bump to `0.10.0`. No Followable migration. Gemspec floors are unchanged.
+- Hosts MUST run the Recording Studio 7.4, 7.5 and 7.7 migrations if they have not.
+- flat_pack 0.2.0 is supported; hosts moving to 0.2 must remove the manual `flat_pack/heroicons` importmap pin and any `flat-pack--icon` controller registration.
 - Users 0.31 refuses password sign-in for an unconfirmed account. The dummy confirms seeded password users. One-time-code sign-up stays unconfirmed until the code step.
 
 ## [0.9.0] - 2026-11-18
@@ -186,7 +193,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Notes
 - Follow features are coming soon. This version does not ship a follow API, models, or public helpers.
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_followable/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_followable/compare/v0.10.0...HEAD
+[0.10.0]: https://github.com/bowerbird-app/RecordingStudio_followable/compare/v0.9.0...v0.10.0
 [0.6.0]: https://github.com/bowerbird-app/RecordingStudio_followable/compare/v0.5.1...v0.6.0
 [0.5.1]: https://github.com/bowerbird-app/RecordingStudio_followable/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/bowerbird-app/RecordingStudio_followable/compare/v0.4.0...v0.5.0

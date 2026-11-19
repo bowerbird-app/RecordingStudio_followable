@@ -33,7 +33,7 @@ class PublicFollowSignInTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, "Follow"
-    assert_includes response.body, "plus-circle"
+    assert_includes response.body, "M12 9v6m3-3H9m12"
     assert_includes response.body, "data-modal-id="
     assert_includes response.body, 'name="email"'
     assert_includes response.body, "follow_sign_in"
