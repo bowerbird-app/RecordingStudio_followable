@@ -28,7 +28,7 @@ class FollowButtonHelperTest < ActionView::TestCase
     html = follow_button(@page_recording, root: @client, actor: @admin)
 
     assert_includes html, "Follow"
-    assert_includes html, "plus-circle"
+    assert_includes html, "M12 9v6m3-3H9m12"
     assert_includes html, 'data-fp-style="default"'
     refute_includes html, 'data-fp-style="primary"'
     refute_includes html, "Unfollow"
@@ -40,10 +40,10 @@ class FollowButtonHelperTest < ActionView::TestCase
     html = follow_button(@page_recording, root: @client, actor: @admin)
 
     assert_includes html, "Following"
-    assert_includes html, "check-circle"
+    assert_includes html, "M9 12.75 11.25 15 15 9.75M21"
     assert_includes html, 'data-fp-style="secondary"'
     assert_includes html, "Unfollow"
-    assert_includes html, "minus-circle"
+    assert_includes html, "M15 12H9m12"
   end
 
   test "follow_button renders for a signed-out visitor on a public page" do
@@ -52,7 +52,7 @@ class FollowButtonHelperTest < ActionView::TestCase
     html = follow_button(@page_recording)
 
     assert_includes html, "Follow"
-    assert_includes html, "plus-circle"
+    assert_includes html, "M12 9v6m3-3H9m12"
     assert_includes html, 'data-fp-style="default"'
     assert_includes html, "follow_sign_in"
     assert_includes html, @page_recording.id
@@ -66,13 +66,13 @@ class FollowButtonHelperTest < ActionView::TestCase
 
     assert_includes html, "Watch"
     assert_includes html, 'data-fp-style="ghost"'
-    assert_includes html, "plus-circle"
+    assert_includes html, "M12 9v6m3-3H9m12"
     assert_includes html, "follow_sign_in"
 
     html = follow_button(@page_recording, follow: { label: "Pin", icon: "check-circle" })
 
     assert_includes html, "Pin"
-    assert_includes html, "check-circle"
+    assert_includes html, "M9 12.75 11.25 15 15 9.75M21"
     refute_includes html, "Watch"
     assert_includes html, 'data-fp-style="ghost"'
   end
@@ -103,7 +103,8 @@ class FollowButtonHelperTest < ActionView::TestCase
     )
 
     assert_includes html, "Kept"
-    assert_includes html, "plus-circle"
+    assert_includes html, "M12 9v6m3-3H9m12"
+    assert_includes CGI.unescape(html), "follow_button[following][icon]=plus-circle"
     assert_includes CGI.unescape(html), "follow_button[follow][label]=Mark"
     assert_includes CGI.unescape(html), "follow_button[following][label]=Kept"
   end
