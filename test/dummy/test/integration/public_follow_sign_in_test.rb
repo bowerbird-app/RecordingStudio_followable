@@ -80,7 +80,7 @@ class PublicFollowSignInTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  test "a new address must accept terms before sign-in and does not follow without a workspace" do
+  test "a new address signs in and does not follow without a workspace" do
     email = "new-#{SecureRandom.hex(4)}@example.com"
     get public_sample_path
     return_to = return_to_from(response.body)
@@ -89,18 +89,12 @@ class PublicFollowSignInTest < ActionDispatch::IntegrationTest
          params: { email: email, return_to: return_to },
          headers: { "Turbo-Frame" => FRAME }
     assert_response :success
-    assert_select "input[name=accept_terms]"
-
-    code = otp_code
-    post code_form_action(response.body),
-         params: { code: code },
-         headers: { "Turbo-Frame" => FRAME }
-    assert_response :unprocessable_entity
-    refute User.find_by!(email: email).confirmed?
+    assert_select "input[name=code]"
+    assert_select "input[name=accept_terms]", count: 0
 
     assert_no_difference -> { follows_for_page } do
       post code_form_action(response.body),
-           params: { code: code, accept_terms: "1" },
+           params: { code: otp_code },
            headers: { "Turbo-Frame" => FRAME }
       assert_response :success
       post recording_studio_followable.follow_sign_in_path, params: { intent: intent_from(return_to) }
@@ -122,7 +116,7 @@ class PublicFollowSignInTest < ActionDispatch::IntegrationTest
          params: { email: email, return_to: return_to },
          headers: { "Turbo-Frame" => FRAME }
     post code_form_action(response.body),
-         params: { code: otp_code, accept_terms: "1" },
+         params: { code: otp_code },
          headers: { "Turbo-Frame" => FRAME }
 
     assert_no_difference -> { follows_for_page } do

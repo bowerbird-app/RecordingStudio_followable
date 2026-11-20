@@ -64,7 +64,7 @@ class RecordingStudioFollowableTest < Minitest::Test
                    "bowerbird-app/RecordingStudio_attachable", "v0.34.0"
     assert_gem_pin gemfile, "recording_studio_api", "~> 1.21", "bowerbird-app/RecordingStudio_api", "v1.21.2"
     assert_gem_pin gemfile, "recording_studio_admin", "~> 2.20", "bowerbird-app/RecordingStudio_admin", "v2.20.0"
-    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_users", tag: "v0.32.0"'
+    assert_gem_pin gemfile, "recording_studio_user", "~> 0.41", "bowerbird-app/RecordingStudio_users", "v0.41.0"
     assert_gem_pin gemfile, "flat_pack", "~> 0.2", "bowerbird-app/flatpack", "v0.2.0"
     refute_includes gemfile, 'branch: "main"'
     refute_match(/ref:\s*"/, gemfile)
