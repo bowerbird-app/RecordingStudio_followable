@@ -7,7 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.1] - 2026-11-20
+
+### Changed
+- `recording_studio_followable.register_api` calls `RecordingStudioFollowable::Api.register!` in a named initializer `before: :finisher_hook`, so followable capability actions exist before Rails runs `after_initialize` (including Recording Studio MCP catalog `validate!`).
 - Dummy app pins RS Users v0.41.0 and no longer pre-registers `users_update`.
+
+### Upgrade notes
+- Bump to `0.10.1`. No Followable migration.
+- Hosts that name Followable API actions on MCP tools at boot no longer depend on engine load order versus MCP `validate!`.
 
 ## [0.10.0] - 2026-11-19
 
@@ -195,7 +203,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Notes
 - Follow features are coming soon. This version does not ship a follow API, models, or public helpers.
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_followable/compare/v0.10.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_followable/compare/v0.10.1...HEAD
+[0.10.1]: https://github.com/bowerbird-app/RecordingStudio_followable/compare/v0.10.0...v0.10.1
 [0.10.0]: https://github.com/bowerbird-app/RecordingStudio_followable/compare/v0.9.0...v0.10.0
 [0.6.0]: https://github.com/bowerbird-app/RecordingStudio_followable/compare/v0.5.1...v0.6.0
 [0.5.1]: https://github.com/bowerbird-app/RecordingStudio_followable/compare/v0.5.0...v0.5.1
