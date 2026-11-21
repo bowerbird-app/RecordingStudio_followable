@@ -283,6 +283,20 @@ class EngineTest < Minitest::Test
     assert find_initializer("recording_studio_followable.helpers")
   end
 
+  def test_register_api_initializer_runs_before_finisher_hook
+    initializer = find_initializer("recording_studio_followable.register_api")
+
+    assert initializer
+    assert_equal :finisher_hook, initializer.before
+
+    called = false
+    RecordingStudioFollowable::Api.stub(:register!, -> { called = true }) do
+      initializer.block.call
+    end
+
+    assert called
+  end
+
   def test_extension_keys_for_removes_duplicate_names
     plain = Class.new do
       def self.name

@@ -1,5 +1,9 @@
 # Development notes
 
+## Host upgrade to 0.10.1
+
+No Followable migration. The engine registers Followable API capability actions (`RecordingStudioFollowable::Api.register!`) from `recording_studio_followable.register_api` before `:finisher_hook`. That runs before Rails `after_initialize` callbacks, including Recording Studio MCP catalog `validate!`. Calling `register!` more than once is a no-op for actions already present.
+
 ## Host upgrade to 0.10.0
 
 No Followable migration. Gemspec floors are unchanged.
