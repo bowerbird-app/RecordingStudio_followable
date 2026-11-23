@@ -135,9 +135,12 @@ module RecordingStudioFollowable
     # Centers registers list_press_center_followers there) and before a host
     # initializer's to_prepare includes the names. A type and action already
     # in configuration.tools is skipped, whatever its name is.
-    initializer "recording_studio_followable.register_api", before: :run_prepare_callbacks do |app|
+    initializer "recording_studio_followable.register_api", before: :run_prepare_callbacks do |app = nil|
       RecordingStudioFollowable::Api.register!
-      app.config.to_prepare do
+      rails_app = app || (defined?(Rails) && Rails.respond_to?(:application) && Rails.application)
+      next unless rails_app
+
+      rails_app.config.to_prepare do
         RecordingStudioFollowable::McpCopy.register!
       end
     end

@@ -290,11 +290,13 @@ class EngineTest < Minitest::Test
     assert_equal :run_prepare_callbacks, initializer.before
 
     called = false
+    app = PrepareRecorder.new
     RecordingStudioFollowable::Api.stub(:register!, -> { called = true }) do
-      initializer.block.call
+      initializer.block.call(app)
     end
 
     assert called
+    assert app.prepared
   end
 
   def test_extension_keys_for_removes_duplicate_names
@@ -305,6 +307,23 @@ class EngineTest < Minitest::Test
     end
 
     assert_equal [:ReportsController], RecordingStudioFollowable::Engine.send(:extension_keys_for, plain)
+  end
+
+  class PrepareRecorder
+    attr_reader :prepared
+
+    def initialize
+      @prepared = false
+    end
+
+    def config
+      self
+    end
+
+    def to_prepare
+      @prepared = true
+      yield if block_given?
+    end
   end
 
   private
