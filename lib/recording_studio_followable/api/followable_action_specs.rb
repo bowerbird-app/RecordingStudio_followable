@@ -62,5 +62,13 @@ module RecordingStudioFollowable
         fields: {}
       }
     ].freeze
+
+    # Shared by the follows API action and the typeless follows MCP tool.
+    FOLLOWS_DESCRIPTION =
+      "Each item is a follow stored under this workspace. The follow points at a recording " \
+      "people in that workspace want to keep up with. Run this on the workspace, not on the " \
+      "followed recording and not on a follow. The workspace must already exist. Calling again " \
+      "returns the current list. When this workspace follows nothing, the list is empty. " \
+      "Returns an array of follows, each with id, type, root_id, parent_id, and target_id."
   end
 end

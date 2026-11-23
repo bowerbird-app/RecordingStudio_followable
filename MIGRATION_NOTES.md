@@ -1,5 +1,17 @@
 # Development notes
 
+## Host upgrade to 0.10.2
+
+No Followable migration. The gemspec does not depend on Recording Studio MCP.
+
+`recording_studio_followable.register_api` runs before `:run_prepare_callbacks`, which runs before `:finisher_hook`. `Api.register!` registers the API actions and, when MCP is loaded, four typeless tools: `follow`, `unfollow`, `followers`, and `follows`. `follows` is the FollowParent action and runs on the workspace. The other three run on the followable recording. A second register is safe. A host `to_prepare` block can include the tool names after that.
+
+Include `RecordingStudioFollowable::McpCopy.tool_names` on the MCP server. Pin MCP `~> 0.45.2`. Leave `capability_action` off that server when these named tools cover the follow actions. `notify_followers` stays off HTTP and MCP.
+
+`override_openapi` still sets the OpenAPI title and description for one type. MCP describe reads `openapi_for`. The named tools keep the shared description.
+
+Development Gemfiles pin API `v1.21.3` and MCP `v0.45.2`. The dummy also pins Oauth `v0.25.1` and Site Settings `v0.6.0`. Dummy security pins are Puma `>= 8.1.2`, net-ssh `>= 7.3.10`, Brakeman `8.1.1`, and Ruby `3.3.14`.
+
 ## Host upgrade to 0.10.1
 
 No Followable migration. The engine registers Followable API capability actions (`RecordingStudioFollowable::Api.register!`) from `recording_studio_followable.register_api` before `:finisher_hook`. That runs before Rails `after_initialize` callbacks, including Recording Studio MCP catalog `validate!`. Calling `register!` more than once is a no-op for actions already present.

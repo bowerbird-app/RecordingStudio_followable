@@ -287,7 +287,7 @@ class EngineTest < Minitest::Test
     initializer = find_initializer("recording_studio_followable.register_api")
 
     assert initializer
-    assert_equal :finisher_hook, initializer.before
+    assert_equal :run_prepare_callbacks, initializer.before
 
     called = false
     RecordingStudioFollowable::Api.stub(:register!, -> { called = true }) do

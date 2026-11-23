@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.2] - 2026-11-23
+
+### Added
+- Named Recording Studio MCP tools `follow`, `unfollow`, `followers`, and `follows`. They register from `Api.register!` when MCP is loaded, and do nothing when it is not. MCP stays an optional host gem (`~> 0.45.2`).
+- `follows` now has an OpenAPI description. The named MCP tool uses that same text.
+
+### Changed
+- Development Gemfiles pin API `v1.21.3` and MCP `v0.45.2`. The dummy also pins Oauth `v0.25.1` and Site Settings `v0.6.0`, and registers `RecordingStudioSiteSettings::SiteSetting` so declaration checks pass.
+- Dummy security pins: Puma `>= 8.1.2`, net-ssh `>= 7.3.10`, Brakeman `8.1.1`, and `.ruby-version` `3.3.14`.
+
+### Upgrade notes
+- Bump to `0.10.2`. No Followable migration. The gemspec does not gain a Recording Studio MCP dependency.
+- Hosts that want the named tools pin Recording Studio MCP `~> 0.45.2` and include `RecordingStudioFollowable::McpCopy.tool_names` on the MCP server. Leave `capability_action` off that server when these tools cover follow.
+- `recording_studio_followable.register_api` now runs before `:run_prepare_callbacks` (still before MCP `validate!`). A host `to_prepare` block can include the tool names.
+- `override_openapi` still changes OpenAPI and MCP describe for one type. The named tool text stays the shared copy.
+- `notify_followers` stays off HTTP and MCP.
+
 ## [0.10.1] - 2026-11-20
 
 ### Changed

@@ -18,6 +18,10 @@ Rails.application.routes.draw do
   mount RecordingStudioRootSwitchable::Engine, at: "/recording_studio_root_switchable"
   mount RecordingStudioNotifications::Engine, at: "/notifications"
   mount RecordingStudioFollowable::Engine, at: "/recording_studio_followable"
+  mount RecordingStudioOauth::Engine, at: "/recording_studio_oauth" if defined?(RecordingStudioOauth::Engine)
+  mount RecordingStudioApi::Engine, at: "/recording_studio_api" if defined?(RecordingStudioApi::Engine)
+  mount RecordingStudioMcp::Engine, at: "/recording_studio_mcp" if defined?(RecordingStudioMcp::Engine)
+  mount RecordingStudioSiteSettings::Engine, at: "/recording_studio_site_settings" if defined?(RecordingStudioSiteSettings::Engine)
 
   get "up" => "rails/health#show", as: :rails_health_check
 

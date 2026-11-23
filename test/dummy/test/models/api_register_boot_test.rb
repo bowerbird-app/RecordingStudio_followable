@@ -12,11 +12,14 @@ class ApiRegisterBootTest < ActiveSupport::TestCase
 
     names = Rails.application.initializers.tsort.map(&:name)
     register_api = names.index("recording_studio_followable.register_api")
+    prepare = names.index(:run_prepare_callbacks)
     finisher = names.index(:finisher_hook)
 
     assert register_api, "missing recording_studio_followable.register_api"
+    assert prepare, "missing :run_prepare_callbacks"
     assert finisher, "missing :finisher_hook"
-    assert_operator register_api, :<, finisher
+    assert_operator register_api, :<, prepare
+    assert_operator prepare, :<, finisher
 
     FOLLOWABLE_ACTIONS.each do |name|
       assert RecordingStudioApi.capability_action(name), "public API missing #{name}"
