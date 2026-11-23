@@ -3,41 +3,41 @@
 require "test_helper"
 
 class FollowableMcpToolsTest < ActiveSupport::TestCase
-  GENERIC_NAMES = %w[capability_action notify_followers].freeze
-  PER_TYPE_NAMES = %w[follow_page unfollow_page follow_workspace list_followers follow_press_center].freeze
+  TYPELESS_NAMES = %w[follow unfollow followers follows capability_action notify_followers].freeze
+  PAGE_NAMES = %w[follow_page unfollow_page followers_page].freeze
 
-  test "named follow tools are listed and generic names are not" do
+  test "per-type follow tools are listed and typeless names are not" do
     listed = RecordingStudioMcp::ToolSurface.for(api: :public).tool_definitions
     names = listed.map { |tool| tool.fetch(:name) }
 
+    assert_equal PAGE_NAMES, RecordingStudioFollowable::McpCopy.tool_names
     RecordingStudioFollowable::McpCopy.tool_names.each do |name|
       assert_includes names, name
+      assert_equal name, RecordingStudioMcp::ToolName.call("Page", action_for(name))
     end
-    GENERIC_NAMES.each { |name| refute_includes names, name }
-    PER_TYPE_NAMES.each { |name| refute_includes names, name }
+    TYPELESS_NAMES.each { |name| refute_includes names, name }
+    refute_includes names, "follows_workspace"
+    refute names.any? { |name| name.end_with?("_follow") }
 
     by_name = listed.to_h { |tool| [ tool.fetch(:name), tool ] }
-    follow = by_name.fetch("follow")
+    follow = by_name.fetch("follow_page")
+    assert_equal "Follow", follow.fetch(:title)
     assert_includes follow.fetch(:description), "Pass root_id"
     assert_includes follow.fetch(:description), "must already exist"
     refute_match(/\b(View|Admin|Access)\b/, follow.fetch(:description))
     follow_props = properties(follow)
-    assert follow_props.key?("type")
     assert follow_props.key?("id")
     assert follow_props.key?("root_id")
-
-    follows = by_name.fetch("follows")
-    assert_equal "Follows", follows.fetch(:title)
-    assert_includes follows.fetch(:description), "Run this on the workspace"
-    follows_props = properties(follows)
-    assert follows_props.key?("type")
-    assert follows_props.key?("id")
-    refute follows_props.key?("root_id")
+    refute follow_props.key?("type")
   end
 
   private
 
-  def properties(tool)
-    tool.fetch(:inputSchema).fetch(:properties).transform_keys(&:to_s)
-  end
+    def properties(tool)
+      tool.fetch(:inputSchema).fetch(:properties).transform_keys(&:to_s)
+    end
+
+    def action_for(name)
+      name.delete_suffix("_page").to_sym
+    end
 end

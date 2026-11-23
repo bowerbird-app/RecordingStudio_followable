@@ -48,16 +48,17 @@ include RecordingStudio::Capabilities::FollowParent.to
 
 ## Named MCP tools
 
-Recording Studio MCP is optional. This gem does not depend on it. When the host loads MCP `~> 0.45.2` (0.45.x, below 0.46), `Api.register!` registers four typeless tools:
+Recording Studio MCP is optional. This gem does not depend on it. When the host loads MCP `~> 0.45.2` (0.45.x, below 0.46), `Api.register!` registers tools only for types that include Followable. The suffix is that type's public snake_case name from its API registration, the same name `RecordingStudioMcp::ToolName` builds.
 
 | Tool | Action | Run it on |
 | --- | --- | --- |
-| `follow` | `follow` | The recording to follow. Pass `root_id` for the workspace that stores the follow. |
-| `unfollow` | `unfollow` | The recording you followed. Pass `root_id` for the workspace that holds the follow. |
-| `followers` | `followers` | The recording whose follows you want. |
-| `follows` | `follows` | The workspace that stores follows. This is the FollowParent action. |
+| `follow_<type>` | `follow` | That followable type. Pass `root_id` for the workspace that stores the follow. |
+| `unfollow_<type>` | `unfollow` | That followable type. Pass `root_id` for the workspace that holds the follow. |
+| `followers_<type>` | `followers` | That followable type. |
 
-`follow`, `unfollow`, and `followers` need the followable capability. `follows` needs FollowParent. There is no `follow_<type>` tool here. The caller passes `type` and `id`, the same way Attachable's `attach` tool does. A host gem that owns one type can register its own name, such as `follow_press_center`. That name does not clash with `follow`.
+A Page with public name `Page` gets `follow_page`, `unfollow_page`, and `followers_page`. The Follow recordable gets no tools. FollowParent roots get no `follows_<type>` tool, because that action lists Follow records. Typeless `follow`, `unfollow`, `followers`, and `follows` are not registered.
+
+Press Centers already registers `follow_press_center` and `unfollow_press_center` for `PressCenter` (public name `PressCenter`). This gem registers first. Press Centers registers the same type and action later, so it keeps its copy. `followers_press_center` is this gem's name. Press Centers' `list_press_center_followers` is a different name. A tool name that is already present is skipped, so a second call does not replace that copy.
 
 Include the names on the MCP server. Leave `capability_action` off that server when these named tools cover the follow actions. `notify_followers` stays off HTTP and MCP.
 
@@ -71,7 +72,7 @@ end
 
 ## Per-type action copy
 
-`override_openapi` still sets the OpenAPI title and description for `follow`, `unfollow`, or `followers` on one recordable type. MCP describe reads that copy from `openapi_for(type:, action:)`. The named MCP tools keep the shared description, because one `follow` tool serves every followable type. Summary, `root_id`, and the request body stay the shared copy. `follows` keeps its shared summary and description. `notify_followers` stays off HTTP and MCP.
+`override_openapi` still sets the OpenAPI title and description for `follow`, `unfollow`, or `followers` on one recordable type. MCP describe reads that copy from `openapi_for(type:, action:)`. That type's named tool uses the same title and description. Summary, `root_id`, and the request body stay the shared copy. `notify_followers` stays off HTTP and MCP.
 
 Pass the recordable class name MCP sends as `recordable_type`. An unknown action name raises `ArgumentError`.
 

@@ -7,16 +7,28 @@ class McpCopyTest < Minitest::Test
     "RecordingStudio::", "Access", "Accessible", ":edit", ":view", "permission", "role",
     "Admin", "staff", "View"
   ].freeze
+  TYPELESS_NAMES = RecordingStudioFollowable::McpCopy::TYPELESS_NAMES
   GENERIC_NAMES = %w[capability_action list show create update delete notify_followers].freeze
-  PER_TYPE_NAMES = %w[follow_page unfollow_page follow_workspace list_followers follow_press_center].freeze
+  PAGE_NAMES = %w[follow_page unfollow_page followers_page].freeze
 
-  def test_tool_names_are_the_follow_actions
-    assert_equal %w[follow unfollow followers follows], RecordingStudioFollowable::McpCopy.tool_names
-    GENERIC_NAMES.each { |name| refute_includes RecordingStudioFollowable::McpCopy.tool_names, name }
-    PER_TYPE_NAMES.each { |name| refute_includes RecordingStudioFollowable::McpCopy.tool_names, name }
-    RecordingStudioFollowable::McpCopy.tool_names.each do |name|
-      assert_match(/\A[a-z][a-z0-9_]*\z/, name)
-      refute_includes name, "::"
+  def test_tool_names_follow_enabled_types_and_skip_typeless_names
+    with_follow_types do
+      names = RecordingStudioFollowable::McpCopy.tool_names
+
+      assert_equal PAGE_NAMES, names
+      (TYPELESS_NAMES + GENERIC_NAMES).each { |name| refute_includes names, name }
+      names.each do |name|
+        assert_match(/\A[a-z][a-z0-9_]*\z/, name)
+        refute_includes name, "::"
+      end
+    end
+  end
+
+  def test_tool_name_uses_the_api_public_name
+    with_follow_types do
+      assert_equal "follow_page", RecordingStudioFollowable::McpCopy.tool_name(:follow, "Page")
+      assert_equal "follow_press_center",
+                   RecordingStudioFollowable::McpCopy.tool_name(:follow, "RecordingStudioPressCenters::PressCenter")
     end
   end
 
@@ -26,50 +38,52 @@ class McpCopyTest < Minitest::Test
     end
   end
 
-  def test_register_declares_named_tools_and_not_generic_names
+  def test_register_declares_per_type_tools_and_not_typeless_names
     fake = RecordingMcp.new
+    register_twice(fake)
 
-    RecordingStudioFollowable::McpCopy.stub(:mcp_available?, true) do
-      RecordingStudioFollowable::McpCopy.stub(:mcp, fake) do
-        RecordingStudioFollowable::McpCopy.register!
-        RecordingStudioFollowable::McpCopy.register!
-      end
-    end
-
-    assert_equal RecordingStudioFollowable::McpCopy.tool_names, fake.tools.keys
-    assert_equal RecordingStudioFollowable::McpCopy.tool_names.size * 2, fake.calls
-    RecordingStudioFollowable::McpCopy::ACTIONS.each do |action|
-      tool = fake.tools.fetch(action.to_s)
-      assert_equal action, tool[:action]
-      refute tool.key?(:type)
-      refute tool.key?(:operation)
-      refute tool.key?(:endpoint)
-      assert_equal RecordingStudioFollowable::McpCopy.title_for(action), tool[:title]
-      assert_equal RecordingStudioFollowable::McpCopy.description_for(action), tool[:description]
-      assert_equal RecordingStudioFollowable::McpCopy.protocol_input(action), tool[:input]
-      assert_equal RecordingStudioFollowable::McpCopy::OUTPUTS.fetch(action), tool[:output]
-      assert_equal %w[type id], tool[:input].keys
-      FORBIDDEN.each do |phrase|
-        refute_includes tool[:description], phrase
-        tool[:input].each_value { |field| refute_includes field.fetch(:description), phrase }
-      end
-    end
-
-    follow = fake.tools.fetch("follow")
-    assert_includes follow[:description], "Pass root_id"
-    assert_includes follow[:description], "must already exist"
-    assert_includes follow[:description], "cannot follow a follow"
-    unfollow = fake.tools.fetch("unfollow")
-    assert_includes unfollow[:description], "unfollowed true"
-    followers = fake.tools.fetch("followers")
-    assert_includes followers[:description], "list is empty"
-    follows = fake.tools.fetch("follows")
-    assert_includes follows[:description], "Run this on the workspace"
-    assert_includes follows[:description], "must already exist"
-    assert_equal RecordingStudioFollowable::Api::FOLLOWS_DESCRIPTION, follows[:description]
+    assert_equal PAGE_NAMES, fake.tools.keys
+    assert_equal fake.tools.size, fake.calls
+    TYPELESS_NAMES.each { |name| refute fake.tools.key?(name) }
+    assert_page_follow fake.tools.fetch("follow_page")
+    assert_page_unfollow fake.tools.fetch("unfollow_page")
+    assert_page_followers fake.tools.fetch("followers_page")
+    assert_copy_avoids_forbidden_words fake
   end
 
-  def test_named_tool_copy_stays_shared_when_openapi_is_overridden
+  def test_follow_recordable_and_follow_parent_roots_get_no_tools
+    names = with_follow_types(followable: ["Page", "RecordingStudioFollowable::Follow"]) do
+      RecordingStudioFollowable::McpCopy.tool_names
+    end
+
+    assert_equal PAGE_NAMES, names
+    refute_includes names, "follow_follow"
+    refute_includes names, "follows_workspace"
+    refute_includes names, "followers_follow"
+  end
+
+  def test_register_skips_a_name_another_gem_already_owns
+    fake = RecordingMcp.new
+    owned = { name: "follow_press_center", type: "RecordingStudioPressCenters::PressCenter", action: :follow,
+              description: "Press Centers copy" }
+    fake.tools["follow_press_center"] = owned
+
+    with_follow_types(followable: ["Page", "RecordingStudioPressCenters::PressCenter"]) do
+      RecordingStudioFollowable::McpCopy.stub(:mcp_available?, true) do
+        RecordingStudioFollowable::McpCopy.stub(:mcp, fake) do
+          RecordingStudioFollowable::McpCopy.register!
+        end
+      end
+    end
+
+    assert_same owned, fake.tools.fetch("follow_press_center")
+    assert fake.tools.key?("followers_press_center")
+    assert fake.tools.key?("unfollow_press_center")
+    assert fake.tools.key?("follow_page")
+    refute fake.tools.key?("follow")
+  end
+
+  def test_named_tool_copy_uses_the_openapi_override_for_that_type
     RecordingStudioFollowable::Api.override_openapi(
       type: "Page",
       action: :follow,
@@ -78,19 +92,19 @@ class McpCopyTest < Minitest::Test
     )
     fake = RecordingMcp.new
 
-    RecordingStudioFollowable::McpCopy.stub(:mcp_available?, true) do
-      RecordingStudioFollowable::McpCopy.stub(:mcp, fake) do
-        RecordingStudioFollowable::McpCopy.register!
+    with_follow_types do
+      RecordingStudioFollowable::McpCopy.stub(:mcp_available?, true) do
+        RecordingStudioFollowable::McpCopy.stub(:mcp, fake) do
+          RecordingStudioFollowable::McpCopy.register!
+        end
       end
     end
 
-    follow = fake.tools.fetch("follow")
-    shared = RecordingStudioFollowable::Api::FOLLOWABLE_ACTION_SPECS.find { |spec| spec.fetch(:name) == :follow }
-    assert_equal shared.fetch(:title), follow[:title]
-    assert_equal shared.fetch(:description), follow[:description]
+    follow = fake.tools.fetch("follow_page")
+    assert_equal "Follow this page", follow[:title]
+    assert_equal "Follow this page from a workspace.", follow[:description]
     page = RecordingStudioFollowable::Api.openapi_for(type: "Page", action: :follow)
     assert_equal "Follow this page", page.fetch(:title)
-    assert_equal "Follow this page from a workspace.", page.fetch(:description)
   ensure
     RecordingStudioFollowable::Api::OpenapiOverrides.reset!
   end
@@ -104,12 +118,72 @@ class McpCopyTest < Minitest::Test
     assert_includes api, "McpCopy.register!"
   end
 
+  private
+
+  def with_follow_types(followable: ["Page"], &)
+    config = RecordingStudio.configuration
+    lookup = lambda do |capability|
+      capability.to_sym == :followable ? followable : []
+    end
+    config.stub(:enabled_recordable_types_for, lookup, &)
+  end
+
+  def register_twice(fake)
+    with_follow_types do
+      RecordingStudioFollowable::McpCopy.stub(:mcp_available?, true) do
+        RecordingStudioFollowable::McpCopy.stub(:mcp, fake) do
+          RecordingStudioFollowable::McpCopy.register!
+          RecordingStudioFollowable::McpCopy.register!
+        end
+      end
+    end
+  end
+
+  def assert_page_follow(follow)
+    assert_equal :follow, follow[:action]
+    assert_equal "Page", follow[:type]
+    assert_equal "Follow", follow[:title]
+    assert_includes follow[:description], "Pass root_id"
+    assert_includes follow[:description], "must already exist"
+    assert_includes follow[:description], "cannot follow a follow"
+    assert_equal %w[id root_id], follow[:input].keys
+    refute follow[:input].key?("type")
+  end
+
+  def assert_page_unfollow(unfollow)
+    assert_equal "Page", unfollow[:type]
+    assert_includes unfollow[:description], "unfollowed true"
+  end
+
+  def assert_page_followers(followers)
+    assert_equal "Page", followers[:type]
+    assert_includes followers[:description], "list is empty"
+    assert_equal %w[id], followers[:input].keys
+  end
+
+  def assert_copy_avoids_forbidden_words(fake)
+    fake.tools.each_value do |tool|
+      FORBIDDEN.each do |phrase|
+        refute_includes tool[:description], phrase
+        tool[:input].each_value { |field| refute_includes field.fetch(:description), phrase }
+      end
+    end
+  end
+
   class RecordingMcp
     attr_reader :tools, :calls
 
     def initialize
       @tools = {}
       @calls = 0
+    end
+
+    def configuration
+      self
+    end
+
+    def tool(name)
+      @tools[name]
     end
 
     def register_tool(**registration)

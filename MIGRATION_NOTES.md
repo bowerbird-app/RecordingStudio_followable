@@ -4,11 +4,11 @@
 
 No Followable migration. The gemspec does not depend on Recording Studio MCP.
 
-`recording_studio_followable.register_api` runs before `:run_prepare_callbacks`, which runs before `:finisher_hook`. `Api.register!` registers the API actions and, when MCP is loaded, four typeless tools: `follow`, `unfollow`, `followers`, and `follows`. `follows` is the FollowParent action and runs on the workspace. The other three run on the followable recording. A second register is safe. A host `to_prepare` block can include the tool names after that.
+`recording_studio_followable.register_api` runs before `:run_prepare_callbacks`, which runs before `:finisher_hook`. `Api.register!` registers the API actions and, when MCP is loaded, tools only for types that include Followable: `follow_<type>`, `unfollow_<type>`, and `followers_<type>`. The suffix is the type's public snake_case name. The Follow recordable gets no tools. FollowParent roots get no `follows_<type>` tool, because that action lists Follow records. Typeless `follow`, `unfollow`, `followers`, and `follows` are not registered. A name that is already present is skipped. `to_prepare` registers again once recordable classes are loaded. Press Centers registers `follow_press_center` and `unfollow_press_center` for the same type and action. Whichever gem registers that name first keeps the slot; the later call with the same type and action updates copy, and a call that finds the name already present skips it. A host `to_prepare` block can include the tool names.
 
 Include `RecordingStudioFollowable::McpCopy.tool_names` on the MCP server. Pin MCP `~> 0.45.2`. Leave `capability_action` off that server when these named tools cover the follow actions. `notify_followers` stays off HTTP and MCP.
 
-`override_openapi` still sets the OpenAPI title and description for one type. MCP describe reads `openapi_for`. The named tools keep the shared description.
+`override_openapi` still sets the OpenAPI title and description for one type. MCP describe reads `openapi_for`. That type's named tool uses the same title and description.
 
 Development Gemfiles pin API `v1.21.3` and MCP `v0.45.2`. The dummy also pins Oauth `v0.25.1` and Site Settings `v0.6.0`. Dummy security pins are Puma `>= 8.1.2`, net-ssh `>= 7.3.10`, rack-protection `>= 4.2.2`, Brakeman `8.1.1`, and Ruby `3.3.14`.
 
