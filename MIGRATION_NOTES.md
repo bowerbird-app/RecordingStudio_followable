@@ -1,5 +1,11 @@
 # Development notes
 
+## Host upgrade to 0.10.3
+
+No Followable migration.
+
+`follow` and `unfollow` treat a blank or whitespace `root_id` as missing. The API returns 422 `invalid_input`. MCP reports a tool error. A workspace id still follows and unfollows, and both stay idempotent. `notify_followers` stays off HTTP and MCP.
+
 ## Host upgrade to 0.10.2
 
 No Followable migration. The gemspec does not depend on Recording Studio MCP.

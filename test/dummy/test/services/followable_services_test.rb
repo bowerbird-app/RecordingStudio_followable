@@ -272,6 +272,7 @@ class FollowableServicesTest < ActiveSupport::TestCase
     assert_includes follow.openapi.fetch(:description), "403 is error code forbidden"
     assert_includes follow.openapi.fetch(:description), "404 is error code not_found"
     assert_includes follow.openapi.fetch(:description), "422 is error code invalid_input"
+    assert_includes follow.openapi.fetch(:description), "root_id is omitted, blank"
     refute_equal mcp.fetch(:follow), follow.openapi.fetch(:description)
     root_id = follow.input_contract.as_json.fetch(:fields).fetch(:root_id)
     assert_includes root_id.fetch(:description), "404 not_found"
@@ -281,6 +282,7 @@ class FollowableServicesTest < ActiveSupport::TestCase
     unfollow = RecordingStudioApi.capability_action(:unfollow)
     assert_equal "Unfollow a recording", unfollow.openapi.fetch(:title)
     assert_includes unfollow.openapi.fetch(:description), "unfollowed true"
+    assert_includes unfollow.openapi.fetch(:description), "root_id is omitted, blank"
     assert_includes unfollow.openapi.fetch(:description), "POST /api/v1/{resource}/{id}/actions/unfollow"
     refute_equal mcp.fetch(:unfollow), unfollow.openapi.fetch(:description)
 
@@ -358,7 +360,57 @@ class FollowableServicesTest < ActiveSupport::TestCase
     assert_equal @page_recording.id, payload[:target_id]
   end
 
+  test "follow and unfollow reject a blank root_id as invalid input" do
+    follow = RecordingStudioFollowable.follow(target: @page_recording, root: @client, actor: @alice)
+    kept = RecordingStudioFollowable.follows(root: @client, actor: @alice).map(&:id)
+
+    [
+      RecordingStudioFollowable::Api::Actions::Follow,
+      RecordingStudioFollowable::Api::Actions::Unfollow
+    ].each do |action|
+      blank_root_id_params.each do |params|
+        assert_raises(RecordingStudioApi::InvalidActionInputError) do
+          action.call(api_action_context(params))
+        end
+      end
+    end
+
+    assert_equal kept, RecordingStudioFollowable.follows(root: @client, actor: @alice).map(&:id)
+    refute follow.recording_studio_trashable_trashed?
+
+    params = { "root_id" => @client.id }
+    first = RecordingStudioFollowable::Api::Actions::Follow.call(api_action_context(params))
+    second = RecordingStudioFollowable::Api::Actions::Follow.call(api_action_context(params))
+    assert_equal first[:id], second[:id]
+    assert_equal follow.id, first[:id]
+
+    trashed = RecordingStudioFollowable::Api::Actions::Unfollow.call(api_action_context(params))
+    assert_equal follow.id, trashed[:id]
+    again = RecordingStudioFollowable::Api::Actions::Unfollow.call(api_action_context(params))
+    assert_equal({ unfollowed: true }, again)
+    assert_empty RecordingStudioFollowable.follows(root: @client, actor: @alice)
+  end
+
   private
+
+  def blank_root_id_params
+    [
+      {},
+      { root_id: "" },
+      { "root_id" => "" },
+      { root_id: "  " },
+      { "root_id" => " \t" }
+    ]
+  end
+
+  def api_action_context(params)
+    Struct.new(:recording, :access_grant, :actor, :params).new(
+      @page_recording,
+      nil,
+      @alice,
+      params
+    )
+  end
 
   def users(email)
     User.find_or_create_by!(email: email) do |user|

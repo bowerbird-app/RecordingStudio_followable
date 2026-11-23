@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.3] - 2026-11-23
+
+### Fixed
+- `follow` and `unfollow` treat a blank or whitespace `root_id` as missing. The API returns 422 `invalid_input`. MCP reports a tool error. The recording lookup runs only when `root_id` is present.
+
+### Upgrade notes
+- Bump to `0.10.3`. No Followable migration.
+- A blank or whitespace `root_id` on `follow` or `unfollow` is invalid input. A workspace id is unchanged. Follow and unfollow stay idempotent.
+- `notify_followers` stays off HTTP and MCP.
+
 ## [0.10.2] - 2026-11-23
 
 ### Added
