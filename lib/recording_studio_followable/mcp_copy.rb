@@ -2,6 +2,7 @@
 
 require_relative "mcp_copy/naming"
 require_relative "mcp_copy/types"
+require_relative "mcp_copy/copy"
 
 module RecordingStudioFollowable
   # Named MCP tools for the follow actions. This gem does not depend on
@@ -21,7 +22,8 @@ module RecordingStudioFollowable
   # does not register again afterwards, and a second call here skips a name
   # that is already present.
   #
-  # override_openapi changes the title and description of that type's tool.
+  # Default tool text is McpCopy::Copy. override_openapi replaces that type's
+  # tool title and description. HTTP OpenAPI text is separate.
   # notify_followers stays off MCP.
   module McpCopy
     TARGET_ACTIONS = %i[follow unfollow followers].freeze
@@ -120,14 +122,12 @@ module RecordingStudioFollowable
     end
 
     def copy_for(action, type_name)
-      openapi = Api.openapi_for(type: type_name, action: action)
-      { title: openapi.fetch(:title), description: openapi.fetch(:description) }
+      Copy.for(action, type_name)
     end
 
     def protocol_input(action)
       input = { "id" => { description: TARGET_ID } }
-      field = followable_spec(action)&.dig(:fields, :root_id)
-      input["root_id"] = { description: field.fetch(:description) } if field
+      input["root_id"] = { description: Copy::ROOT_ID } if followable_spec(action)&.dig(:fields, :root_id)
       input
     end
 

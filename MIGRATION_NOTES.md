@@ -8,7 +8,7 @@ No Followable migration. The gemspec does not depend on Recording Studio MCP.
 
 Include `RecordingStudioFollowable::McpCopy.tool_names` on the MCP server. Pin MCP `~> 0.45.2`. Leave `capability_action` off that server when these named tools cover the follow actions. `notify_followers` stays off HTTP and MCP.
 
-`override_openapi` still sets the OpenAPI title and description for one type. MCP describe reads `openapi_for`. That type's named tool uses the same title and description.
+HTTP titles and descriptions for `follow`, `unfollow`, `followers`, and `follows` describe the request and response. MCP tools keep their own copy. `override_openapi` still sets the OpenAPI title and description for one type, and that type's named tool uses the override.
 
 Development Gemfiles pin API `v1.21.3` and MCP `v0.45.2`. The dummy also pins Oauth `v0.25.1` and Site Settings `v0.6.0`. Dummy security pins are Puma `>= 8.1.2`, net-ssh `>= 7.3.10`, rack-protection `>= 4.2.2`, Brakeman `8.1.1`, and Ruby `3.3.14`.
 

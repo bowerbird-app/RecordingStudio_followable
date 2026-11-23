@@ -72,7 +72,7 @@ end
 
 ## Per-type action copy
 
-`override_openapi` still sets the OpenAPI title and description for `follow`, `unfollow`, or `followers` on one recordable type. MCP describe reads that copy from `openapi_for(type:, action:)`. That type's named tool uses the same title and description. Summary, `root_id`, and the request body stay the shared copy. `notify_followers` stays off HTTP and MCP.
+`override_openapi` sets the OpenAPI title and description for `follow`, `unfollow`, or `followers` on one recordable type. That override replaces the shared HTTP title and description, and that type's named MCP tool uses the same title and description. Without an override, the HTTP description and the MCP description differ. Summary and `root_id` stay the shared HTTP copy. `notify_followers` stays off HTTP and MCP.
 
 Pass the recordable class name MCP sends as `recordable_type`. An unknown action name raises `ArgumentError`.
 

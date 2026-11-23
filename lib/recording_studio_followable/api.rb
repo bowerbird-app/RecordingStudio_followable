@@ -33,7 +33,8 @@ module RecordingStudioFollowable
         handler: Actions::Follows,
         input_contract: { reject_unknown: true, fields: {} },
         openapi: {
-          summary: "List follows stored in this workspace",
+          title: FOLLOWS_TITLE,
+          summary: FOLLOWS_SUMMARY,
           description: FOLLOWS_DESCRIPTION
         }
       )

@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Per-type Recording Studio MCP tools for types that include Followable: `follow_<type>`, `unfollow_<type>`, and `followers_<type>`. The suffix is that type's public snake_case name (`RecordingStudioMcp::ToolName`). The Follow recordable gets no tools. FollowParent roots get no `follows_<type>` tool, because that action lists Follow records. Typeless `follow`, `unfollow`, `followers`, and `follows` are not registered. They register from `Api.register!` when MCP is loaded, and do nothing when it is not. MCP stays an optional host gem (`~> 0.45.2`).
-- `follows` now has an OpenAPI description. The named MCP tool uses that same text.
+- `follows` has an OpenAPI title and description for HTTP callers. It is not an MCP tool.
 - A tool name that is already registered is left in place. Press Centers registers `follow_press_center` and `unfollow_press_center` for `PressCenter` after this gem, with the same type and action, so Press Centers keeps that copy. `followers_press_center` does not use Press Centers' `list_press_center_followers` name.
 
 ### Changed
@@ -22,7 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Bump to `0.10.2`. No Followable migration. The gemspec does not gain a Recording Studio MCP dependency.
 - Hosts that want the named tools pin Recording Studio MCP `~> 0.45.2` and include `RecordingStudioFollowable::McpCopy.tool_names` on the MCP server. Leave `capability_action` off that server when these tools cover follow. Leave typeless `follow`, `unfollow`, `followers`, and `follows` off that server.
 - `recording_studio_followable.register_api` runs before `:run_prepare_callbacks` (still before MCP `validate!`). `to_prepare` registers again once recordable classes are loaded. A name already registered is skipped, so Press Centers keeps `follow_press_center` and `unfollow_press_center` when it registered first. A host `to_prepare` block can include `McpCopy.tool_names`.
-- `override_openapi` still changes OpenAPI and MCP describe for one type, and that type's named tool uses the same title and description.
+- OpenAPI titles and descriptions for `follow`, `unfollow`, `followers`, and `follows` describe the HTTP method, path, body, 200 response, and 403, 404, and 422 errors. MCP tools keep their own copy. A host `override_openapi` still replaces that type's HTTP title and description, and that type's named tool uses the override.
 - `notify_followers` stays off HTTP and MCP.
 
 ## [0.10.1] - 2026-11-20

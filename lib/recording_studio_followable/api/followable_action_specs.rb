@@ -6,10 +6,9 @@ module RecordingStudioFollowable
       type: :string,
       required: true,
       description:
-        "The id of the workspace that holds this follow. " \
-        "Use that workspace's id from list or show, or the id returned when the workspace was created. " \
-        "A recording under a workspace is accepted and the follow is stored on that workspace. " \
-        "A missing or trashed id is rejected as not found."
+        "Recording id of the workspace that stores the follow. " \
+        "A recording under that workspace is accepted and the follow is stored on the workspace. " \
+        "A missing or trashed id is 404 not_found."
     }.freeze
 
     FOLLOWABLE_ACTION_SPECS = [
@@ -17,58 +16,60 @@ module RecordingStudioFollowable
         name: :follow,
         http_verb: :post,
         handler: Actions::Follow,
-        title: "Follow",
-        summary: "Follow this recording from a workspace.",
+        title: "Follow a recording",
+        summary: "Create a follow from a workspace.",
         description:
-          "A follow is a record under a workspace that points at this recording, so people in that " \
-          "workspace can keep up with it. Run this on the recording you want to follow, not on a follow. " \
-          "The recording must already exist and not be in the trash. Pass root_id as the workspace id " \
-          "that should hold the follow. Use that workspace's id from list or show, or the id returned " \
-          "when the workspace was created. A missing or trashed root_id is rejected as not found. A " \
-          "blank root_id is rejected. You cannot follow a follow. If this recording is not visible to " \
-          "you, the call is rejected. If that workspace already follows this recording, the call " \
-          "succeeds and nothing changes. Returns the follow, with id, type, root_id, parent_id, and " \
-          "target_id.",
+          "POST /api/v1/{resource}/{id}/actions/follow. Path id is the recording. " \
+          "JSON body requires root_id, the workspace recording id that stores the follow. " \
+          "200 returns the follow as id, type, root_id, parent_id, and target_id, " \
+          "including when that workspace already follows it. " \
+          "403 is error code forbidden when the caller cannot see the recording. " \
+          "404 is error code not_found when the path id or root_id is missing or trashed. " \
+          "422 is error code invalid_input when root_id is omitted or the body has an unknown field.",
         fields: { root_id: ROOT_ID_FIELD }
       },
       {
         name: :unfollow,
         http_verb: :post,
         handler: Actions::Unfollow,
-        title: "Unfollow",
-        summary: "Stop following this recording from a workspace.",
+        title: "Unfollow a recording",
+        summary: "Trash the follow from a workspace.",
         description:
-          "Unfollowing trashes the follow under that workspace that points at this recording. The " \
-          "recording itself stays. Run this on the recording you followed, not on the follow. Pass " \
-          "root_id as the workspace id that holds the follow. Use that workspace's id from list or " \
-          "show, or the id returned when the workspace was created. A missing or trashed root_id is " \
-          "rejected as not found. A blank root_id is rejected. If that workspace is not following " \
-          "this recording, the call succeeds and returns unfollowed true. If it is following, the " \
-          "follow is trashed and the call returns that follow, with id, type, root_id, parent_id, " \
-          "and target_id.",
+          "POST /api/v1/{resource}/{id}/actions/unfollow. Path id is the followed recording. " \
+          "JSON body requires root_id, the workspace recording id that holds the follow. " \
+          "200 returns the trashed follow as id, type, root_id, parent_id, and target_id, " \
+          "or unfollowed true when that workspace is not following. " \
+          "403 is error code forbidden when the caller cannot see the recording. " \
+          "404 is error code not_found when the path id or root_id is missing or trashed. " \
+          "422 is error code invalid_input when root_id is omitted or the body has an unknown field.",
         fields: { root_id: ROOT_ID_FIELD }
       },
       {
         name: :followers,
         http_verb: :get,
         handler: Actions::Followers,
-        title: "Followers",
-        summary: "List the follows that point at this recording.",
+        title: "List recording followers",
+        summary: "List follows that point at a recording.",
         description:
-          "Each item is a follow stored under a workspace that points at this recording. Run this on " \
-          "the recording whose follows you want. The recording must already exist. Calling again " \
-          "returns the current list. When nobody is following, the list is empty. Returns an array " \
-          "of follows, each with id, type, root_id, parent_id, and target_id.",
+          "GET /api/v1/{resource}/{id}/actions/followers. Path id is the recording. No request body. " \
+          "200 returns an array of follows that point at it, each with id, type, root_id, parent_id, and target_id. " \
+          "The array is empty when nobody is following. " \
+          "403 is error code forbidden when the caller cannot see the recording. " \
+          "404 is error code not_found when the path id is missing or trashed. " \
+          "422 is error code invalid_input when the request has an unknown field.",
         fields: {}
       }
     ].freeze
 
-    # Shared by the follows API action and the typeless follows MCP tool.
+    # HTTP description for the follows action. MCP does not register this action.
     FOLLOWS_DESCRIPTION =
-      "Each item is a follow stored under this workspace. The follow points at a recording " \
-      "people in that workspace want to keep up with. Run this on the workspace, not on the " \
-      "followed recording and not on a follow. The workspace must already exist. Calling again " \
-      "returns the current list. When this workspace follows nothing, the list is empty. " \
-      "Returns an array of follows, each with id, type, root_id, parent_id, and target_id."
+      "GET /api/v1/{resource}/{id}/actions/follows. Path id is the workspace. No request body. " \
+      "200 returns an array of follows stored there, each with id, type, root_id, parent_id, and target_id. " \
+      "The array is empty when the workspace follows nothing. " \
+      "403 is error code forbidden when the caller cannot see the workspace. " \
+      "404 is error code not_found when the path id is missing or trashed. " \
+      "422 is error code invalid_input when the request has an unknown field."
+    FOLLOWS_TITLE = "List workspace follows"
+    FOLLOWS_SUMMARY = "List follows stored on a workspace."
   end
 end
