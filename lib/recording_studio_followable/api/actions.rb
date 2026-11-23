@@ -37,7 +37,10 @@ module RecordingStudioFollowable
 
         def self.root_id_from(context)
           params = context.params || {}
-          params[:root_id].presence || params["root_id"]
+          root_id = params[:root_id].presence || params["root_id"].presence
+          return root_id if root_id
+
+          raise RecordingStudioApi::InvalidActionInputError, "root_id is required"
         end
       end
 

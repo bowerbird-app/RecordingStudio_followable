@@ -25,7 +25,7 @@ module RecordingStudioFollowable
           "including when that workspace already follows it. " \
           "403 is error code forbidden when the caller cannot see the recording. " \
           "404 is error code not_found when the path id or root_id is missing or trashed. " \
-          "422 is error code invalid_input when root_id is omitted or the body has an unknown field.",
+          "422 is error code invalid_input when root_id is omitted, blank, or the body has an unknown field.",
         fields: { root_id: ROOT_ID_FIELD }
       },
       {
@@ -41,7 +41,7 @@ module RecordingStudioFollowable
           "or unfollowed true when that workspace is not following. " \
           "403 is error code forbidden when the caller cannot see the recording. " \
           "404 is error code not_found when the path id or root_id is missing or trashed. " \
-          "422 is error code invalid_input when root_id is omitted or the body has an unknown field.",
+          "422 is error code invalid_input when root_id is omitted, blank, or the body has an unknown field.",
         fields: { root_id: ROOT_ID_FIELD }
       },
       {
