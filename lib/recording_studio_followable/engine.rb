@@ -129,10 +129,17 @@ module RecordingStudioFollowable
       end
     end
 
-    # Recording Studio MCP runs catalog validate! in config.after_initialize,
-    # which Rails fires from :finisher_hook. Register capability actions before that.
-    initializer "recording_studio_followable.register_api", before: :finisher_hook do
+    # Recording Studio MCP runs catalog validate! from :finisher_hook. Register
+    # the API actions before :run_prepare_callbacks. Append tool registration to
+    # to_prepare from this initializer so it runs after other engines (Press
+    # Centers registers list_press_center_followers there) and before a host
+    # initializer's to_prepare includes the names. A type and action already
+    # in configuration.tools is skipped, whatever its name is.
+    initializer "recording_studio_followable.register_api", before: :run_prepare_callbacks do |app|
       RecordingStudioFollowable::Api.register!
+      app.config.to_prepare do
+        RecordingStudioFollowable::McpCopy.register!
+      end
     end
 
     config.to_prepare do

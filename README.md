@@ -44,11 +44,35 @@ include RecordingStudio::Capabilities::FollowParent.to
 5. Let Accessible `:view` on the follow root create and trash Follows. Dummy `authorize_write` treats Follow creates as `:view`. Trashable on Follow also uses `:view`.
 6. Mount the engine (`generate recording_studio_followable:install` does this). Then render `follow_button(recording)` on a host page. The helper uses the current root and actor, and the button updates in place over Turbo. Without JavaScript it redirects back. The Following page is `GET` on the mount's `/follows`. Set `config.current_root` to the open workspace (dummy uses `current_root_recording`). `follow_target_url(recording)` is the path for a followed item. It uses `polymorphic_path` on the recordable. Set `config.followed_url` when the host path is different. `config.page_size` (default 25) is the Following page slice. `FlatPack::PaginationInfinite` fetches the next slice as you scroll. See Button look to change the style, icon, or label.
 7. Register a Notifications type with `scope: :root` before you call `notify_followers`. Dummy registers `:followed_update`.
-8. Register the followed type and the root type with Recording Studio API so `follow`, `unfollow`, `followers`, and `follows` appear. Do not register `notify_followers`. This gem registers those capability actions in `recording_studio_followable.register_api` before Rails `:finisher_hook`, so they exist when `after_initialize` runs (including Recording Studio MCP catalog `validate!`). Recording Studio MCP exposes the same capability actions once the host pins a MCP gem that accepts your API version. MCP 0.28.0 still requires API `< 0.18`, so this dummy pins API `v1.21.2` without MCP. `follow`, `unfollow`, and `followers` carry titles, summaries, action text, and `root_id` field descriptions for those MCP pages.
+8. Register the followed type and the root type with Recording Studio API so `follow`, `unfollow`, `followers`, and `follows` appear. Do not register `notify_followers`. This gem registers those capability actions in `recording_studio_followable.register_api` before Rails `:finisher_hook`, so they exist when `after_initialize` runs (including Recording Studio MCP catalog `validate!`).
+
+## Named MCP tools
+
+Recording Studio MCP is optional. This gem does not depend on it. When the host loads MCP `~> 0.45.2` (0.45.x, below 0.46), `Api.register!` registers tools only for types that include Followable. The suffix is that type's public snake_case name from its API registration, the same name `RecordingStudioMcp::ToolName` builds.
+
+| Tool | Action | Run it on |
+| --- | --- | --- |
+| `follow_<type>` | `follow` | That followable type. Pass `root_id` for the workspace that stores the follow. |
+| `unfollow_<type>` | `unfollow` | That followable type. Pass `root_id` for the workspace that holds the follow. |
+| `followers_<type>` | `followers` | That followable type. |
+
+A Page with public name `Page` gets `follow_page`, `unfollow_page`, and `followers_page`. The Follow recordable gets no tools. FollowParent roots get no `follows_<type>` tool, because that action lists Follow records. Typeless `follow`, `unfollow`, `followers`, and `follows` are not registered.
+
+Names come from `RecordingStudioMcp::ToolName`. A type and action already in `RecordingStudioMcp.configuration.tools` is skipped, whatever name it uses. Press Centers registers `follow_press_center`, `unfollow_press_center`, and `list_press_center_followers` for PressCenter. This gem does not add `followers_press_center` when that followers tool is already registered. Tool registration is appended to `to_prepare` from `register_api`, after other engines.
+
+Include the names on the MCP server. Leave `capability_action` off that server when these named tools cover the follow actions. `notify_followers` stays off HTTP and MCP.
+
+```ruby
+RecordingStudioMcp.register_server(:public, api: :public) do
+  include_tools(*RecordingStudioFollowable::McpCopy.tool_names)
+end
+```
+
+`follow` and `unfollow` change data. The recording must already exist. `follow` also refuses a recording in the trash, a follow, and a recording you cannot see. Pass `root_id` as the workspace id from list or show. A missing or trashed workspace is rejected as not found. Calling `follow` again when that workspace already follows the recording returns the same follow. `unfollow` on a workspace that is not following returns `unfollowed: true`.
 
 ## Per-type action copy
 
-MCP 0.36.5 reads a per-type title and description from `openapi_for(type:, action:)` on `follow`, `unfollow`, and `followers`. Set that copy for one recordable type. Every other type keeps the shared titles Follow, Unfollow, and Followers. Summary, `root_id`, and the request body stay the shared copy. `follows` keeps its shared summary. `notify_followers` stays off HTTP and MCP.
+`override_openapi` sets the OpenAPI title and description for `follow`, `unfollow`, or `followers` on one recordable type. That override replaces the shared HTTP title and description, and that type's named MCP tool uses the same title and description. Without an override, the HTTP description and the MCP description differ. Summary and `root_id` stay the shared HTTP copy. `notify_followers` stays off HTTP and MCP.
 
 Pass the recordable class name MCP sends as `recordable_type`. An unknown action name raises `ArgumentError`.
 

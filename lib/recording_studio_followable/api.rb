@@ -9,6 +9,7 @@ end
 require "recording_studio_followable/api/actions"
 require "recording_studio_followable/api/followable_action_specs"
 require "recording_studio_followable/api/openapi_overrides"
+require "recording_studio_followable/mcp_copy"
 
 module RecordingStudioFollowable
   module Api
@@ -32,9 +33,13 @@ module RecordingStudioFollowable
         handler: Actions::Follows,
         input_contract: { reject_unknown: true, fields: {} },
         openapi: {
-          summary: "List follows stored in this workspace"
+          title: FOLLOWS_TITLE,
+          summary: FOLLOWS_SUMMARY,
+          description: FOLLOWS_DESCRIPTION
         }
       )
+
+      McpCopy.register!
     end
 
     def register_followable_action(spec)

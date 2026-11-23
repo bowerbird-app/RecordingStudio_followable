@@ -31,23 +31,23 @@ class FollowableOpenapiOverrideTest < ActiveSupport::TestCase
     assert_equal "Follow press center", overridden.fetch(:title)
     assert_equal "Follow this press center from a workspace.", overridden.fetch(:description)
     assert_equal follow.openapi.fetch(:summary), overridden.fetch(:summary)
-    assert_equal "Follow", follow.openapi.fetch(:title)
+    assert_equal "Follow a recording", follow.openapi.fetch(:title)
     request_root = overridden.dig(:request_body, :content, :"application/json", :schema, :properties, :root_id)
-    assert_includes request_root.fetch(:description), "rejected as not found"
+    assert_includes request_root.fetch(:description), "404 not_found"
 
     page = follow.openapi_for(type: "Page", action: :follow)
-    assert_equal "Follow", page.fetch(:title)
+    assert_equal "Follow a recording", page.fetch(:title)
 
     followers = RecordingStudioApi.capability_action(:followers).openapi_for(type: PRESS_CENTER, action: :followers)
-    assert_equal "Followers", followers.fetch(:title)
+    assert_equal "List recording followers", followers.fetch(:title)
 
     follows = RecordingStudioApi.capability_action(:follows).openapi_for(type: PRESS_CENTER, action: :follows)
-    assert_equal "List follows stored in this workspace", follows.fetch(:summary)
-    assert_nil follows[:title]
+    assert_equal "List follows stored on a workspace.", follows.fetch(:summary)
+    assert_equal "List workspace follows", follows.fetch(:title)
 
     RecordingStudioFollowable::Api::OpenapiOverrides.reset!
     restored = follow.openapi_for(type: PRESS_CENTER, action: :follow)
-    assert_equal "Follow", restored.fetch(:title)
-    assert_includes restored.fetch(:description), "Pass root_id"
+    assert_equal "Follow a recording", restored.fetch(:title)
+    assert_includes restored.fetch(:description), "POST /api/v1/{resource}/{id}/actions/follow"
   end
 end

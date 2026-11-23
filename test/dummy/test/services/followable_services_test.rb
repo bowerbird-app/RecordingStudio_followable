@@ -259,33 +259,43 @@ class FollowableServicesTest < ActiveSupport::TestCase
     assert_includes workspace_actions, :follows
   end
 
-  test "follow unfollow and followers expose this gem's MCP copy" do
+  test "follow unfollow followers and follows describe the HTTP API" do
     specs = RecordingStudioFollowable::Api::FOLLOWABLE_ACTION_SPECS.to_h { |spec| [ spec.fetch(:name), spec ] }
+    mcp = RecordingStudioFollowable::McpCopy::Copy::DESCRIPTIONS
 
     follow = RecordingStudioApi.capability_action(:follow)
     follow_spec = specs.fetch(:follow)
-    assert_equal "Follow", follow.openapi.fetch(:title)
+    assert_equal "Follow a recording", follow.openapi.fetch(:title)
     assert_equal follow_spec.fetch(:summary), follow.openapi.fetch(:summary)
-    assert_includes follow.openapi.fetch(:description), "Pass root_id"
-    assert_includes follow.openapi.fetch(:description), "cannot follow a follow"
-    assert_includes follow.openapi.fetch(:description), "already follows this recording"
-    assert_includes follow.openapi.fetch(:description), "Returns the follow"
+    assert_includes follow.openapi.fetch(:description), "POST /api/v1/{resource}/{id}/actions/follow"
+    assert_includes follow.openapi.fetch(:description), "200 returns the follow"
+    assert_includes follow.openapi.fetch(:description), "403 is error code forbidden"
+    assert_includes follow.openapi.fetch(:description), "404 is error code not_found"
+    assert_includes follow.openapi.fetch(:description), "422 is error code invalid_input"
+    refute_equal mcp.fetch(:follow), follow.openapi.fetch(:description)
     root_id = follow.input_contract.as_json.fetch(:fields).fetch(:root_id)
-    assert_includes root_id.fetch(:description), "workspace's id from list or show"
+    assert_includes root_id.fetch(:description), "404 not_found"
     request_root = follow.openapi.dig(:request_body, :content, :"application/json", :schema, :properties, :root_id)
-    assert_includes request_root.fetch(:description), "rejected as not found"
+    assert_includes request_root.fetch(:description), "404 not_found"
 
     unfollow = RecordingStudioApi.capability_action(:unfollow)
-    assert_equal "Unfollow", unfollow.openapi.fetch(:title)
+    assert_equal "Unfollow a recording", unfollow.openapi.fetch(:title)
     assert_includes unfollow.openapi.fetch(:description), "unfollowed true"
-    assert_includes unfollow.openapi.fetch(:description), "If it is following"
+    assert_includes unfollow.openapi.fetch(:description), "POST /api/v1/{resource}/{id}/actions/unfollow"
+    refute_equal mcp.fetch(:unfollow), unfollow.openapi.fetch(:description)
 
     followers = RecordingStudioApi.capability_action(:followers)
-    assert_equal "Followers", followers.openapi.fetch(:title)
-    assert_includes followers.openapi.fetch(:description), "list is empty"
-    assert_includes followers.openapi.fetch(:description), "Calling again"
+    assert_equal "List recording followers", followers.openapi.fetch(:title)
+    assert_includes followers.openapi.fetch(:description), "GET /api/v1/{resource}/{id}/actions/followers"
+    assert_includes followers.openapi.fetch(:description), "array is empty"
+    refute_equal mcp.fetch(:followers), followers.openapi.fetch(:description)
 
-    [ follow, unfollow, followers ].each do |action|
+    follows = RecordingStudioApi.capability_action(:follows)
+    assert_equal "List workspace follows", follows.openapi.fetch(:title)
+    assert_includes follows.openapi.fetch(:description), "GET /api/v1/{resource}/{id}/actions/follows"
+    refute_includes follows.openapi.fetch(:description), "Run this on the workspace"
+
+    [ follow, unfollow, followers, follows ].each do |action|
       fields = action.input_contract.as_json.fetch(:fields)
       blob = [
         action.openapi[:title],

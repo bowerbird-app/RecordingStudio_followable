@@ -12,7 +12,8 @@ RecordingStudio.configure do |config|
     "RecordingStudioFollowable::Follow",
     "RecordingStudioUser::People",
     "RecordingStudioUser::Profile",
-    "RecordingStudioAttachable::Attachment"
+    "RecordingStudioAttachable::Attachment",
+    "RecordingStudioSiteSettings::SiteSetting"
   ]
 
   config.require_recordable_declarations = true

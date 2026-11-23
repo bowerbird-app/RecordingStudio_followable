@@ -4,7 +4,7 @@ require "test_helper"
 
 class RecordingStudioFollowableTest < Minitest::Test
   def test_version_matches_release
-    assert_equal "0.10.1", ::RecordingStudioFollowable::VERSION
+    assert_equal "0.10.2", ::RecordingStudioFollowable::VERSION
   end
 
   def test_engine_exists
@@ -62,10 +62,17 @@ class RecordingStudioFollowableTest < Minitest::Test
     assert_gem_pin gemfile, "recording_studio_moveable", "~> 6.1", "bowerbird-app/RecordingStudio_moveable", "v6.1.0"
     assert_gem_pin gemfile, "recording_studio_attachable", "~> 0.34",
                    "bowerbird-app/RecordingStudio_attachable", "v0.34.0"
-    assert_gem_pin gemfile, "recording_studio_api", "~> 1.21", "bowerbird-app/RecordingStudio_api", "v1.21.2"
+    assert_gem_pin gemfile, "recording_studio_api", "~> 1.21", "bowerbird-app/RecordingStudio_api", "v1.21.3"
+    assert_gem_pin gemfile, "recording_studio_mcp", "~> 0.45.2", "bowerbird-app/RecordingStudio_MCP", "v0.45.2"
+    assert_includes gemfile,
+                    'gem "recording_studio_oauth", github: "bowerbird-app/RecordingStudio_Oauth", tag: "v0.25.1"'
+    site_settings = 'gem "recording_studio_site_settings", ' \
+                    'github: "bowerbird-app/RecordingStudio_site_settings", tag: "v0.6.0"'
+    assert_includes gemfile, site_settings
     assert_gem_pin gemfile, "recording_studio_admin", "~> 2.20", "bowerbird-app/RecordingStudio_admin", "v2.20.0"
     assert_gem_pin gemfile, "recording_studio_user", "~> 0.41", "bowerbird-app/RecordingStudio_users", "v0.41.0"
     assert_gem_pin gemfile, "flat_pack", "~> 0.2", "bowerbird-app/flatpack", "v0.2.0"
+    assert_includes gemfile, 'gem "rack-protection", ">= 4.2.2"'
     refute_includes gemfile, 'branch: "main"'
     refute_match(/ref:\s*"/, gemfile)
     refute_includes gemfile, 'tag: "v4.7.1"'
@@ -76,7 +83,8 @@ class RecordingStudioFollowableTest < Minitest::Test
     assert_gem_pin root_gemfile, "recording_studio", "~> 7.8", "bowerbird-app/RecordingStudio", "v7.8.0"
     assert_gem_pin root_gemfile, "recording_studio_accessible", "~> 0.58",
                    "bowerbird-app/RecordingStudio_accessible", "v0.58.0"
-    assert_gem_pin root_gemfile, "recording_studio_api", "~> 1.21", "bowerbird-app/RecordingStudio_api", "v1.21.2"
+    assert_gem_pin root_gemfile, "recording_studio_api", "~> 1.21", "bowerbird-app/RecordingStudio_api", "v1.21.3"
+    assert_gem_pin root_gemfile, "recording_studio_mcp", "~> 0.45.2", "bowerbird-app/RecordingStudio_MCP", "v0.45.2"
     assert_gem_pin root_gemfile, "recording_studio_icons", "~> 0.5", "bowerbird-app/RecordingStudio_icons", "v0.5.0"
     assert_gem_pin root_gemfile, "recording_studio_logs", "~> 0.9", "bowerbird-app/RecordingStudio_logs", "v0.9.0"
     assert_gem_pin root_gemfile, "recording_studio_metrics", "~> 0.10",

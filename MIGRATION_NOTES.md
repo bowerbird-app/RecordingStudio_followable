@@ -1,5 +1,17 @@
 # Development notes
 
+## Host upgrade to 0.10.2
+
+No Followable migration. The gemspec does not depend on Recording Studio MCP.
+
+`recording_studio_followable.register_api` runs before `:run_prepare_callbacks`, which runs before `:finisher_hook`. `Api.register!` registers the API actions and, when MCP is loaded, tools only for types that include Followable: `follow_<type>`, `unfollow_<type>`, and `followers_<type>`. The suffix is the type's public snake_case name. The Follow recordable gets no tools. FollowParent roots get no `follows_<type>` tool, because that action lists Follow records. Typeless `follow`, `unfollow`, `followers`, and `follows` are not registered. `register_api` appends a `to_prepare` block that registers tools after other engines. A type and action already in `RecordingStudioMcp.configuration.tools` is skipped, whatever name it uses. Press Centers' `list_press_center_followers` covers PressCenter followers, so `followers_press_center` is not added. A host initializer `to_prepare` can include the tool names.
+
+Include `RecordingStudioFollowable::McpCopy.tool_names` on the MCP server. Pin MCP `~> 0.45.2`. Leave `capability_action` off that server when these named tools cover the follow actions. `notify_followers` stays off HTTP and MCP.
+
+HTTP titles and descriptions for `follow`, `unfollow`, `followers`, and `follows` describe the request and response. MCP tools keep their own copy. `override_openapi` still sets the OpenAPI title and description for one type, and that type's named tool uses the override.
+
+Development Gemfiles pin API `v1.21.3` and MCP `v0.45.2`. The dummy also pins Oauth `v0.25.1` and Site Settings `v0.6.0`. Dummy security pins are Puma `>= 8.1.2`, net-ssh `>= 7.3.10`, rack-protection `>= 4.2.2`, Brakeman `8.1.1`, and Ruby `3.3.14`.
+
 ## Host upgrade to 0.10.1
 
 No Followable migration. The engine registers Followable API capability actions (`RecordingStudioFollowable::Api.register!`) from `recording_studio_followable.register_api` before `:finisher_hook`. That runs before Rails `after_initialize` callbacks, including Recording Studio MCP catalog `validate!`. Calling `register!` more than once is a no-op for actions already present.
