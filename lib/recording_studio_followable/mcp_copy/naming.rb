@@ -7,9 +7,7 @@ module RecordingStudioFollowable
       module_function
 
       def tool_name(action, type_name)
-        return ::RecordingStudioMcp::ToolName.call(type_name, action) if defined?(::RecordingStudioMcp::ToolName)
-
-        "#{action}_#{type_snake(type_name)}"
+        ::RecordingStudioMcp::ToolName.call(type_name, action)
       end
 
       def types_for(capability)
@@ -28,24 +26,6 @@ module RecordingStudioFollowable
         return unless config.respond_to?(:recordable_types)
 
         Array(config.recordable_types).each { |type_name| type_name.to_s.safe_constantize }
-      end
-
-      def type_snake(type_name)
-        public_type_name(type_name).underscore.singularize
-      end
-
-      def public_type_name(type_name)
-        registered = registered_public_name(type_name)
-        return registered if registered.present?
-
-        type_name.to_s.demodulize
-      end
-
-      def registered_public_name(type_name)
-        return unless defined?(::RecordingStudioApi)
-        return unless ::RecordingStudioApi.respond_to?(:recordable_registration_for)
-
-        ::RecordingStudioApi.recordable_registration_for(type_name, api: :public)&.public_name
       end
     end
   end

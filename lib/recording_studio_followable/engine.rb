@@ -130,23 +130,22 @@ module RecordingStudioFollowable
     end
 
     # Recording Studio MCP runs catalog validate! from :finisher_hook. Register
-    # the API actions and per-type tools before :run_prepare_callbacks so a host
-    # to_prepare block can include those tools, and before validate!. A later
-    # register of the same name, type, and action (Press Centers' follow_press_center)
-    # keeps that gem's copy. This initializer does not register again after that.
-    initializer "recording_studio_followable.register_api", before: :run_prepare_callbacks do
+    # the API actions before :run_prepare_callbacks. Append tool registration to
+    # to_prepare from this initializer so it runs after other engines (Press
+    # Centers registers list_press_center_followers there) and before a host
+    # initializer's to_prepare includes the names. A type and action already
+    # in configuration.tools is skipped, whatever its name is.
+    initializer "recording_studio_followable.register_api", before: :run_prepare_callbacks do |app|
       RecordingStudioFollowable::Api.register!
+      app.config.to_prepare do
+        RecordingStudioFollowable::McpCopy.register!
+      end
     end
 
     config.to_prepare do
       engine_root = RecordingStudioFollowable::Engine.root
       load engine_root.join("lib/recording_studio_followable/capabilities/followable.rb")
       load engine_root.join("lib/recording_studio_followable/capabilities/follow_parent.rb")
-      # Models are loadable here. The earlier register_api pass can run before
-      # those classes exist, so register the per-type tools again. A name that
-      # is already present is skipped, which leaves Press Centers' copy in place
-      # when that gem registered first.
-      RecordingStudioFollowable::McpCopy.register!
     end
   end
 end

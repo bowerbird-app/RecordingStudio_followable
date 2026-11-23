@@ -3,6 +3,7 @@
 require_relative "mcp_copy/naming"
 require_relative "mcp_copy/types"
 require_relative "mcp_copy/copy"
+require_relative "mcp_copy/registry"
 
 module RecordingStudioFollowable
   # Named MCP tools for the follow actions. This gem does not depend on
@@ -15,12 +16,10 @@ module RecordingStudioFollowable
   # roots get no follows_<type> tool: that action lists Follow records.
   # Typeless follow, unfollow, followers, and follows are not registered.
   #
-  # A name another gem already registered is left alone. Press Centers
-  # registers follow_press_center and unfollow_press_center for PressCenter
-  # on to_prepare, after this gem's early register. That later register is
-  # the same type and action, so Press Centers keeps its copy. This gem
-  # does not register again afterwards, and a second call here skips a name
-  # that is already present.
+  # A type and action another gem already registered is left alone, whatever
+  # name they used. Press Centers registers list_press_center_followers for
+  # PressCenter followers, so this gem does not also register
+  # followers_press_center. configuration.tools is the public registry.
   #
   # Default tool text is McpCopy::Copy. override_openapi replaces that type's
   # tool title and description. HTTP OpenAPI text is separate.
@@ -61,14 +60,14 @@ module RecordingStudioFollowable
     end
 
     def register_entry(entry)
-      Types.register_type_for(entry.fetch(:type))
-      return if tool_taken?(entry.fetch(:name))
+      return if action_registered?(entry)
 
+      Types.register_type_for(entry.fetch(:type))
       mcp.register_tool(**tool_registration(entry))
     end
 
     def tool_names
-      tool_entries.map { |entry| entry.fetch(:name) }
+      tool_entries.reject { |entry| owned_by_another_tool?(entry) }.map { |entry| entry.fetch(:name) }
     end
 
     def tool_entries
@@ -112,13 +111,12 @@ module RecordingStudioFollowable
       }
     end
 
-    def tool_taken?(name)
-      return false unless mcp.respond_to?(:configuration)
+    def action_registered?(entry)
+      Registry.action_registered?(entry)
+    end
 
-      config = mcp.configuration
-      return false unless config.respond_to?(:tool)
-
-      !config.tool(name).nil?
+    def owned_by_another_tool?(entry)
+      Registry.owned_by_another_tool?(entry)
     end
 
     def copy_for(action, type_name)

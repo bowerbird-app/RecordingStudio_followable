@@ -8,7 +8,6 @@ module RecordingStudioFollowable
 
       def api_actions_ready?
         return true unless defined?(::RecordingStudioMcp)
-        return true unless McpCopy.mcp.equal?(::RecordingStudioMcp)
         return true unless defined?(::RecordingStudioApi)
         return true unless ::RecordingStudioApi.respond_to?(:capability_action)
 
@@ -32,9 +31,10 @@ module RecordingStudioFollowable
       end
 
       def type_description(type_name)
-        label = Naming.public_type_name(type_name)
-        snake = Naming.type_snake(type_name)
-        "#{label} can be followed. follow_#{snake} starts a follow from a workspace."
+        follow = ::RecordingStudioMcp::ToolName.call(type_name, :follow)
+        unfollow = ::RecordingStudioMcp::ToolName.call(type_name, :unfollow)
+        followers = ::RecordingStudioMcp::ToolName.call(type_name, :followers)
+        "#{follow} starts a follow from a workspace. #{unfollow} stops it. #{followers} lists who follows."
       end
     end
   end
