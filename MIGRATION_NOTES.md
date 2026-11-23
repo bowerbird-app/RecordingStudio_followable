@@ -10,7 +10,7 @@ Include `RecordingStudioFollowable::McpCopy.tool_names` on the MCP server. Pin M
 
 `override_openapi` still sets the OpenAPI title and description for one type. MCP describe reads `openapi_for`. The named tools keep the shared description.
 
-Development Gemfiles pin API `v1.21.3` and MCP `v0.45.2`. The dummy also pins Oauth `v0.25.1` and Site Settings `v0.6.0`. Dummy security pins are Puma `>= 8.1.2`, net-ssh `>= 7.3.10`, Brakeman `8.1.1`, and Ruby `3.3.14`.
+Development Gemfiles pin API `v1.21.3` and MCP `v0.45.2`. The dummy also pins Oauth `v0.25.1` and Site Settings `v0.6.0`. Dummy security pins are Puma `>= 8.1.2`, net-ssh `>= 7.3.10`, rack-protection `>= 4.2.2`, Brakeman `8.1.1`, and Ruby `3.3.14`.
 
 ## Host upgrade to 0.10.1
 

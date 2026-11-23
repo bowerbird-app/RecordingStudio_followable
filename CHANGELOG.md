@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Development Gemfiles pin API `v1.21.3` and MCP `v0.45.2`. The dummy also pins Oauth `v0.25.1` and Site Settings `v0.6.0`, and registers `RecordingStudioSiteSettings::SiteSetting` so declaration checks pass.
-- Dummy security pins: Puma `>= 8.1.2`, net-ssh `>= 7.3.10`, Brakeman `8.1.1`, and `.ruby-version` `3.3.14`.
+- Dummy security pins: Puma `>= 8.1.2`, net-ssh `>= 7.3.10`, rack-protection `>= 4.2.2`, Brakeman `8.1.1`, and `.ruby-version` `3.3.14`.
 
 ### Upgrade notes
 - Bump to `0.10.2`. No Followable migration. The gemspec does not gain a Recording Studio MCP dependency.

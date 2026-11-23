@@ -72,6 +72,7 @@ class RecordingStudioFollowableTest < Minitest::Test
     assert_gem_pin gemfile, "recording_studio_admin", "~> 2.20", "bowerbird-app/RecordingStudio_admin", "v2.20.0"
     assert_gem_pin gemfile, "recording_studio_user", "~> 0.41", "bowerbird-app/RecordingStudio_users", "v0.41.0"
     assert_gem_pin gemfile, "flat_pack", "~> 0.2", "bowerbird-app/flatpack", "v0.2.0"
+    assert_includes gemfile, 'gem "rack-protection", ">= 4.2.2"'
     refute_includes gemfile, 'branch: "main"'
     refute_match(/ref:\s*"/, gemfile)
     refute_includes gemfile, 'tag: "v4.7.1"'
